@@ -1,0 +1,29 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.6
+Creation-Date: 2023-11-24T14:27:00-07:00
+
+====== Action ======
+Created Friday 24 November 2023
+
+{Thrust, Parry, Feint} forms an imperfect RPS triangle with respect to both timing and spacing. Smash Melee has several mechanics that break or reverse this triangle, or cases in which (due to e.g. spacing or move properties) rock beats both paper and scissors. 
+
+The following table contains examples of 
+| situation | Thrust                    | Parry               | Feint           |
+|:----------|:--------------------------|:--------------------|:----------------|
+|           |                           |                     |                 |
+|           |                           | SDI and slideoff DI | empty landing   |
+|           | nair at opponent position | crouch              | undershoot nair |
+|           | run up grab               |                     |                 |
+
+
+A Thrust (a.k.a. attack) is an action presenting an immediate threat. It should lead to an expected gain if the opponent chooses no action at all. 
+
+A Parry (a.k.a. counterattack) is an action representing a direct answer to a Thrust. It should lead to an expected gain if the opponent uses a Thrust-type action with a predictable timing.
+
+A Feint (a.k.a. bait) is an action meant to incite the opponent to Parry. 
+
+Most play in melee (across most levels of play) 
+
+TODO: watch a video of play and see if this simplified framework is usable;
+identify the cases when it's not!!
+

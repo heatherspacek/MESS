@@ -1,0 +1,21 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.6
+Creation-Date: 2023-11-24T14:48:57-07:00
+
+====== Asynchronicity ======
+Created Friday 24 November 2023
+
+[This page is for explaining the limitations of the [[../Action.txt]] page.]
+
+Because a Thrust action is defined as "leading to gain in the absence of any response from the opponent," and there are many occasions in which a player cannot be said to be clearly engaging any one of {Thrust, Parry, Feint}, the asynchonicity of the game leads to a natural imbalance-- in a naive environment, Thrust is valued the highest. This self-balances slightly because players are then encouraged to 
+
+Here is an example table encoding the time-balance of actions in a low-level, mid-level, and high-level match.
+| match              | thrust time | parry time | feint time | None time | # of thrusts | # of parries | # of feints |
+|:-------------------|:------------|:-----------|:-----------|:----------|:-------------|:-------------|:------------|
+| wizzrobe vs leffen |             |            |            |           |              |              |             |
+|                    |             |            |            |           |              |              |             |
+|                    |             |            |            |           |              |              |             |
+|                    |             |            |            |           |              |              |             |
+|                    |             |            |            |           |              |              |             |
+|                    |             |            |            |           |              |              |             |
+|                    |             |            |            |           |              |              |             |

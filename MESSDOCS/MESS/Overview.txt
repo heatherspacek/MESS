@@ -1,0 +1,9 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.6
+Creation-Date: 2023-11-20T16:09:13-07:00
+
+====== Overview ======
+Created Monday 20 November 2023
+
+The Melee Empirical Strategy Solver is an attempt to develop an "engine" resembling current computer chess engines that can determine a balance of  favourable or optimal strategies (and relevant counter-strategies) for Super Smash Bros Melee. 
+

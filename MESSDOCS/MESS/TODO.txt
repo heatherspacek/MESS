@@ -1,0 +1,24 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.6
+Creation-Date: 2023-11-20T16:30:45-07:00
+
+====== TODO ======
+Created Monday 20 November 2023
+
+* Fully set-up Dolphin/libmelee interface with appropriate CODES. Main goal is rapid iteration of melee interaction sequences.
+	* sub-goals: 
+	* maximum speedup code (can we run 80x-realtime melee with this? **Is there a bad interaction with the Python live-parsing of the slipstream?**)
+	* auto-setup for a known starting position... start with just being in Wait at a specified position, verifying the condition, then setting a save state? this is slightly hard!
+		* whoa, can i adapt the save state assembly code somehow ?! use memory debugging to see 
+		* ^ pog idea , only a little challenging. [[./dolphin|''./dolphin'']]'' -d''
+* UI for composing a strategy. Tree or state-machine structure. Dynamic elements (e.g. right click "add a reaction node" or something).
+	* Probably just a series of menus at first
+	* DEVISE A DATA STRUCTURE that represents a strategy!
+* Define strategy components.
+	* All actions: aerial attacks (vary jump trajectories, vary drifts, vary fastfall timing, and vary aerial timing... whew thats a lot already!); wavedash-forward attack, wavedash-back-attack
+		* Maybe this is a good first-pass attempt at defining an Attack Action.
+	* Meta-actions? What if a strategy component is "feint" and it comprise
+		* This is an interesting idea!! Human strategy players do find it easy to grasp "do one of three things all of which serve the same purpose"
+		* Maybe this should just be implemented at the processing/pruning stage-- when analyzing a Strategy candidate, maybe the engine can say "well
+	* All things that can be reacted to- __radius reaction__, __animation reaction__, 
+		* When I'm looking to see if opponent will attempt an overshoot approach, I look for cues in their previous actions... does this make sense? 

@@ -1,0 +1,9 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.6
+Creation-Date: 2023-11-20T16:09:43-07:00
+
+====== Developments Log ======
+Created Monday 20 November 2023
+
+2023-Nov 20: Altafen in the Slippi discord helped me debug the ASM issues I was having with the 20XX save states code. Save states work now!
+2023-Nov 24: Some brainstorming re: structure (phase 1 phase 2, "strategy mutation") and definition of Actions (movement and attacks should be partially connected; T-P-F as an RPS)

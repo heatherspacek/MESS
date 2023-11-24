@@ -1,0 +1,11 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.6
+Creation-Date: 2023-11-24T13:45:16-07:00
+
+====== Strategy ======
+Created Friday 24 November 2023
+
+A Strategy in MESS is a state machine encoding [...]
+
+==== Basic Strategy ====
+Step 1 

@@ -1,0 +1,25 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.6
+Creation-Date: 2023-11-24T13:54:03-07:00
+
+====== Framework ======
+Created Friday 24 November 2023
+
+[draft of how the components will work together.]
+
+INPUT: 
+
+Step 1: compose a matrix of Basic Strategies
+
+
+Step 2: mutate and adapt a subset of the Basic Strategies
+	Mutation should encompass: 
+		--reacting to different things (we know which opposing strategies are good against each candidate, so that can be used to inform additional reaction branches.
+		--replacing Attack Actions with Meta-Actions (e.g. overshoot nair can become "any overshoot") ** think on this more.
+	
+	
+	
+	(Assumption: that a bad [totally dominated] Basic Strat will not become a very good one)
+	(How do chess engines do tree pruning??)
+
+OUTPUT:

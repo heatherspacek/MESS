@@ -1,0 +1,9 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.6
+Creation-Date: 2023-11-24T13:46:35-07:00
+
+====== Scratchpad ======
+Created Friday 24 November 2023
+
+* Idea: instead of iterating over all possible strategies in the solution space, a tree-like evolution structure where Strategies attempt to correct for their observed counterplay 
+	* A flawed strategy can 
