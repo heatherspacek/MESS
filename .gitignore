@@ -1,4 +1,9 @@
 *.exe
 *.tcl
+*.pyc
 
-"gecko code stuff/*"
+__pycache__/*
+
+gecko\ code\ stuff/*
+
+

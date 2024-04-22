@@ -1,14 +1,83 @@
 from enum import Enum
 import melee
+import pdb
+import numpy as np
 
-def character_go_to_x(x, character_state, controller):
-	"Setup function."
-	if abs(character_state.position.x - x) > 1:
-		controller.tilt_analog(melee.enums.Button.BUTTON_MAIN, int((character_state.position.x - x)<0), 0.5)
-		print(character_state.position.x)
-		return -1
+def character_go_to_x(x: float, facing: str, \
+		character_state:melee.gamestate.PlayerState, controller:melee.controller.Controller):
+	"""
+	Setup function.
+	Off spawn platform, walk (close) to the given position and then pivot.
+	(cant dash forward out of walk-- need to 'stand' for one frame at the transition. lol)
+	"""
+	#pdb.set_trace()
+	print([character_state.character  , character_state.action, "R" if character_state.facing else "L"])
 
-def action_to_input_queue(action: str, parameter: int = 0):
+	PIVOT_SIZE = 8.0 
+	TARGET_SIZE = 0.7
+
+	if abs(character_state.position.x - x) > PIVOT_SIZE:
+		# walk.
+		controller.tilt_analog(melee.enums.Button.BUTTON_MAIN, 0.75 if (character_state.position.x - x)<0 else 0.25 , 0.5)
+		return 0
+	elif (abs(character_state.position.x - x) <= PIVOT_SIZE) and (abs(character_state.position.x - x) > TARGET_SIZE):
+		# dash (set up for pivot)
+		if character_state.action == melee.enums.Action.STANDING:
+			controller.tilt_analog(melee.enums.Button.BUTTON_MAIN, 1.0 if (character_state.position.x - x)<0 else 0.0, 0.5 )
+		else:
+			"try and force stand-out-of-walk for one frame"
+			controller.tilt_analog(melee.enums.Button.BUTTON_MAIN, 0.5, 0.5 )
+		return 0
+	else:
+		# absolute difference in position is <1.5
+		# either pivot or shieldstop. either way, this is last in sequence
+		if (facing=="L" and character_state.facing==False) or (facing=="R" and character_state.facing==True):
+			controller.press_button(melee.enums.Button.BUTTON_L)
+		else: 
+			controller.tilt_analog(melee.enums.Button.BUTTON_MAIN, 0.0 if character_state.facing else 1.0, 0.5 )
+		print("might be done!")
+		print([character_state.position.x , x ])
+		return 1 # i.e. this is last in sequence.
+
+def jumpsquat(character: melee.enums.Character):
+	match character:
+		case melee.enums.Character.FALCO | melee.enums.Character.JIGGLYPUFF | melee.enums.Character.DK:
+			return 5
+		case melee.enums.Character.CPTFALCON | melee.enums.Character.MARTH | melee.enums.Character.DOC:
+			return 4
+		case melee.enums.Character.FOX | melee.enums.Character.PIKACHU | melee.enums.Character.SHEIK:
+			return 3
+
+def angle_to_meleecircle(angle: int, quadrant: str):
+	"returns an X and Y that are on the rim of the unit circle. input in degrees. intended for use with DI and WDs"
+	if (angle > 90.0) or (angle < 0.0):
+		print("error in angle_to_meleecircle: need 0<angle<90 for clarity")
+		raise
+	#numpy likes radians...
+	angle_radians = np.pi * angle/180.0 
+	xc_u = np.cos( angle_radians )
+	yc_u = np.sin( angle_radians )
+
+	"next, map 0..1 to 0.5..1"
+	match quadrant:
+		case "UL":
+			xc = 0.5 - xc_u/2
+			yc = 0.5 + yc_u/2
+		case "UR":
+			xc = 0.5 + xc_u/2
+			yc = 0.5 + yc_u/2
+		case "BL":
+			xc = 0.5 - xc_u/2
+			yc = 0.5 - yc_u/2
+		case "BR":
+			xc = 0.5 + xc_u/2
+			yc = 0.5 - yc_u/2
+		case _:
+			print("error in angle_to_meleecircle: specified an invalid quadrant")
+			raise
+	return (xc, yc)
+
+def action_to_input_queue(action: str, parameter: int = 0, character: melee.enums.Character = 1):
 	'''
 	Gets called once a strategy decision is made... 
 	The parent caller will do something different depending on how long the input_queue ends up being.
@@ -20,100 +89,26 @@ def action_to_input_queue(action: str, parameter: int = 0):
 			pass
 		case "dash-jc-grab":
 			pass
+		case "wd-left-23":
+			input_queue.extend("jump" * jumpsquat(character))
+			input_queue.append("airdodge-left-23")
+		case "wd-right-23":
+			input_queue.extend("jump" * jumpsquat(character))
+			input_queue.append("airdodge-right-23")
+
+	print(input_queue)
 	return input_queue
 
-def input_queue_to_controller(queue: list, controller: melee.controller.Controller):
+def input_queue_item_to_controller(queue_entry: string, controller: melee.controller.Controller):
 	# presumably we are using something resembling an internal encoding format... let's decode that here?
 	# dunno if this is overcomplicating things.
-	pass
+	match queue_entry:
+		case "airdodge-left-23":
+			controller.press_button(melee.enums.Button.BUTTON_R)
+			(xc, yc) = angle_to_meleecircle(23, "BL")
+			controller.tilt_analog( melee.enums.Button.BUTTON_MAIN, xc, yc )
+		case "airdodge-right-23":
+			controller.press_button(melee.enums.Button.BUTTON_R)
+			(xc, yc) = angle_to_meleecircle(23, "BR")
+			controller.tilt_analog( melee.enums.Button.BUTTON_MAIN, xc, yc )
 
-
-class Strategy(object):
-	'''
-	Instances of `Strategy()` will be `consult()`-able, and will remember which node they are on ...
-	It should always return a set of inputs that 
-	'''
-	nodes = []
-	root_node = None
-
-	current_node = None
-
-	def __init__(self, UID: str):
-		pass
-
-	def consult(self):
-		pass
-
-	def traverse(self):
-		if (current_node is None) and (isinstance(root_node, StrategyNode)):
-			root_node.traverse()
-
-class TrivialStrategy(Strategy):
-	'''
-	TS1 = Strategy(base_action = "crouch", )
-	'''
-
-	def consult(self):
-		return 
-
-class StrategyNode(object):
-	'''
-	Nodes can be 
-
-	It must provide information such that when Strategy calls consult(), the currently-active StrategyNode
-	informs the action that is passed back...	
-	'''	
-
-	def __init__(self):
-		pass
-
-
-class stageEnum(Enum):
-	FD = 0x20
-
-
-
-def compose_codestring():
-	S1 = """
-$pepiscode [hiatus heather]
-
-C21B148C 00000025
-3C608048 60630530
-48000021 7C8802A6
-38A000F0 3D808000
-618C31F4 7D8903A6
-4E800421 480000F8
-4E800021 2A08024C
-20000000 000000FF
-00000020 000001E0
-00000000 00000000
-00000000 FFFFFFFF
-FFFFFFFF 00000000
-3F800000 3F800000
-3F800000 00000000
-00000000 00000000
-00000000 00000000
-00000000 00000000
-00000000 00000000
-00000000 09000400
-00FF0000 09007800
-40000401 00000000
-00000000 3F800000
-3F800000 3F800000
-09000400 00FF0000
-09007800 40000401
-00000000 00000000
-3F800000 3F800000
-3F800000 09030400
-00FF0000 09007800
-40000401 00000000
-00000000 3F800000
-3F800000 3F800000
-09030400 00FF0000
-09007800 40000401
-00000000 00000000
-3F800000 3F800000
-3F800000 BB610014
-60000000 00000000
-		"""
-	return S1 
