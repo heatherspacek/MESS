@@ -1,41 +1,37 @@
 
-from MESSaux import *
+import melee
+from melee.enums import Character
 
-class Strategy(object):
-	'''
-	Instances of `Strategy()` will be `consult()`-able, and will remember which node they are on ...
-	It should always return a set of inputs that 
-	'''
-	nodes = []
-	root_node = None
+import MESSaux
+from dataclasses import dataclass
 
-	current_node = None
+@dataclass
+class Trigger:
+	pass
 
-	def __init__(self, UID: str):
-		pass
-
-	def consult(self):
-		pass
-
-	def traverse(self):
-		if (current_node is None) and (isinstance(root_node, StrategyNode)):
-			root_node.traverse()
+@dataclass
+class Response:
+	pass
+	
+@dataclass # saves us from writing an __init__.
+class Strategy:
+	"""
+	A data structure that was specified through the builder UI.
+	"""
+	character: Character
+	triggers: list[Trigger]
+	responses: list[Response]
 
 class TrivialStrategy(Strategy):
-	'''
-	TS1 = Strategy(base_action = "crouch", )
-	'''
+	
 	sequence = None
 	frame_pos_in_seq = 0
-
-	def __init__(self, ID: str):
-		super(TrivialStrategy, self).__init__(ID)
 
 	def consult(self, controller: melee.controller.Controller):
 		"""eventually this will have an internal log of which strategies are ongoing, 
 		and which action is ongiong, and also where in the sequence we are."""
 		"FOR NOW: just run a wavedash over and over lol"
-		sequence = action_to_input_queue("wd-left-23") if np.random.randint(2) else action_to_input_queue("wd-right-23")
+		sequence = MESSaux.action_to_input_queue("wd-left-23") if np.random.randint(2) else action_to_input_queue("wd-right-23")
 
 		input_queue_item_to_controller(sequence[frame_pos_in_seq] , controller)
 		# finally, increment position(?)
@@ -46,15 +42,3 @@ class TrivialStrategy(Strategy):
 		else: 
 			frame_pos_in_seq += 1
 
-
-
-class StrategyNode(object):
-	'''
-	Nodes can be 
-
-	It must provide information such that when Strategy calls consult(), the currently-active StrategyNode
-	informs the action that is passed back...	
-	'''	
-
-	def __init__(self):
-		pass

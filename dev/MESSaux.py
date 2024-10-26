@@ -99,7 +99,7 @@ def action_to_input_queue(action: str, parameter: int = 0, character: melee.enum
 	print(input_queue)
 	return input_queue
 
-def input_queue_item_to_controller(queue_entry: string, controller: melee.controller.Controller):
+def input_queue_item_to_controller(queue_entry: str, controller: melee.controller.Controller):
 	# presumably we are using something resembling an internal encoding format... let's decode that here?
 	# dunno if this is overcomplicating things.
 	match queue_entry:
