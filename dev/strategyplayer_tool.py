@@ -1,13 +1,13 @@
 import dearpygui.dearpygui as dpg
 import melee
 import os  # for os.path.join
-import ctypes
+import ctypes  # for Windows high-dpi text rendering "fuzziness" fix
 from dataclasses import dataclass
 # -
 import strategyplayer_tool_callbacks as cbx
 # -
-# from MESSaux import jumpsquat  # not actually useful. placeholder organization
-from MESSabstract import Trigger, Response, Strategy
+# from MESSaux import jumpsquat  # not actually useful. placeholder
+from MESSabstract import Response, Strategy
 
 # #######look up "blinker" package; do i need this type of inter-object comms?
 
@@ -23,7 +23,13 @@ class StrategyPlayer():
     """
     Entity that interfaces with a Strategy, which is just a data-structure.
     """
-    loaded_strategy: Strategy
+    loaded_strategy: Strategy = None
+    controller: melee.Controller = None
+    # --
+    current_response: Response = None
+
+    def consult(self):
+        pass
 
 
 class ConsoleInterface():
@@ -34,20 +40,30 @@ class ConsoleInterface():
     console = None
     controller1 = None
     controller2 = None
+    gamestate = None
 
     def __init__(self, console: melee.Console):
         self.console = console
 
     def setup(self):
         self.console.run()
-        self.console.connect()
+        # self.console.connect()
+        print("Connecting to console...")
+        if not self.console.connect():
+            print("ERROR: Failed to connect to the console.")
+            raise RuntimeError
+        print("Console connected")
         self.controller1 = melee.Controller(console=self.console, port=1)
         self.controller2 = melee.Controller(console=self.console, port=2)
         self.controller1.connect()
         self.controller2.connect()
+        self.running = True
 
     def step(self):
-        gamestate = self.console.step()
+        if self.running:
+            # Trying to ask for a step before setup has occurred can cause
+            # unpredictable behaviour.
+            self.gamestate = self.console.step()
 
 
 """
@@ -55,6 +71,19 @@ class ConsoleInterface():
 app entry point.
 ===============================================================================
 """
+
+
+def callback_ok(sender, app_data):
+    print('OK was clicked.')
+    print("Sender: ", sender)
+    print("App Data: ", app_data)
+
+
+def cancel_callback(sender, app_data):
+    print('Cancel was clicked.')
+    print("Sender: ", sender)
+    print("App Data: ", app_data)
+
 
 if __name__ == "__main__":
 
@@ -65,6 +94,13 @@ if __name__ == "__main__":
     Interface = ConsoleInterface(console)
     Gsm = GlobalState()
 
+    S1 = Strategy()
+
+    Player1 = StrategyPlayer()
+    Player1.loaded_strategy = S1
+
+    Player2 = StrategyPlayer()
+
     dpg.create_context()
 
     # =====
@@ -74,20 +110,54 @@ if __name__ == "__main__":
     tab1_1str = "SP Setup"
     tab1_2str = "Situation Setup"
 
-    with dpg.window(label="START HERE") as top_level_wnd:
-        dpg.set_item_width(top_level_wnd, 350)
-        dpg.set_item_height(top_level_wnd, 350)
+    dpg.add_file_dialog(
+        directory_selector=True,
+        show=False,
+        callback=callback_ok,
+        tag="strategy_fileselect",
+        cancel_callback=cancel_callback,
+        width=500, height=400
+        )
+
+    dpg.add_file_dialog(
+        directory_selector=True,
+        show=False,
+        callback=callback_ok,
+        tag="situation_fileselect",
+        cancel_callback=cancel_callback,
+        width=500, height=400
+        )
+
+    with dpg.window(label="START HERE", no_close=True) as top_level_wnd:
+        dpg.set_item_width(top_level_wnd, 600)
+        dpg.set_item_height(top_level_wnd, 600)
         with dpg.tab_bar():
-            with dpg.tab(label=tab1str) as tab1:
+            with dpg.tab(label=tab1str) as tab1:  # 1P 1CPU mode
+                dpg.add_button(
+                    label="Import Strategy...",
+                    callback=lambda: dpg.show_item("strategy_fileselect")
+                    )
+                dpg.add_button(
+                    label="Import Situation...",
+                    callback=lambda: dpg.show_item("situation_fileselect")
+                    )
+
                 with dpg.tab_bar():
-                    with dpg.tab(label=tab1_1str) as tab1_1:
-                        pass
-                    with dpg.tab(label=tab1_2str) as tab1_2:
+                    with dpg.tab(label=tab1_1str) as tab1_1:  # SP Setup
+                        dpg.add_combo(list(melee.enums.Character), label="Chr")
+                        dpg.add_combo([2, 3, 4], label="SP controller port")
+                        dpg.add_separator()
+                        with dpg.collapsing_header(label="Triggers", default_open=True) as head1:
+                            dpg.add_button(label="(+) Add Trigger")
+                        with dpg.collapsing_header(label="Responses", default_open=True) as head2:
+                            dpg.add_button(label="(+) Add Response")
+
+                    with dpg.tab(label=tab1_2str) as tab1_2:  # Situation setup
                         pass
 
-                dpg.add_button(label="\nPlay against a\nStrategyPlayer\n")
                 dpg.add_button(label="LAUNCH MELEE (test)",
                                callback=Interface.setup)
+            # -----
             with dpg.tab(label=tab2str) as tab2:
                 dpg.add_button(label="\nTest two\nStrategyPlayers\n")
 
@@ -97,13 +167,11 @@ if __name__ == "__main__":
                    user_data=tab1,
                    parent=tab1)
 
-    # user data and callback set any time after button has been created
-    # #btn = dpg.add_button(label="Apply 2 \nmore lines", parent=group1)
-    # #dpg.set_item_callback(btn, cbx.button_callback)
-    # #dpg.set_item_user_data(btn, "Some Extra User Data")
-
     # Viewport creation (the window)
-    dpg.create_viewport(title='StrategyPlayer Invocation Tool', width=400, height=600)
+    dpg.create_viewport(
+        title='StrategyPlayer Invocation Tool',
+        width=700, height=600
+        )
     dpg.setup_dearpygui()
 
     # add a font registry
@@ -118,8 +186,6 @@ if __name__ == "__main__":
 
     import dearpygui.demo as demo
     demo.show_demo()
-
-    # dpg.show_font_manager()
 
     if os.name == 'nt':
         # Windows-specific "high-DPI" bugfix for blurry text.
