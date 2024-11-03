@@ -1,0 +1,5 @@
+!!python/object:MESSabstract.Strategy
+character: !!python/object/apply:melee.enums.Character
+- 2
+responses: []
+triggers: []

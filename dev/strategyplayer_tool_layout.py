@@ -57,9 +57,6 @@ def window_layout(Interface: ConsoleInterface,
                                "modal_misc", show=False))
 
     with dpg.window(label="START HERE", no_close=True) as top_level_wnd:
-        # give out the reference to the top level window
-        dpg.set_item_user_data("strategy_fileselect", top_level_wnd)
-
         dpg.set_item_width(top_level_wnd, 600)
         dpg.set_item_height(top_level_wnd, 600)
         with dpg.tab_bar():
@@ -89,7 +86,9 @@ def window_layout(Interface: ConsoleInterface,
             #
         dpg.add_text("=====")
         dpg.add_button(label="Export Strategy",
-                       callback=cbx.callback_strategy_export)
+                       callback=cbx.callback_strategy_export,
+                       tag="importantbutton",
+                       user_data=Player1)
 
     # Viewport creation (the window)
     dpg.create_viewport(

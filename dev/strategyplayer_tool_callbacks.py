@@ -41,8 +41,11 @@ def callback_strategy_load_cancel(sender, app_data, user_data):
 
 def callback_strategy_save_ok(sender, app_data, user_data):
     print("save-ok")
+    with open(app_data['file_path_name'], 'w') as wstream:
+        strategyplayer = dpg.get_item_user_data("importantbutton")
+        yaml.dump(strategyplayer.loaded_strategy, wstream)
 
-        
+
 def callback_strategy_save_cancel(sender, app_data, user_data):
     print("save-cancel")
 
