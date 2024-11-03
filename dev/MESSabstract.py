@@ -1,8 +1,6 @@
 
-import melee
 from melee.enums import Character
 
-import MESSaux
 from dataclasses import dataclass, field
 
 
@@ -29,6 +27,7 @@ class Strategy:
         self.triggers.append(trigger)
 
 
+'''
 class TrivialStrategy(Strategy):
 
     sequence = None
@@ -48,3 +47,4 @@ class TrivialStrategy(Strategy):
             frame_pos_in_seq = 0
         else: 
             frame_pos_in_seq += 1
+'''
