@@ -2,6 +2,15 @@ import dearpygui.dearpygui as dpg
 import yaml  # serialization of `Strategy`s`
 import os
 from MESSabstract import Strategy
+from MESSaux import Strat2Dict, Dict2Strat
+
+
+def callback_TEST(sender, app_data, user_data):
+    interface = dpg.get_item_user_data("holder0")
+    player2 = dpg.get_item_user_data("holder2")
+
+    player2.connect_controller(interface.controller2)
+    player2.controller.connect()
 
 
 def callback_strategy_import(sender, app_data, user_data):
@@ -27,7 +36,12 @@ def callback_strategy_load_ok(sender, app_data, user_data):
     try:
         print(path_to_try_loading)
         with open(path_to_try_loading) as fstream:
-            yaml.safe_load(fstream)
+            strategy_dict = yaml.safe_load(fstream)
+            print(strategy_dict)
+            print(Dict2Strat(strategy_dict))
+
+            # player1 = dpg.get_item_user_data("load_strategy_button")
+            # player1.loaded_strategy = Dict2Strat(strategy_dict)
     except FileNotFoundError:
         # user_data should be a reference to the main window
         # check out simple module for details
@@ -43,7 +57,9 @@ def callback_strategy_save_ok(sender, app_data, user_data):
     print("save-ok")
     with open(app_data['file_path_name'], 'w') as wstream:
         strategyplayer = dpg.get_item_user_data("importantbutton")
-        yaml.dump(strategyplayer.loaded_strategy, wstream)
+        strategy_dict = Strat2Dict(strategyplayer.loaded_strategy)
+        print(strategy_dict)
+        yaml.safe_dump(strategy_dict, wstream)
 
 
 def callback_strategy_save_cancel(sender, app_data, user_data):

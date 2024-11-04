@@ -2,6 +2,8 @@ import melee
 import numpy as np
 from MESSabstract import Strategy, Response
 
+import random
+
 
 class StrategyPlayer():
     """
@@ -11,6 +13,20 @@ class StrategyPlayer():
     controller: melee.Controller = None
     # --
     current_response: Response = None
+
+    def connect_controller(self, external_controller):
+        self.controller = external_controller
+
+    def step(self, gamestate: melee.gamestate.GameState):
+        # test issuing this input
+
+        if self.controller is not None:
+
+            self.controller.tilt_analog(
+                melee.enums.Button.BUTTON_MAIN,
+                random.random(),
+                0.5
+                )
 
     def consult(self):
         pass
@@ -48,6 +64,16 @@ class ConsoleInterface():
             # Trying to ask for a step before setup has occurred can cause
             # unpredictable behaviour.
             self.gamestate = self.console.step()
+
+
+def Strat2Dict(strategy: Strategy) -> dict:
+    return strategy.__dict__
+
+
+def Dict2Strat(dict_in: dict) -> Strategy:
+    strategy = Strategy()
+    strategy.__dict__ = dict_in
+    return strategy
 
 
 def character_go_to_x(x: float, facing: str,

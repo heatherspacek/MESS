@@ -37,6 +37,10 @@ def window_layout(Interface: ConsoleInterface,
         width=500, height=400
         )
 
+    """
+    Modal window. Re-usable for any announcement that should freeze the rest
+    of the app. """
+
     with dpg.window(label="[Placeholder Title]",
                     modal=True,
                     show=False,
@@ -46,7 +50,9 @@ def window_layout(Interface: ConsoleInterface,
             "File load failed.",
             tag="model_misc_text"
             )
-        dpg.add_separator()
+        dpg.add_separator(tag="holder0", user_data=Interface)
+        dpg.add_separator(tag="holder1", user_data=Player1)
+        dpg.add_separator(tag="holder2", user_data=Player2)
         dpg.add_checkbox(label="Don't ask me next time")
         with dpg.group(horizontal=True):
             dpg.add_button(label="OK", width=75,
@@ -56,11 +62,13 @@ def window_layout(Interface: ConsoleInterface,
                            callback=lambda: dpg.configure_item(
                                "modal_misc", show=False))
 
+    """ Top-level strategy composition window. """
+
     with dpg.window(label="START HERE", no_close=True) as top_level_wnd:
         dpg.set_item_width(top_level_wnd, 600)
         dpg.set_item_height(top_level_wnd, 600)
         with dpg.tab_bar():
-            with dpg.tab(label=tab1str) as tab1:  # 1P 1CPU mode
+            with dpg.tab(label=tab1str):  # 1P 1CPU mode
                 with dpg.group(horizontal=True):
                     dpg.add_button(
                         label="Import Strategy...",
@@ -72,16 +80,16 @@ def window_layout(Interface: ConsoleInterface,
                         )
 
                 with dpg.tab_bar():
-                    with dpg.tab(label=tab1_1str) as tab1_1:  # SP Setup
+                    with dpg.tab(label=tab1_1str):  # SP Setup
                         strategy_setup_section()
 
-                    with dpg.tab(label=tab1_2str) as tab1_2:  # Situation setup
+                    with dpg.tab(label=tab1_2str):  # Situation setup
                         pass
 
                 dpg.add_button(label="LAUNCH MELEE (test)",
                                callback=Interface.setup)
             # -----
-            with dpg.tab(label=tab2str) as tab2:
+            with dpg.tab(label=tab2str):
                 dpg.add_button(label="\nTest two\nStrategyPlayers\n")
             #
         dpg.add_text("=====")
@@ -89,6 +97,10 @@ def window_layout(Interface: ConsoleInterface,
                        callback=cbx.callback_strategy_export,
                        tag="importantbutton",
                        user_data=Player1)
+        dpg.add_button(label="connect p2",
+                       callback=cbx.callback_TEST,
+                       tag="testingbutton",
+                       user_data=Player2)
 
     # Viewport creation (the window)
     dpg.create_viewport(
@@ -107,8 +119,8 @@ def window_layout(Interface: ConsoleInterface,
 
     dpg.bind_font(default_font)
 
-    import dearpygui.demo as demo
-    demo.show_demo()
+    # import dearpygui.demo as demo
+    # demo.show_demo()
 
     if os.name == 'nt':
         # Windows-specific "high-DPI" bugfix for blurry text.

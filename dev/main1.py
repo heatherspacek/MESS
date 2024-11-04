@@ -1,5 +1,4 @@
 import melee
-import pdb
 from MESSaux import character_go_to_x
 from MESSabstract import TrivialStrategy
 
