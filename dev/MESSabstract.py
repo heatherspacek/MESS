@@ -3,7 +3,6 @@ from melee.enums import Character
 
 from dataclasses import dataclass, field
 
-
 @dataclass
 class Trigger:
     pass

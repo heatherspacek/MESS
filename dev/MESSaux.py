@@ -8,6 +8,7 @@ import random
 class StrategyPlayer():
     """
     Entity that interfaces with a Strategy, which is just a data-structure.
+    Holds a `controller`. Issues a new 
     """
     loaded_strategy: Strategy = None
     controller: melee.Controller = None
@@ -18,18 +19,22 @@ class StrategyPlayer():
         self.controller = external_controller
 
     def step(self, gamestate: melee.gamestate.GameState):
+        """replacing the old 'consult' paradigm. we just do one new controller 
+        input per frame."""
+
+        # 1. if in the middle of an ongoing action (eg. wavedash inputs) just 
+        # do the next input in the sequence. 
+
         # test issuing this input
 
         if self.controller is not None:
-
+            print("attempting to tilt")
             self.controller.tilt_analog(
-                melee.enums.Button.BUTTON_MAIN,
+                melee.enums.Button.BUTTON_C,
                 random.random(),
                 0.5
                 )
-
-    def consult(self):
-        pass
+            self.controller.flush()
 
 
 class ConsoleInterface():
@@ -47,16 +52,17 @@ class ConsoleInterface():
 
     def setup(self):
         self.console.run()
-        # self.console.connect()
         print("Connecting to console...")
         if not self.console.connect():
             print("ERROR: Failed to connect to the console.")
             raise RuntimeError
         print("Console connected")
-        self.controller1 = melee.Controller(console=self.console, port=1)
-        self.controller2 = melee.Controller(console=self.console, port=2)
-        self.controller1.connect()
-        self.controller2.connect()
+        # self.controller1 = melee.Controller(console=self.console, port=1,
+        #                                     type=melee.ControllerType.STANDARD)
+        # self.controller2 = melee.Controller(console=self.console, port=2,
+        #                                     type=melee.ControllerType.STANDARD)
+        # self.controller1.connect()
+        # print(self.controller2.connect())
         self.running = True
 
     def step(self):
