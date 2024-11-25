@@ -3,6 +3,12 @@ from melee.enums import Character
 
 from dataclasses import dataclass, field
 
+
+@dataclass
+class Action:
+    sequence: list
+
+
 @dataclass
 class Trigger:
     pass
@@ -18,32 +24,10 @@ class Strategy:
     """
     A data structure that was specified through the builder UI.
     """
+    name: str
     character: Character = Character.CPTFALCON  # from melee.enums
     triggers: list[Trigger] = field(default_factory=list)
     responses: list[Response] = field(default_factory=list)
 
     def add_trigger(self, trigger: Trigger):
         self.triggers.append(trigger)
-
-
-'''
-class TrivialStrategy(Strategy):
-
-    sequence = None
-    frame_pos_in_seq = 0
-
-    def consult(self, controller: melee.controller.Controller):
-        """eventually this will have an internal log of which strategies are ongoing, 
-        and which action is ongiong, and also where in the sequence we are."""
-        "FOR NOW: just run a wavedash over and over lol"
-        sequence = MESSaux.action_to_input_queue("wd-left-23") if np.random.randint(2) else action_to_input_queue("wd-right-23")
-
-        input_queue_item_to_controller(sequence[frame_pos_in_seq] , controller)
-        # finally, increment position(?)
-        # reset the counter if we have run out of sequence, I think.
-        # TODO: figure out how "yielding" will work?
-        if frame_pos_in_seq == len(sequence):
-            frame_pos_in_seq = 0
-        else: 
-            frame_pos_in_seq += 1
-'''

@@ -19,6 +19,8 @@ def window_layout(Interface: ConsoleInterface,
     tab1_1str = "Strategy Setup"
     tab1_2str = "Situation Setup"
 
+    # =====
+    # not-shown-until-needed windows.
     dpg.add_file_dialog(
         directory_selector=False,
         show=False,
@@ -27,7 +29,6 @@ def window_layout(Interface: ConsoleInterface,
         width=500, height=400
         )
     dpg.add_file_extension(".yaml", parent="strategy_fileselect")
-
     dpg.add_file_dialog(
         directory_selector=False,
         show=False,
@@ -36,11 +37,6 @@ def window_layout(Interface: ConsoleInterface,
         cancel_callback=cbx.callback_situation_load_cancel,
         width=500, height=400
         )
-
-    """
-    Modal window. Re-usable for any announcement that should freeze the rest
-    of the app. """
-
     with dpg.window(label="[Placeholder Title]",
                     modal=True,
                     show=False,
@@ -62,11 +58,14 @@ def window_layout(Interface: ConsoleInterface,
                            callback=lambda: dpg.configure_item(
                                "modal_misc", show=False))
 
-    """ Top-level strategy composition window. """
+    """ Top-level strategy composition window. ===== """
 
     with dpg.window(label="START HERE", no_close=True) as top_level_wnd:
         dpg.set_item_width(top_level_wnd, 600)
         dpg.set_item_height(top_level_wnd, 600)
+        with dpg.group(horizontal=True):
+            dpg.add_loading_indicator(circle_count=6, radius=1, height=48)
+            dpg.add_text("Welcome to MESS! Status messages will show up here.")
         with dpg.tab_bar():
             with dpg.tab(label=tab1str):  # 1P 1CPU mode
                 with dpg.group(horizontal=True):
@@ -87,7 +86,7 @@ def window_layout(Interface: ConsoleInterface,
                         pass
 
                 dpg.add_button(label="LAUNCH MELEE (test)",
-                               callback=Interface.setup)
+                               callback=Interface.setup_oneplayer)
             # -----
             with dpg.tab(label=tab2str):
                 dpg.add_button(label="\nTest two\nStrategyPlayers\n")
@@ -131,8 +130,9 @@ def window_layout(Interface: ConsoleInterface,
 
 
 def strategy_setup_section():
+    dpg.add_input_text(label="Strategy Name", default_value="New Strategy 1")
     dpg.add_combo(list(melee.enums.Character), label="Chr")
-    dpg.add_combo([2, 3, 4], label="SP controller port")
+    # dpg.add_combo([2, 3, 4], label="SP controller port")
     dpg.add_separator()
     with dpg.collapsing_header(label="Triggers", default_open=True) as head1:
         dpg.add_button(label="(+) Add Trigger",

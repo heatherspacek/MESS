@@ -8,24 +8,35 @@ import random
 class StrategyPlayer():
     """
     Entity that interfaces with a Strategy, which is just a data-structure.
-    Holds a `controller`. Issues a new 
+    Holds a `controller`.
     """
     loaded_strategy: Strategy = None
     controller: melee.Controller = None
     # --
-    current_response: Response = None
+    current_action = None
 
-    def connect_controller(self, external_controller):
-        self.controller = external_controller
+    def connect_controller(self, controller):
+        self.controller = controller
 
     def step(self, gamestate: melee.gamestate.GameState):
-        """replacing the old 'consult' paradigm. we just do one new controller 
+        """replacing the old 'consult' paradigm; we just do one new controller
         input per frame."""
 
-        # 1. if in the middle of an ongoing action (eg. wavedash inputs) just 
-        # do the next input in the sequence. 
+        if self.loaded_strategy is None:
+            return
 
-        # test issuing this input
+        # 0. consult triggers to see if (for example) an ongoing action got
+        # interrupted by something. e.g. we went for grab but noticed it
+        # whiffed, and now we are holding down to asdi down punish.
+
+        for trigger in self.loaded_strategy.triggers:
+            pass
+
+        # 1. if in the middle of an ongoing action (eg. wavedash inputs) just
+        # do the next input in the sequence.
+        
+
+        # 2. check remainder of Triggers
 
         if self.controller is not None:
             print("attempting to tilt")
@@ -49,20 +60,28 @@ class ConsoleInterface():
 
     def __init__(self, console: melee.Console):
         self.console = console
+        self.controller1 = melee.Controller(
+            console=console,
+            port=1,
+            type=melee.ControllerType.GCN_ADAPTER
+            )
+        self.controller2 = melee.Controller(
+            console=console,
+            port=2,
+            type=melee.ControllerType.STANDARD
+            )
 
-    def setup(self):
+    def setup_oneplayer(self):
         self.console.run()
         print("Connecting to console...")
         if not self.console.connect():
             print("ERROR: Failed to connect to the console.")
             raise RuntimeError
-        print("Console connected")
-        # self.controller1 = melee.Controller(console=self.console, port=1,
-        #                                     type=melee.ControllerType.STANDARD)
-        # self.controller2 = melee.Controller(console=self.console, port=2,
-        #                                     type=melee.ControllerType.STANDARD)
-        # self.controller1.connect()
-        # print(self.controller2.connect())
+        print("Console connected.")
+        if not self.controller2.connect():
+            print("ERROR: CPU controller failed to connect.")
+            raise RuntimeError
+        print("CPU controller connected.")
         self.running = True
 
     def step(self):
@@ -137,17 +156,35 @@ def character_go_to_x(x: float, facing: str,
 
 def jumpsquat(character: melee.enums.Character):
     match character:
-        case (melee.enums.Character.FALCO |
-              melee.enums.Character.JIGGLYPUFF |
-              melee.enums.Character.DK):
+        case (melee.enums.Character.LINK
+              | melee.enums.Character.GANONDORF
+              | melee.enums.Character.ZELDA):
+            return 6
+        case (melee.enums.Character.DK
+              | melee.enums.Character.FALCO
+              | melee.enums.Character.PEACH
+              | melee.enums.Character.JIGGLYPUFF
+              | melee.enums.Character.ROY
+              | melee.enums.Character.MEWTWO
+              | melee.enums.Character.YOSHI):
             return 5
-        case (melee.enums.Character.CPTFALCON |
-              melee.enums.Character.MARTH |
-              melee.enums.Character.DOC):
+        case (melee.enums.Character.CPTFALCON
+              | melee.enums.Character.DOC
+              | melee.enums.Character.GAMEANDWATCH
+              | melee.enums.Character.LUIGI
+              | melee.enums.Character.MARIO
+              | melee.enums.Character.MARTH
+              | melee.enums.Character.NESS
+              | melee.enums.Character.YLINK
+              ):
             return 4
-        case (melee.enums.Character.FOX |
-              melee.enums.Character.PIKACHU |
-              melee.enums.Character.SHEIK):
+        case (melee.enums.Character.FOX
+              | melee.enums.Character.KIRBY
+              | melee.enums.Character.PICHU
+              | melee.enums.Character.PIKACHU
+              | melee.enums.Character.POPO
+              | melee.enums.Character.SAMUS
+              | melee.enums.Character.SHEIK):
             return 3
 
 
@@ -211,19 +248,15 @@ def action_to_input_queue(
     return input_queue
 
 
-def input_queue_item_to_controller(
-        queue_entry: str,
-        controller: melee.controller.Controller
+def action_to_controller(
+        controller: melee.controller.Controller,
+        action_string: str,
+        parameter: int | tuple = None
         ):
-    # presumably we are using something resembling an internal encoding
-    # format... let's decode that here?
-    # dunno if this is overcomplicating things.
-    match queue_entry:
-        case "airdodge-left-23":
+    match action_string:
+        case "jump":
+            controller.press_button(melee.enums.Button.BUTTON_Y)
+        case "airdodge":
+            controller.tilt_analog(melee.enums.Button.BUTTON_MAIN,
+                                   parameter[0], parameter[1])
             controller.press_button(melee.enums.Button.BUTTON_R)
-            (xc, yc) = angle_to_meleecircle(23, "BL")
-            controller.tilt_analog(melee.enums.Button.BUTTON_MAIN, xc, yc)
-        case "airdodge-right-23":
-            controller.press_button(melee.enums.Button.BUTTON_R)
-            (xc, yc) = angle_to_meleecircle(23, "BR")
-            controller.tilt_analog(melee.enums.Button.BUTTON_MAIN, xc, yc)
