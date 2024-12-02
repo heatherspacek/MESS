@@ -2,8 +2,6 @@ import melee
 import numpy as np
 from MESSabstract import Strategy, Response
 
-import random
-
 
 class StrategyPlayer():
     """
@@ -18,6 +16,9 @@ class StrategyPlayer():
     def connect_controller(self, controller):
         self.controller = controller
 
+    def perform_input(self, ):
+        pass
+
     def step(self, gamestate: melee.gamestate.GameState):
         """replacing the old 'consult' paradigm; we just do one new controller
         input per frame."""
@@ -30,22 +31,16 @@ class StrategyPlayer():
         # whiffed, and now we are holding down to asdi down punish.
 
         for trigger in self.loaded_strategy.triggers:
-            pass
+            if trigger.check_triggered(gamestate):
+                self.current_action = trigger.response
+                break
 
         # 1. if in the middle of an ongoing action (eg. wavedash inputs) just
         # do the next input in the sequence.
-        
+        if self.current_action is not None:
+            self.controller
 
         # 2. check remainder of Triggers
-
-        if self.controller is not None:
-            print("attempting to tilt")
-            self.controller.tilt_analog(
-                melee.enums.Button.BUTTON_C,
-                random.random(),
-                0.5
-                )
-            self.controller.flush()
 
 
 class ConsoleInterface():
