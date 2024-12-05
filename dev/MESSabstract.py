@@ -9,12 +9,23 @@ from dataclasses import dataclass, field
 class Input:
     button: Button | None = None
     coordinates: tuple | None = None
+    c_coordinates: tuple | None = None
 
     def do_input(self, controller: Controller):
         if self.button is not None:
             controller.press_button(self.button)
         if self.coordinates is not None:
-            controller.tilt_analog(self.coordinates[0], self.coordinates[1])
+            controller.tilt_analog(
+                Button.BUTTON_MAIN,
+                self.coordinates[0],
+                self.coordinates[1]
+                )
+        if self.c_coordinates is not None:
+            controller.tilt_analog(
+                Button.BUTTON_C,
+                self.c_coordinates[0],
+                self.c_coordinates[1]
+                )
 
 
 class StochasticInput(Input):

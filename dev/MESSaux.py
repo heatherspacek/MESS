@@ -1,5 +1,6 @@
 import melee
 import numpy as np
+from enum import Enum
 from MESSabstract import Strategy, Response
 
 
@@ -84,6 +85,11 @@ class ConsoleInterface():
             # Trying to ask for a step before setup has occurred can cause
             # unpredictable behaviour.
             self.gamestate = self.console.step()
+
+
+class FacingDirection(Enum):
+    LEFT = "LEFT"
+    RIGHT = "RIGHT"
 
 
 def Strat2Dict(strategy: Strategy) -> dict:
@@ -209,9 +215,8 @@ def angle_to_meleecircle(angle: int, quadrant: str):
             xc = 0.5 + xc_u/2
             yc = 0.5 - yc_u/2
         case _:
-            print("error in angle_to_meleecircle: " +
+            raise RuntimeError("error in angle_to_meleecircle: " +
                   "specified an invalid quadrant")
-            raise
     return (xc, yc)
 
 
