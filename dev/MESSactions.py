@@ -6,18 +6,18 @@ from MESSaux import angle_to_meleecircle, jumpsquat, FacingDirection
 class Inputs:
     """Organizing class used so elements can be accessed with e.g.
     `Inputs.jump`.
-    Character is always assumed to be facing RIGHT"""
+    """
 
-    def airdodge(self, angle: int | float, quadrant: str):
+    def airdodge(angle: int | float, quadrant: str):
         return Input(
             button=Button.BUTTON_R,
             coordinates=angle_to_meleecircle(angle, quadrant)
             )
 
-    def analog_jump(self, angle: float):
+    def analog_jump(angle: float):
         return Input(button=Button.BUTTON_X, coordinates=(0.5, 0.7))
 
-    def back_air(self, direction: FacingDirection):
+    def back_air(direction: FacingDirection):
         backwards = (
             (0.5, 0.0) if direction == FacingDirection.LEFT
             else (0.5, 1.0)
@@ -28,14 +28,14 @@ class Inputs:
 
     fastfall = Input(coordinates=(0.5, 0.0))
 
-    def forward_air(self, direction: FacingDirection):
+    def forward_air(direction: FacingDirection):
         forwards = (
             (0.5, 0.0) if direction == FacingDirection.RIGHT
             else (0.5, 1.0)
         )
         return Input(c_coordinates=forwards)
 
-    def jump(self, angle: int | float = 90, quadrant: str = "UR"):
+    def jump(angle: int | float = 90, quadrant: str = "UR"):
         return Input(button=Button.BUTTON_X)
 
     laser = Input(button=Button.BUTTON_B, coordinates=(0.5, 0.5))
