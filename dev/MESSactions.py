@@ -24,9 +24,9 @@ class Inputs:
         )
         return Input(c_coordinates=backwards)
 
-    down_air = Input(c_coordinates=(0.0, 0.0))
+    def down_air(): return Input(c_coordinates=(0.0, 0.0))
 
-    fastfall = Input(coordinates=(0.5, 0.0))
+    def fastfall(): return Input(coordinates=(0.5, 0.0))
 
     def forward_air(direction: FacingDirection):
         forwards = (
@@ -38,13 +38,13 @@ class Inputs:
     def jump(angle: int | float = 90, quadrant: str = "UR"):
         return Input(button=Button.BUTTON_X)
 
-    laser = Input(button=Button.BUTTON_B, coordinates=(0.5, 0.5))
+    def laser(): return Input(button=Button.BUTTON_B, coordinates=(0.5, 0.5))
 
-    nair = Input(button=Button.BUTTON_A, coordinates=(0.5, 0.5))
+    def nair(): return Input(button=Button.BUTTON_A, coordinates=(0.5, 0.5))
 
-    null = Input()  # No input
+    def null(): return Input()  # No input
 
-    up_air = Input(c_coordinates=(0.0, 1.0))
+    def up_air(): return Input(c_coordinates=(0.0, 1.0))
 
 
 class Actions:
@@ -62,7 +62,7 @@ class Actions:
             angle: int | float
             ):
         # Jump with a direction and angle specified by input arguments...
-        sequence = [Inputs.jump()] * jumpsquat(character)
+        sequence = [Inputs.jump()] * jumpsquat(character)-1
         sequence.append(Inputs.nair)
         # Put a spacer in here-- a StochasticInput
         sequence.append(StochasticInput())
