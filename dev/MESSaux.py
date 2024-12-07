@@ -14,6 +14,10 @@ class StrategyPlayer():
     # --
     current_action = None
 
+    def add_trigger(self, trigger):
+        if self.loaded_strategy is not None:
+            self.loaded_strategy.add_trigger(trigger)
+
     def connect_controller(self, controller):
         self.controller = controller
 

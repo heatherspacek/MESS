@@ -36,7 +36,8 @@ if __name__ == "__main__":
 
     layout.window_layout(Interface, Player1, Player2)
 
-    demo.show_demo()
+    if False:
+        demo.show_demo()
 
     dpg.start_dearpygui()
 

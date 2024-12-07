@@ -1,7 +1,7 @@
 import dearpygui.dearpygui as dpg
 import yaml  # serialization of `Strategy`s`
 import os
-from MESSabstract import Strategy
+from MESSabstract import Strategy, Trigger
 from MESSaux import Strat2Dict, Dict2Strat
 
 
@@ -79,9 +79,14 @@ def callback_situation_load_cancel(sender, app_data, user_data):
 
 
 def callback_add_trigger(sender, app_data, user_data):
-    # Add to the main data structure;
-    # let the app reflect the change on the next frame.
-    pass
+    # Add to the data structure and the app at the same time.
+    # Also, give the app component a reference (so that deletion is elegant).
+
+    new_trigger = Trigger()  # TODO: how will this become e.g. a TimeTrigger?
+
+    dpg.add_collapsing_header(label="Trigger 1", user_data=new_trigger)
+
+    user_data.add_trigger(new_trigger)
 
 
 def save_strategy(strategy: Strategy, path: str):

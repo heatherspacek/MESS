@@ -2,9 +2,11 @@ import dearpygui.dearpygui as dpg
 import ctypes  # for Windows high-dpi text rendering "fuzziness" fix
 import melee
 import os  # for os.path.join
+import pdb
 # --
 import strategyplayer_tool_callbacks as cbx
 from MESSaux import ConsoleInterface, StrategyPlayer
+from MESSactions import Actions, Inputs
 
 
 def window_layout(Interface: ConsoleInterface,
@@ -66,6 +68,8 @@ def window_layout(Interface: ConsoleInterface,
         with dpg.group(horizontal=True):
             dpg.add_loading_indicator(circle_count=6, radius=1, height=48)
             dpg.add_text("Welcome to MESS! Status messages will show up here.")
+            dpg.add_button(label="debug console",
+                           callback=lambda: pdb.set_trace())
         with dpg.tab_bar():
             with dpg.tab(label=tab1str):  # 1P 1CPU mode
                 with dpg.group(horizontal=True):
@@ -80,7 +84,7 @@ def window_layout(Interface: ConsoleInterface,
 
                 with dpg.tab_bar():
                     with dpg.tab(label=tab1_1str):  # SP Setup
-                        strategy_setup_section()
+                        strategy_setup_section(Player2)
 
                     with dpg.tab(label=tab1_2str):  # Situation setup
                         pass
@@ -118,9 +122,6 @@ def window_layout(Interface: ConsoleInterface,
 
     dpg.bind_font(default_font)
 
-    # import dearpygui.demo as demo
-    # demo.show_demo()
-
     if os.name == 'nt':
         # Windows-specific "high-DPI" bugfix for blurry text.
         # before showing the viewport/calling `show_viewport`:
@@ -129,15 +130,16 @@ def window_layout(Interface: ConsoleInterface,
     dpg.show_viewport()
 
 
-def strategy_setup_section():
+def strategy_setup_section(Player2: StrategyPlayer):
     dpg.add_input_text(label="Strategy Name", default_value="New Strategy 1")
     dpg.add_combo(list(melee.enums.Character), label="Chr")
     # dpg.add_combo([2, 3, 4], label="SP controller port")
     dpg.add_separator()
-    with dpg.collapsing_header(label="Triggers", default_open=True) as head1:
+    with dpg.collapsing_header(label="Triggers", default_open=True):
         dpg.add_button(label="(+) Add Trigger",
                        callback=cbx.callback_add_trigger,
-                       user_data=head1)
+                       user_data=Player2)
+
     with dpg.collapsing_header(label="Responses", default_open=True) as head2:
         dpg.add_button(label="(+) Add Response",
                        callback=cbx.callback_add_trigger,  # change this later
