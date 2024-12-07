@@ -14,29 +14,49 @@ class Inputs:
             coordinates=angle_to_meleecircle(angle, quadrant)
             )
 
-    def analog_jump(self, direction_ratio: float):
-        return Input(button=Button.BUTTON_X, coordinates=(0.5, direction_ratio))
+    def analog_jump(self, angle: float):
+        return Input(button=Button.BUTTON_X, coordinates=(0.5, 0.7))
 
-    back_air = Input(
-        c_coordinates=()
-    )
+    def back_air(self, direction: FacingDirection):
+        backwards = (
+            (0.5, 0.0) if direction == FacingDirection.LEFT
+            else (0.5, 1.0)
+        )
+        return Input(c_coordinates=backwards)
+
+    down_air = Input(c_coordinates=(0.0, 0.0))
 
     fastfall = Input(coordinates=(0.5, 0.0))
+
+    def forward_air(self, direction: FacingDirection):
+        forwards = (
+            (0.5, 0.0) if direction == FacingDirection.RIGHT
+            else (0.5, 1.0)
+        )
+        return Input(c_coordinates=forwards)
 
     def jump(self, angle: int | float = 90, quadrant: str = "UR"):
         return Input(button=Button.BUTTON_X)
 
+    laser = Input(button=Button.BUTTON_B, coordinates=(0.5, 0.5))
+
     nair = Input(button=Button.BUTTON_A, coordinates=(0.5, 0.5))
 
-    null = Input()  # Serves to hold last input
+    null = Input()  # No input
+
+    up_air = Input(c_coordinates=(0.0, 1.0))
 
 
 class Actions:
     """organizing class used so elements can be accessed with e.g.
     `Actions.wavedash_shallow`."""
 
+    def all_actions():
+        all_attributes = dir(Actions)
+        return [attr for attr in all_attributes
+                if not (attr.startswith("__") or attr == "all_actions")]
+
     def early_nair(
-            self,
             character: Character,
             direction: FacingDirection,
             angle: int | float
@@ -49,15 +69,26 @@ class Actions:
         sequence.append(Inputs.fastfall)
         return Action(sequence=sequence)
 
-    def wavedash_shallow(
-            self,
+    def falco_laser(
+        direction: FacingDirection,
+        angle: int | float,
+        height: int
+    ):
+        sequence = [Inputs.jump()] * jumpsquat(Character.FALCO)
+        sequence.extend(Inputs.null * 10)
+        sequence.append(Inputs.laser)
+        sequence.append(Inputs.fastfall)
+        return Action(sequence=sequence)
+
+    def wavedash(
             character: Character,
-            direction: FacingDirection
+            direction: FacingDirection, 
+            angle: int | float
             ):
         sequence = [Inputs.jump()] * jumpsquat(character)
         sequence.append(
             Inputs.airdodge(
-                23,
+                angle,
                 "BL" if direction == FacingDirection.LEFT else "BR"
                 )
             )
