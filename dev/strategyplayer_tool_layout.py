@@ -5,6 +5,7 @@ import os  # for os.path.join
 import pdb
 # --
 import strategyplayer_tool_callbacks as cbx
+import strategyplayer_tool_templates as tp8
 from MESSaux import ConsoleInterface, StrategyPlayer
 from MESSactions import Actions, Inputs
 
@@ -20,6 +21,10 @@ def window_layout(Interface: ConsoleInterface,
     tab2str = "[0P, 2CPU] Init two StrategyPlayers"
     tab1_1str = "Strategy Setup"
     tab1_2str = "Situation Setup"
+
+    # =====
+    # themes. (Defined below)
+    window_themes()
 
     # =====
     # not-shown-until-needed windows.
@@ -117,8 +122,8 @@ def window_layout(Interface: ConsoleInterface,
         # first argument ids the path to the .ttf or .otf file
         default_font = dpg.add_font(os.path.join(
             "res", "NotoSans-Regular.ttf"), 20)
-        # bold_font = dpg.add_font(os.path.join(
-        #     "res", "NotoSans-Bold.ttf"), 20)
+        bold_font = dpg.add_font(os.path.join(
+            "res", "NotoSans-Bold.ttf"), 20)
 
     dpg.bind_font(default_font)
 
@@ -135,7 +140,8 @@ def strategy_setup_section(Player2: StrategyPlayer):
     dpg.add_combo(list(melee.enums.Character), label="Chr")
     # dpg.add_combo([2, 3, 4], label="SP controller port")
     dpg.add_separator()
-    with dpg.collapsing_header(label="Triggers", default_open=True):
+    with dpg.collapsing_header(label="Triggers", default_open=True) as H_T:
+        dpg.bind_item_theme(H_T, "theme1")
         dpg.add_button(label="(+) Add Trigger",
                        callback=cbx.callback_add_trigger,
                        user_data=Player2)
@@ -144,3 +150,12 @@ def strategy_setup_section(Player2: StrategyPlayer):
         dpg.add_button(label="(+) Add Response",
                        callback=cbx.callback_add_trigger,  # change this later
                        user_data=head2)
+
+
+def window_themes():
+    with dpg.theme(tag="theme1"):
+        with dpg.theme_component(dpg.mvCollapsingHeader):
+            dpg.add_theme_color(dpg.mvThemeCol_Header, [98, 48, 67])
+            dpg.add_theme_color(dpg.mvThemeCol_HeaderHovered, [119, 61, 84])
+            dpg.add_theme_color(dpg.mvThemeCol_HeaderActive, [119, 44, 74])
+            dpg.add_theme_color(dpg.mvThemeCol_Text, [211, 211, 211])

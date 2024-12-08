@@ -3,6 +3,7 @@ import yaml  # serialization of `Strategy`s`
 import os
 from MESSabstract import Strategy, Trigger
 from MESSaux import Strat2Dict, Dict2Strat
+import strategyplayer_tool_templates as tp8
 
 
 def callback_TEST(sender, app_data, user_data):
@@ -83,10 +84,25 @@ def callback_add_trigger(sender, app_data, user_data):
     # Also, give the app component a reference (so that deletion is elegant).
 
     new_trigger = Trigger()  # TODO: how will this become e.g. a TimeTrigger?
-
-    dpg.add_collapsing_header(label="Trigger 1", user_data=new_trigger)
-
+    tp8.trigger_template(
+        parent=dpg.get_item_parent(sender),
+        trigger=new_trigger
+        )
     user_data.add_trigger(new_trigger)
+
+
+def callback_delete_trigger(sender, app_data, user_data):
+    # delete the app elements,
+    # and delete (list.remove()) the trigger from the Strategy
+    print(f"sender is: {sender}")
+    print(f"app_data is: {app_data}")
+    print(f"user_data is: {user_data}")
+
+
+def set_trigger_type(sender, app_data, user_data):
+    print(f"sender is: {sender}")
+    print(f"app_data is: {app_data}")
+    print(f"user_data is: {user_data}")
 
 
 def save_strategy(strategy: Strategy, path: str):
