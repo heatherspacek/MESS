@@ -1,8 +1,14 @@
-
 from melee.enums import Character, Button
 from melee.controller import Controller
 
+
+from enum import Enum
 from dataclasses import dataclass, field
+
+
+class FacingDirection(Enum):
+    LEFT = "LEFT"
+    RIGHT = "RIGHT"
 
 
 @dataclass
@@ -82,10 +88,20 @@ class Strategy:
     """
     A data structure that was specified through the builder UI.
     """
-    name: str
+    name: str = "strategy1"
     character: Character = Character.CPTFALCON  # from melee.enums
     triggers: list[Trigger] = field(default_factory=list)
     responses: list[Response] = field(default_factory=list)
 
-    def add_trigger(self, trigger: Trigger):
+    def add_new_trigger(self):
+        trigger = Trigger()
         self.triggers.append(trigger)
+        return trigger, len(self.triggers)
+
+    def change_trigger_type(self, index, new_type_string):
+        match new_type_string:
+            case "":
+                pass
+
+    def delete_trigger_by_index(self, index: int):
+        self.triggers.pop(index)

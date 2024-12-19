@@ -1,9 +1,9 @@
 import dearpygui.dearpygui as dpg
 import yaml  # serialization of `Strategy`s`
 import os
-from MESSabstract import Strategy, Trigger
-from MESSaux import Strat2Dict, Dict2Strat
-import strategyplayer_tool_templates as tp8
+from messlib.classes_abstract import Strategy, Trigger
+from messlib.functions_aux import Strat2Dict, Dict2Strat
+import messtool.strategyplayer_tool_templates as tp8
 
 
 def callback_TEST(sender, app_data, user_data):
@@ -83,12 +83,17 @@ def callback_add_trigger(sender, app_data, user_data):
     # Add to the data structure and the app at the same time.
     # Also, give the app component a reference (so that deletion is elegant).
 
-    new_trigger = Trigger()  # TODO: how will this become e.g. a TimeTrigger?
+    # dev note: user_data will hold the strategyplayer
+
+    # *** this section is broken, but is being replaced imminently with MVC
+    # restructure.
+    user_data.add_trigger(new_trigger)
+
     tp8.trigger_template(
         parent=dpg.get_item_parent(sender),
-        trigger=new_trigger
+        trigger=new_trigger,
+        n=len(user_data.loaded_strategy.triggers)+1
         )
-    user_data.add_trigger(new_trigger)
 
 
 def callback_delete_trigger(sender, app_data, user_data):

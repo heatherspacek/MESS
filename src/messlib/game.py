@@ -1,6 +1,7 @@
-from MESSabstract import Input, StochasticInput, Action
+from messlib.classes_abstract import (
+    Input, StochasticInput, Action, FacingDirection)
 from melee.enums import Button, Character
-from MESSaux import angle_to_meleecircle, jumpsquat, FacingDirection
+from messlib.functions_aux import angle_to_meleecircle, jumpsquat
 
 
 class Inputs:
@@ -82,7 +83,7 @@ class Actions:
 
     def wavedash(
             character: Character,
-            direction: FacingDirection, 
+            direction: FacingDirection,
             angle: int | float
             ):
         sequence = [Inputs.jump()] * jumpsquat(character)

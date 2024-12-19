@@ -4,10 +4,10 @@ import melee
 import os  # for os.path.join
 import pdb
 # --
-import strategyplayer_tool_callbacks as cbx
-import strategyplayer_tool_templates as tp8
-from MESSaux import ConsoleInterface, StrategyPlayer
-from MESSactions import Actions, Inputs
+import messtool.strategyplayer_tool_callbacks as cbx
+import messtool.strategyplayer_tool_templates as tp8
+from messlib.classes_functional import ConsoleInterface, StrategyPlayer
+from messlib.game import Actions, Inputs
 
 
 def window_layout(Interface: ConsoleInterface,
@@ -136,7 +136,10 @@ def window_layout(Interface: ConsoleInterface,
 
 
 def strategy_setup_section(Player2: StrategyPlayer):
-    dpg.add_input_text(label="Strategy Name", default_value="New Strategy 1")
+    dpg.add_input_text(
+        label="Strategy Name",
+        default_value=Player2.loaded_strategy.name
+        )
     dpg.add_combo(list(melee.enums.Character), label="Chr")
     # dpg.add_combo([2, 3, 4], label="SP controller port")
     dpg.add_separator()

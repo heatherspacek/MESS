@@ -1,20 +1,12 @@
 import dearpygui.dearpygui as dpg
 import melee
 import os  # for os.path.join
-from dataclasses import dataclass
 # -
-import strategyplayer_tool_layout as layout
+import messtool.strategyplayer_tool_layout as layout
 import dearpygui.demo as demo
 # -
-from MESSaux import ConsoleInterface, StrategyPlayer
-
-
-@dataclass
-class GlobalState():
-    """
-    storage for useful global states"""
-    pass
-
+from messlib.classes_functional import ConsoleInterface, StrategyPlayer
+from messlib.classes_abstract import Strategy
 
 """
 ===============================================================================
@@ -29,14 +21,16 @@ if __name__ == "__main__":
     Console = melee.Console(path=slippi_playback_path)
 
     Interface = ConsoleInterface(Console)
-    Gsm = GlobalState()
+
+    EmptyStrategy = Strategy()
 
     Player1 = StrategyPlayer()
     Player2 = StrategyPlayer()
+    Player2.loaded_strategy = EmptyStrategy
 
     layout.window_layout(Interface, Player1, Player2)
 
-    if False:
+    if True:
         demo.show_demo()
 
     dpg.start_dearpygui()

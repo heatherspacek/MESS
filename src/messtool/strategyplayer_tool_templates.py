@@ -1,15 +1,18 @@
 import dearpygui.dearpygui as dpg
-import strategyplayer_tool_callbacks as cbx
+import messtool.strategyplayer_tool_callbacks as cbx
 
 
-def trigger_template(parent, trigger):
-    with dpg.collapsing_header(label="Trigger N", user_data=trigger,
-                               parent=parent, indent=20) as H1:
+def trigger_template(parent, trigger, n):
+    with dpg.collapsing_header(label="Trigger "+str(n),
+                               user_data=trigger,
+                               parent=parent,
+                               indent=20,
+                               default_open=True) as H1:
         header_id = str(H1)
 
         def trigger_type_select_callback(sender, value, user_data):
-            # Based on box selection, change the state of the template, and
-            # also
+            # Based on box selection, change the state of the template
+            # ...and also change the underlying Trigger object.
             sender_header_id = str(
                     dpg.get_item_parent(dpg.get_item_parent(sender))
                 )
@@ -44,4 +47,3 @@ def trigger_template(parent, trigger):
             dpg.add_input_int(label="distance value")
         with dpg.group(show=False, tag="actiongroup_"+header_id):
             dpg.add_input_int(label="frame value")
-
