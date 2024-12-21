@@ -2,7 +2,7 @@ import dearpygui.dearpygui as dpg
 import yaml  # serialization of `Strategy`s`
 import os
 from messlib.classes_abstract import Strategy, Trigger
-from messlib.functions_aux import Strat2Dict, Dict2Strat
+from messlib.serialization import strat2dict, dict2strat
 import messtool.strategyplayer_tool_templates as tp8
 
 
@@ -39,7 +39,7 @@ def callback_strategy_load_ok(sender, app_data, user_data):
         with open(path_to_try_loading) as fstream:
             strategy_dict = yaml.safe_load(fstream)
             print(strategy_dict)
-            print(Dict2Strat(strategy_dict))
+            print(dict2strat(strategy_dict))
 
             # player1 = dpg.get_item_user_data("load_strategy_button")
             # player1.loaded_strategy = Dict2Strat(strategy_dict)
@@ -58,7 +58,7 @@ def callback_strategy_save_ok(sender, app_data, user_data):
     print("save-ok")
     with open(app_data['file_path_name'], 'w') as wstream:
         strategyplayer = dpg.get_item_user_data("importantbutton")
-        strategy_dict = Strat2Dict(strategyplayer.loaded_strategy)
+        strategy_dict = strat2dict(strategyplayer.loaded_strategy)
         print(strategy_dict)
         yaml.safe_dump(strategy_dict, wstream)
 

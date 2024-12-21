@@ -12,13 +12,14 @@
             },
             "args": [
                 "run",
-                "dev/strategyplayer_tool.py"
+                "src/strategyplayer_tool.py"
             ],
             "presentation": {
                 "echo": true,
                 "panel": "shared",
                 "focus": true
-            }
+            },
+            "problemMatcher": []
         }
     ]
 }
