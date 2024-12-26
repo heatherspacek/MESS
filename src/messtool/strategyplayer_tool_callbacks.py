@@ -79,6 +79,7 @@ def callback_situation_load_cancel(sender, app_data, user_data):
     print(f"user_data is: {user_data}")
 
 
+'''
 def callback_add_trigger(sender, app_data, user_data):
     # Add to the data structure and the app at the same time.
     # Also, give the app component a reference (so that deletion is elegant).
@@ -94,6 +95,7 @@ def callback_add_trigger(sender, app_data, user_data):
         trigger=new_trigger,
         n=len(user_data.loaded_strategy.triggers)+1
         )
+'''
 
 
 def callback_delete_trigger(sender, app_data, user_data):

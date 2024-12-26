@@ -32,7 +32,7 @@ if __name__ == "__main__":
     GuiController = app_classes.GuiController()
 
     # View
-    app_layout.layout_setup(Interface, Player1, Player2, GuiController)
+    app_layout.layout_setup(GuiController)
 
     dpg.start_dearpygui()
 

@@ -2,9 +2,8 @@ import dearpygui.dearpygui as dpg
 import messtool.strategyplayer_tool_callbacks as cbx
 
 
-def trigger_template(parent, trigger, n):
-    with dpg.collapsing_header(label="Trigger "+str(n),
-                               user_data=trigger,
+def trigger_template(parent):
+    with dpg.collapsing_header(label="[placeholder]",
                                parent=parent,
                                indent=20,
                                default_open=True) as H1:
@@ -39,8 +38,7 @@ def trigger_template(parent, trigger, n):
                     callback=trigger_type_select_callback,
                     user_data=()
                     )
-            dpg.add_button(label=" × ", callback=cbx.callback_delete_trigger,
-                           user_data=trigger)
+            dpg.add_button(label=" × ", callback=cbx.callback_delete_trigger)
         with dpg.group(show=False, tag="timegroup_"+header_id):
             dpg.add_input_int(label="time value")
         with dpg.group(show=False, tag="distgroup_"+header_id):

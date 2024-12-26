@@ -17,7 +17,7 @@ def layout_setup(GuiController: tool.GuiController):
     main_layout(GuiController)
 
     dpg.create_viewport(
-        title='StrategyPlayer Invocation Tool',
+        title="MESS Strategy Editor",
         width=700, height=600
         )
     dpg.setup_dearpygui()
@@ -51,7 +51,7 @@ def main_layout(GuiController: tool.GuiController):
                     dpg.add_button(
                         label="Import Strategy...",
                         callback=cbx.callback_strategy_import
-                        )
+                        )  # TODO: callback should be to GuiController.
                     dpg.add_button(
                         label="Import Situation...",
                         callback=lambda: dpg.show_item("situation_fileselect")
@@ -59,7 +59,7 @@ def main_layout(GuiController: tool.GuiController):
 
                 with dpg.tab_bar():
                     with dpg.tab(label=tab1_1str):  # SP Setup
-                        strategy_setup_section(Player2)
+                        strategy_setup_section(GuiController)
 
                     with dpg.tab(label=tab1_2str):  # Situation setup
                         pass
@@ -81,24 +81,32 @@ def main_layout(GuiController: tool.GuiController):
                        )
 
 
-def strategy_setup_section(Player2: StrategyPlayer):
-    dpg.add_input_text(
-        label="Strategy Name",
-        default_value=Player2.loaded_strategy.name
-        )
-    dpg.add_combo(list(melee.enums.Character), label="Chr")
+def strategy_setup_section(GuiController: tool.GuiController):
+    id_strat_name = dpg.add_input_text(label="Strategy Name")
+    id_character_combobox = dpg.add_combo(
+        list(melee.enums.Character), label="Character")
     # dpg.add_combo([2, 3, 4], label="SP controller port")
     dpg.add_separator()
     with dpg.collapsing_header(label="Triggers", default_open=True) as H_T:
+        # Register this header with the MVC Controller
+        GuiController.triggers_header_ref = H_T
         dpg.bind_item_theme(H_T, "theme1")
         dpg.add_button(label="(+) Add Trigger",
-                       callback=cbx.callback_add_trigger,
-                       user_data=Player2)
+                       callback=GuiController.add_trigger)
 
     with dpg.collapsing_header(label="Responses", default_open=True) as head2:
         dpg.add_button(label="(+) Add Response",
-                       callback=cbx.callback_add_trigger,  # change this later
+                       callback=None,  # change this later
                        user_data=head2)
+    """
+    Register these elements with the GuiController so that it can send model
+    changes back to the UI (e.g. loaded a Strat from file, need to update name
+    field)
+    """
+    print(id_strat_name)
+    print(id_character_combobox)
+    GuiController.add_ui_entries(("strat_name", "character_select"),
+                                 (id_strat_name, id_character_combobox))
 
 
 def hidden_windows_setup():
