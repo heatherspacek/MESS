@@ -30,6 +30,7 @@ if __name__ == "__main__":
 
     # Controller (in the M-V-C sense, not game-controller)
     GuiController = app_classes.GuiController()
+    GuiController.sp2 = Player2
 
     # View
     app_layout.layout_setup(GuiController)

@@ -9,34 +9,11 @@ def trigger_template(parent):
                                default_open=True) as H1:
         header_id = str(H1)
 
-        def trigger_type_select_callback(sender, value, user_data):
-            # Based on box selection, change the state of the template
-            # ...and also change the underlying Trigger object.
-            sender_header_id = str(
-                    dpg.get_item_parent(dpg.get_item_parent(sender))
-                )
-
-            if value == "TimeTrigger":
-                dpg.configure_item("timegroup_"+sender_header_id, show=True)
-                dpg.configure_item("distgroup_"+sender_header_id, show=False)
-                dpg.configure_item("actiongroup_"+sender_header_id, show=False)
-            elif value == "DistanceTrigger":
-                dpg.configure_item("timegroup_"+sender_header_id, show=False)
-                dpg.configure_item("distgroup_"+sender_header_id, show=True)
-                dpg.configure_item("actiongroup_"+sender_header_id, show=False)
-            elif value == "ActionTrigger":
-                dpg.configure_item("timegroup_"+sender_header_id, show=False)
-                dpg.configure_item("distgroup_"+sender_header_id, show=False)
-                dpg.configure_item("actiongroup_"+sender_header_id, show=True)
-            else:
-                pass
-
         with dpg.group(horizontal=True):
             dpg.add_combo(
                     ["TimeTrigger", "DistanceTrigger", "ActionTrigger"],
                     label="Trigger Type",
-                    callback=trigger_type_select_callback,
-                    user_data=()
+                    callback=cbx.callback_trigger_type_select
                     )
             dpg.add_button(label=" × ", callback=cbx.callback_delete_trigger)
         with dpg.group(show=False, tag="timegroup_"+header_id):
@@ -45,3 +22,4 @@ def trigger_template(parent):
             dpg.add_input_int(label="distance value")
         with dpg.group(show=False, tag="actiongroup_"+header_id):
             dpg.add_input_int(label="frame value")
+    return H1

@@ -79,31 +79,35 @@ def callback_situation_load_cancel(sender, app_data, user_data):
     print(f"user_data is: {user_data}")
 
 
-'''
-def callback_add_trigger(sender, app_data, user_data):
-    # Add to the data structure and the app at the same time.
-    # Also, give the app component a reference (so that deletion is elegant).
-
-    # dev note: user_data will hold the strategyplayer
-
-    # *** this section is broken, but is being replaced imminently with MVC
-    # restructure.
-    user_data.add_trigger(new_trigger)
-
-    tp8.trigger_template(
-        parent=dpg.get_item_parent(sender),
-        trigger=new_trigger,
-        n=len(user_data.loaded_strategy.triggers)+1
-        )
-'''
-
-
 def callback_delete_trigger(sender, app_data, user_data):
     # delete the app elements,
     # and delete (list.remove()) the trigger from the Strategy
     print(f"sender is: {sender}")
     print(f"app_data is: {app_data}")
     print(f"user_data is: {user_data}")
+
+
+def callback_trigger_type_select(sender, value, user_data):
+    # Based on box selection, change the state of the template
+    # ...and also change the underlying Trigger object.
+    sender_header_id = str(
+            dpg.get_item_parent(dpg.get_item_parent(sender))
+        )
+
+    if value == "TimeTrigger":
+        dpg.configure_item("timegroup_"+sender_header_id, show=True)
+        dpg.configure_item("distgroup_"+sender_header_id, show=False)
+        dpg.configure_item("actiongroup_"+sender_header_id, show=False)
+    elif value == "DistanceTrigger":
+        dpg.configure_item("timegroup_"+sender_header_id, show=False)
+        dpg.configure_item("distgroup_"+sender_header_id, show=True)
+        dpg.configure_item("actiongroup_"+sender_header_id, show=False)
+    elif value == "ActionTrigger":
+        dpg.configure_item("timegroup_"+sender_header_id, show=False)
+        dpg.configure_item("distgroup_"+sender_header_id, show=False)
+        dpg.configure_item("actiongroup_"+sender_header_id, show=True)
+    else:
+        pass
 
 
 def set_trigger_type(sender, app_data, user_data):

@@ -10,40 +10,41 @@ UIEntry = namedtuple("UIEntry", "name, id, update_signature")
 
 class GuiController:
 
-    ui_references = []
+    ui_references = {}
     triggers_header_ref = None
     actions_header_ref = None
+    sp2 = None
 
-    def add_ui_entries(self, names, dpg_tags):
-        for name, tag in zip(names, dpg_tags):
-            type = dpg.get_item_info(tag)['type']
+    def add_ui_entries(self, *entry_pairs):
+        for name, tag in entry_pairs:
+            # type = dpg.get_item_info(tag)['type']
             # config = dpg.get_item_configuration(d)
             # value = dpg.get_value(tag)
             new_entry = UIEntry(
                 name=name,
                 id=tag,
-                update_signature=self.get_ui_update_signature(type)
+                update_signature=()
                 )
-            self.ui_references.append(new_entry)
-
-    def get_ui_update_signature(self, type: str):
-        match type:
-            case 'mvAppItemType::mvInputText':
-                return {'default_value': None}
-            case 'mvAppItemType::mvCombo':
-                return {'items': None}
-            case _:
-                raise NotImplementedError
+            self.ui_references[name] = new_entry
+        print(self.ui_references)
 
     def update_ui_elements(self):
-        for uie in self.ui_references:
+        for uie_key in self.ui_references:
+            pass
             # Retaining this as a **demo, but it might not be the best model.
-            dpg.configure_item(uie.id, **uie.update_signature)
+            # dpg.configure_item(entry.id, **uie.update_signature)
 
     def add_trigger(self):
         if self.triggers_header_ref is not None:
             # add the corresponding "template" underneath it
-            tp8.trigger_template(parent=self.triggers_header_ref)
+            tp8_ref = tp8.trigger_template(parent=self.triggers_header_ref)
+            n_triggers_so_far = len(self.sp2.loaded_strategy.triggers)
+            self.add_ui_entries(
+                ("trigger_" + str(1+n_triggers_so_far), tp8_ref)
+                )
+
+    def delete_trigger(self, ui_id):
+        pass
 
     def load_strategy_from_file(self):
         pass

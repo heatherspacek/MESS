@@ -37,9 +37,7 @@ def main_layout(GuiController: tool.GuiController):
     tab1_1str = "Strategy Setup"
     tab1_2str = "Situation Setup"
 
-    with dpg.window(label="START HERE", no_close=True) as top_level_wnd:
-        dpg.set_item_width(top_level_wnd, 600)
-        dpg.set_item_height(top_level_wnd, 600)
+    with dpg.window(label="MESS Strategy Editor", tag="topwnd"):
         with dpg.group(horizontal=True):
             dpg.add_loading_indicator(circle_count=6, radius=2, height=48)
             dpg.add_text("Welcome to MESS! Status messages will show up here.")
@@ -80,6 +78,8 @@ def main_layout(GuiController: tool.GuiController):
                        tag="testingbutton",
                        )
 
+    dpg.set_primary_window("topwnd", True)
+
 
 def strategy_setup_section(GuiController: tool.GuiController):
     id_strat_name = dpg.add_input_text(label="Strategy Name")
@@ -105,8 +105,8 @@ def strategy_setup_section(GuiController: tool.GuiController):
     """
     print(id_strat_name)
     print(id_character_combobox)
-    GuiController.add_ui_entries(("strat_name", "character_select"),
-                                 (id_strat_name, id_character_combobox))
+    GuiController.add_ui_entries(("strat_name", id_strat_name),
+                                 ("character_select", id_character_combobox))
 
 
 def hidden_windows_setup():
