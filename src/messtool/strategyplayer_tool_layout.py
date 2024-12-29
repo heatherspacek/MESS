@@ -4,7 +4,6 @@ import melee
 import os  # for os.path.join
 import pdb
 # --
-import messtool.strategyplayer_tool_callbacks as cbx
 import messtool.strategyplayer_tool_templates as tp8
 import messtool.strategyplayer_tool_classes as tool
 
@@ -48,8 +47,8 @@ def main_layout(GuiController: tool.GuiController):
                 with dpg.group(horizontal=True):
                     dpg.add_button(
                         label="Import Strategy...",
-                        callback=cbx.callback_strategy_import
-                        )  # TODO: callback should be to GuiController.
+                        callback=GuiController.load_strategy_from_file
+                        )
                     dpg.add_button(
                         label="Import Situation...",
                         callback=lambda: dpg.show_item("situation_fileselect")
@@ -70,11 +69,11 @@ def main_layout(GuiController: tool.GuiController):
             #
         dpg.add_text("=====")
         dpg.add_button(label="Export Strategy",
-                       callback=cbx.callback_strategy_export,
+                       callback=GuiController.save_strategy_to_file,
                        tag="importantbutton",
                        )
         dpg.add_button(label="connect p2",
-                       callback=cbx.callback_TEST,
+                       callback=(),
                        tag="testingbutton",
                        )
 
@@ -91,8 +90,18 @@ def strategy_setup_section(GuiController: tool.GuiController):
         # Register this header with the MVC Controller
         GuiController.triggers_header_ref = H_T
         dpg.bind_item_theme(H_T, "theme1")
-        dpg.add_button(label="(+) Add Trigger",
-                       callback=GuiController.add_trigger)
+        with dpg.group(horizontal=True, horizontal_spacing=-1):
+            dpg.add_button(label="(+) Add Trigger",
+                           height=35,
+                           width=150,
+                           callback=GuiController.add_trigger)
+            dpg.add_spacer(width=150)
+            dpg.add_button(label="Collapse All",
+                           width=150,
+                           callback=GuiController.collapse_all)
+            dpg.add_button(label="Expand All",
+                           width=150,
+                           callback=GuiController.collapse_all)
 
     with dpg.collapsing_header(label="Responses", default_open=True) as head2:
         dpg.add_button(label="(+) Add Response",
@@ -103,10 +112,9 @@ def strategy_setup_section(GuiController: tool.GuiController):
     changes back to the UI (e.g. loaded a Strat from file, need to update name
     field)
     """
-    print(id_strat_name)
-    print(id_character_combobox)
-    GuiController.add_ui_entries(("strat_name", id_strat_name),
-                                 ("character_select", id_character_combobox))
+    GuiController.register_ui_reference("strat_name", id_strat_name)
+    GuiController.register_ui_reference(
+        "character_select", id_character_combobox)
 
 
 def hidden_windows_setup():
@@ -121,9 +129,9 @@ def hidden_windows_setup():
     dpg.add_file_dialog(
         directory_selector=False,
         show=False,
-        callback=cbx.callback_situation_load_ok,
+        callback=None,
         tag="situation_fileselect",
-        cancel_callback=cbx.callback_situation_load_cancel,
+        cancel_callback=None,
         width=500, height=400
         )
     with dpg.window(label="[Placeholder Title]",

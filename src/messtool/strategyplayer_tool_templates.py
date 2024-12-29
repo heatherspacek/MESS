@@ -1,8 +1,7 @@
 import dearpygui.dearpygui as dpg
-import messtool.strategyplayer_tool_callbacks as cbx
 
 
-def trigger_template(parent):
+def trigger_template(parent, GuiController):
     with dpg.collapsing_header(label="[placeholder]",
                                parent=parent,
                                indent=20,
@@ -13,13 +12,24 @@ def trigger_template(parent):
             dpg.add_combo(
                     ["TimeTrigger", "DistanceTrigger", "ActionTrigger"],
                     label="Trigger Type",
-                    callback=cbx.callback_trigger_type_select
+                    callback=GuiController.trigger_type_select
                     )
-            dpg.add_button(label=" × ", callback=cbx.callback_delete_trigger)
+            dpg.add_spacer(width=30)
+            dpg.add_button(label="×",
+                           width=30,
+                           height=30,
+                           callback=GuiController.delete_trigger)
         with dpg.group(show=False, tag="timegroup_"+header_id):
-            dpg.add_input_int(label="time value")
+            dpg.add_input_int(label="time value (frames)",
+                              callback=GuiController.pull_values)
         with dpg.group(show=False, tag="distgroup_"+header_id):
-            dpg.add_input_int(label="distance value")
+            dpg.add_input_int(label="distance value",
+                              callback=GuiController.pull_values)
         with dpg.group(show=False, tag="actiongroup_"+header_id):
-            dpg.add_input_int(label="frame value")
+            dpg.add_input_int(label="frame value",
+                              callback=GuiController.pull_values)
+        with dpg.group(show=False, tag="responseselect_"+header_id):
+            dpg.add_combo(
+                ["placeholder."]
+            )
     return H1

@@ -8,6 +8,8 @@ import messtool.strategyplayer_tool_classes as app_classes
 from messlib.classes_functional import ConsoleInterface, StrategyPlayer
 from messlib.classes_abstract import Strategy
 
+from dearpygui.demo import show_demo
+
 """
 ===============================================================================
 app entry point.
@@ -30,11 +32,10 @@ if __name__ == "__main__":
 
     # Controller (in the M-V-C sense, not game-controller)
     GuiController = app_classes.GuiController()
-    GuiController.sp2 = Player2
+    GuiController.loaded_strategy = EmptyStrategy
 
     # View
     app_layout.layout_setup(GuiController)
 
     dpg.start_dearpygui()
-
     dpg.destroy_context()

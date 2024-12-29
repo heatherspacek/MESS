@@ -105,3 +105,6 @@ class Strategy:
 
     def delete_trigger_by_index(self, index: int):
         self.triggers.pop(index)
+
+    def delete_trigger_by_reference(self, trigger_ref: Trigger):
+        self.triggers.remove(trigger_ref)
