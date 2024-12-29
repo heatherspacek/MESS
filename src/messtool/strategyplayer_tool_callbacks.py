@@ -1,4 +1,3 @@
-import dearpygui.dearpygui as dpg
 import yaml  # serialization of `Strategy`s`
 import os
 from messlib.classes_abstract import Strategy, Trigger

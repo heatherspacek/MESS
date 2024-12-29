@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>550</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>50</y>
+      <width>161</width>
+      <height>361</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QScrollArea" name="scrollArea">
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="QWidget" name="scrollAreaWidgetContents">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>157</width>
+          <height>330</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboBox">
+       <item>
+        <property name="text">
+         <string>cap</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>mark</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>430</y>
+      <width>111</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>launch melee</string>
+    </property>
+   </widget>
+   <widget class="QToolBox" name="toolBox">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>60</y>
+      <width>201</width>
+      <height>341</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="page">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>201</width>
+       <height>221</height>
+      </rect>
+     </property>
+     <attribute name="label">
+      <string>Page 1</string>
+     </attribute>
+    </widget>
+    <widget class="QWidget" name="page_3">
+     <attribute name="label">
+      <string>Page</string>
+     </attribute>
+    </widget>
+    <widget class="QWidget" name="page_4">
+     <attribute name="label">
+      <string>Page</string>
+     </attribute>
+    </widget>
+    <widget class="QWidget" name="page_2">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>201</width>
+       <height>221</height>
+      </rect>
+     </property>
+     <attribute name="label">
+      <string>Page 2</string>
+     </attribute>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>500</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

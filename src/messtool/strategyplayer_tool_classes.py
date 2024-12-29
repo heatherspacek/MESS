@@ -1,5 +1,4 @@
 from collections import namedtuple
-import dearpygui.dearpygui as dpg
 
 import messtool.strategyplayer_tool_templates as tp8
 

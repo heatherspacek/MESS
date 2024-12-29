@@ -5,7 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "dearpygui>=1.11.1",
     "melee>=0.41.1",
+    "pyside6>=6.8.1,!=6.8.1.1",
     "pyyaml>=6.0.2",
 ]

@@ -1,4 +1,3 @@
-import dearpygui.dearpygui as dpg
 import messtool.strategyplayer_tool_callbacks as cbx
 
 

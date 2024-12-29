@@ -1,8 +1,9 @@
-import dearpygui.dearpygui as dpg
-import ctypes  # for Windows high-dpi text rendering "fuzziness" fix
 import melee
-import os  # for os.path.join
 import pdb
+import os
+# --
+from PySide6.QtWidgets import (QApplication, QMainWindow, QLabel, QPushButton)
+from PySide6.QtCore import Slot
 # --
 import messtool.strategyplayer_tool_callbacks as cbx
 import messtool.strategyplayer_tool_templates as tp8
@@ -10,24 +11,22 @@ import messtool.strategyplayer_tool_classes as tool
 
 
 def layout_setup(GuiController: tool.GuiController):
-    dpg.create_context()
-    window_themes()
-    window_fonts()
-    hidden_windows_setup()
-    main_layout(GuiController)
+    app = QApplication()
 
-    dpg.create_viewport(
-        title="MESS Strategy Editor",
-        width=700, height=600
-        )
-    dpg.setup_dearpygui()
+    win = MainWindow()
+    win.resize(500, 600)
+    win.show()
 
-    if os.name == 'nt':
-        # Windows-specific "high-DPI" bugfix for blurry text.
-        # before showing the viewport/calling `show_viewport`:
-        ctypes.windll.shcore.SetProcessDpiAwareness(2)
+    app.exec()
 
-    dpg.show_viewport()
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("MESS Strategy Builder")
+        # --
+        self.menu = self.menuBar()
+        self.file_menu = self.menu.addMenu("File")
 
 
 def main_layout(GuiController: tool.GuiController):
