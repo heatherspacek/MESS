@@ -14,6 +14,7 @@ class UIEntry:
 @dataclass
 class UIEntryTrigger(UIEntry):
     trigger_ref: any  # well not ANY but im lazyyy
+    trigger_index: int
 
 
 # get_value and set_value work on all dpg ui items, apparently.
