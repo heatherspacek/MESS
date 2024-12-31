@@ -1,8 +1,8 @@
 import dearpygui.dearpygui as dpg
 
 
-def trigger_template(parent, GuiController):
-    with dpg.collapsing_header(label="[placeholder]",
+def trigger_template(GuiController, label, parent):
+    with dpg.collapsing_header(label=label,
                                parent=parent,
                                indent=20,
                                default_open=True) as H1:

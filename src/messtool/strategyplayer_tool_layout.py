@@ -81,14 +81,12 @@ def main_layout(GuiController: tool.GuiController):
 
 
 def strategy_setup_section(GuiController: tool.GuiController):
-    id_strat_name = dpg.add_input_text(label="Strategy Name")
-    id_character_combobox = dpg.add_combo(
+    GuiController.strat_name_ref = dpg.add_input_text(label="Strategy Name")
+    GuiController.character_combo_ref = dpg.add_combo(
         list(melee.enums.Character), label="Character")
-    # dpg.add_combo([2, 3, 4], label="SP controller port")
+
     dpg.add_separator()
     with dpg.collapsing_header(label="Triggers", default_open=True) as H_T:
-        # Register this header with the MVC Controller
-        GuiController.triggers_header_ref = H_T
         dpg.bind_item_theme(H_T, "theme1")
         with dpg.group(horizontal=True, horizontal_spacing=-1):
             dpg.add_button(label="(+) Add Trigger",
@@ -102,19 +100,27 @@ def strategy_setup_section(GuiController: tool.GuiController):
             dpg.add_button(label="Expand All",
                            width=150,
                            callback=GuiController.collapse_all)
+            with dpg.group() as triggers_group:
+                # Register this (empty) group with the Controller.
+                GuiController.triggers_group_ref = triggers_group
 
     with dpg.collapsing_header(label="Responses", default_open=True) as head2:
-        dpg.add_button(label="(+) Add Response",
-                       callback=None,  # change this later
-                       user_data=head2)
-    """
-    Register these elements with the GuiController so that it can send model
-    changes back to the UI (e.g. loaded a Strat from file, need to update name
-    field)
-    """
-    GuiController.register_ui_reference("strat_name", id_strat_name)
-    GuiController.register_ui_reference(
-        "character_select", id_character_combobox)
+        dpg.bind_item_theme(head2, "theme2")
+        with dpg.group(horizontal=True, horizontal_spacing=-1):
+            dpg.add_button(label="(+) Add Response",
+                           height=35,
+                           width=150,
+                           callback=GuiController.add_trigger)
+            dpg.add_spacer(width=150)
+            dpg.add_button(label="Collapse All",
+                           width=150,
+                           callback=GuiController.collapse_all)
+            dpg.add_button(label="Expand All",
+                           width=150,
+                           callback=GuiController.collapse_all)
+            with dpg.group() as responses_group:
+                # Register this group with the Controller.
+                GuiController.actions_group_ref = responses_group
 
 
 def hidden_windows_setup():
@@ -157,6 +163,13 @@ def window_themes():
     with dpg.theme(tag="theme1"):
         with dpg.theme_component(dpg.mvCollapsingHeader):
             dpg.add_theme_color(dpg.mvThemeCol_Header, [98, 48, 67])
+            dpg.add_theme_color(dpg.mvThemeCol_HeaderHovered, [119, 61, 84])
+            dpg.add_theme_color(dpg.mvThemeCol_HeaderActive, [119, 44, 74])
+            dpg.add_theme_color(dpg.mvThemeCol_Text, [211, 211, 211])
+
+    with dpg.theme(tag="theme2"):
+        with dpg.theme_component(dpg.mvCollapsingHeader):
+            dpg.add_theme_color(dpg.mvThemeCol_Header, [28, 48, 97])
             dpg.add_theme_color(dpg.mvThemeCol_HeaderHovered, [119, 61, 84])
             dpg.add_theme_color(dpg.mvThemeCol_HeaderActive, [119, 44, 74])
             dpg.add_theme_color(dpg.mvThemeCol_Text, [211, 211, 211])

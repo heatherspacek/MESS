@@ -8,8 +8,6 @@ import messtool.strategyplayer_tool_classes as app_classes
 from messlib.classes_functional import ConsoleInterface, StrategyPlayer
 from messlib.classes_abstract import Strategy
 
-from dearpygui.demo import show_demo
-
 """
 ===============================================================================
 app entry point.
