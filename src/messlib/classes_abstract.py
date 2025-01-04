@@ -5,10 +5,18 @@ from melee.controller import Controller
 from enum import Enum
 from dataclasses import dataclass, field
 
+# TODO: come up with better category names than "abstract" and "functional"
+
 
 class FacingDirection(Enum):
     LEFT = "LEFT"
     RIGHT = "RIGHT"
+
+
+# This is probably silly.
+class Comparison(Enum):
+    LESSTHAN = "LESSTHAN"
+    GREATERTHAN = "GREATERTHAN"
 
 
 @dataclass
@@ -35,6 +43,9 @@ class Input:
 
 
 class StochasticInput(Input):
+    # Idea: normal inputs always return a "go to next input" flag, but
+    # StochasticInputs can "sometimes" set that flag?
+    # Unsure, coming back to it later.
     def do_input(self, controller: Controller):
         pass
 
@@ -63,6 +74,9 @@ class Action:
 class Trigger:
     associated_action: Action | None = None
 
+    # Hacky way to keep nice things about @dataclass
+    def __eq__(self, other): return False
+
 
 @dataclass
 class TimeTrigger(Trigger):
@@ -72,11 +86,25 @@ class TimeTrigger(Trigger):
 @dataclass
 class DistanceTrigger(Trigger):
     distance_value: int = 0
+    comparator: Comparison = Comparison.LESSTHAN
+
+    def set_comparator(self, symbol_str: str):
+        match symbol_str:
+            case "<":
+                self.comparator = Comparison.LESSTHAN
+            case ">":
+                self.comparator = Comparison.GREATERTHAN
+            case _:
+                raise ValueError("Unknown comparison symbol")
+
+    def get_comparator_symbol(self):
+        return ">" if self.comparator == Comparison.GREATERTHAN else "<"
 
 
 @dataclass
 class ActionTrigger(Trigger):
     frame_value: int = 0
+    reaction_animation: None = None
 
 
 @dataclass

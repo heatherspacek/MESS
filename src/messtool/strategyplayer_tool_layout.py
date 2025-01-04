@@ -4,7 +4,6 @@ import melee
 import os  # for os.path.join
 import pdb
 # --
-import messtool.strategyplayer_tool_templates as tp8
 import messtool.strategyplayer_tool_classes as tool
 
 
@@ -178,6 +177,8 @@ def window_themes():
 def window_fonts():
     with dpg.font_registry():
         # first argument ids the path to the .ttf or .otf file
+        # TODO: this is fragile!!! only works right now because VS Code sets
+        # a specific cwd. Look more later!
         dpg.add_font(os.path.join("res", "NotoSans-Regular.ttf"),
                      20, tag="default_font")
         dpg.add_font(os.path.join("res", "NotoSans-Bold.ttf"),
