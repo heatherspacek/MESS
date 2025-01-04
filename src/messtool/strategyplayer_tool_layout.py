@@ -100,9 +100,9 @@ def strategy_setup_section(GuiController: tool.GuiController):
             dpg.add_button(label="Expand All",
                            width=150,
                            callback=GuiController.collapse_all)
-            with dpg.group() as triggers_group:
-                # Register this (empty) group with the Controller.
-                GuiController.triggers_group_ref = triggers_group
+        with dpg.group() as triggers_group:
+            # Register this (empty) group with the Controller.
+            GuiController.triggers_group_ref = triggers_group
 
     with dpg.collapsing_header(label="Responses", default_open=True) as head2:
         dpg.bind_item_theme(head2, "theme2")

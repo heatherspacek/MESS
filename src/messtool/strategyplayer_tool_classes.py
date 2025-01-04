@@ -3,6 +3,8 @@ import dearpygui.dearpygui as dpg
 import messtool.strategyplayer_tool_templates as tp8
 from messlib.classes_abstract import Strategy
 
+import pdb
+
 # get_value and set_value work on all dpg ui items, apparently.
 # delete_item() can do runtime deletion. (container AND children!)
 
@@ -25,16 +27,16 @@ class GuiController:
         # Function to consult the Model
         # we registered key elements of the View into GuiController already
 
-        # 1. delete everything)
+        # 1. delete everything
         dpg.delete_item(self.triggers_group_ref, children_only=True)
-
+        print(self.loaded_strategy.triggers)
         # 2. consult the model and re-add all of them
         for i, tr in enumerate(self.loaded_strategy.triggers):
-            print(self.triggers_group_ref)
             tp8.trigger_template(
                 GuiController=self,
                 label="trigger#"+str(i),
-                parent=self.triggers_group_ref
+                parent=self.triggers_group_ref,
+                trigger=tr
             )
 
     def add_trigger(self):
@@ -79,34 +81,15 @@ class GuiController:
         dpg.delete_item(trigger_header)
 
     def trigger_type_select(self, sender, value, user_data):
-        # Based on box selection, change the state of the template
-        # ...and also change the underlying Trigger object.
-        sender_header_id = str(
-                dpg.get_item_parent(dpg.get_item_parent(sender))
+
+        pdb.set_trace()
+        # Update the model. Trigger object is in user_data
+        self.loaded_strategy.change_trigger_type(
+            trigger_ref=user_data,
+            new_type_string=value
             )
+        self.update_view()
 
-        if value == "TimeTrigger":
-            dpg.configure_item("timegroup_"+sender_header_id, show=True)
-            dpg.configure_item("distgroup_"+sender_header_id, show=False)
-            dpg.configure_item("actiongroup_"+sender_header_id, show=False)
-            dpg.configure_item("responseselect_"+sender_header_id, show=True)
-        elif value == "DistanceTrigger":
-            dpg.configure_item("timegroup_"+sender_header_id, show=False)
-            dpg.configure_item("distgroup_"+sender_header_id, show=True)
-            dpg.configure_item("actiongroup_"+sender_header_id, show=False)
-            dpg.configure_item("responseselect_"+sender_header_id, show=True)
-        elif value == "ActionTrigger":
-            dpg.configure_item("timegroup_"+sender_header_id, show=False)
-            dpg.configure_item("distgroup_"+sender_header_id, show=False)
-            dpg.configure_item("actiongroup_"+sender_header_id, show=True)
-            dpg.configure_item("responseselect_"+sender_header_id, show=True)
-        else:
-            pass
-
-    ####
-    # Synchronization
-    def pull_values(self):
-        pass
 
     ####
     # Serialization

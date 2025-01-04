@@ -61,21 +61,22 @@ class Action:
 
 @dataclass
 class Trigger:
-    def has_been_triggered(self):
-        raise NotImplementedError
+    associated_action: Action | None = None
 
 
+@dataclass
 class TimeTrigger(Trigger):
-    def has_been_triggered(self):
-        print("does something here")
+    time_value: int = 0
 
 
+@dataclass
 class DistanceTrigger(Trigger):
-    pass
+    distance_value: int = 0
 
 
+@dataclass
 class ActionTrigger(Trigger):
-    pass
+    frame_value: int = 0
 
 
 @dataclass
@@ -98,10 +99,15 @@ class Strategy:
         self.triggers.append(trigger)
         return trigger, len(self.triggers)
 
-    def change_trigger_type(self, index, new_type_string):
+    def change_trigger_type(self, trigger_ref: Trigger, new_type_string: str):
+        list_position = self.triggers.index(trigger_ref)
         match new_type_string:
-            case "":
-                pass
+            case "TimeTrigger":
+                self.triggers[list_position] = TimeTrigger()
+            case "DistanceTrigger":
+                self.triggers[list_position] = DistanceTrigger()
+            case "ActionTrigger":
+                self.triggers[list_position] = ActionTrigger()
 
     def delete_trigger_by_index(self, index: int):
         self.triggers.pop(index)
