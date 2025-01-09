@@ -109,7 +109,7 @@ def strategy_setup_section(GuiController: tool.GuiController):
             dpg.add_button(label="(+) Add Response",
                            height=35,
                            width=150,
-                           callback=GuiController.add_trigger)
+                           callback=GuiController.add_response)
             dpg.add_spacer(width=150)
             dpg.add_button(label="Collapse All",
                            width=150,
@@ -117,9 +117,9 @@ def strategy_setup_section(GuiController: tool.GuiController):
             dpg.add_button(label="Expand All",
                            width=150,
                            callback=GuiController.collapse_all)
-            with dpg.group() as responses_group:
-                # Register this group with the Controller.
-                GuiController.actions_group_ref = responses_group
+        with dpg.group() as responses_group:
+            # Register this group with the Controller.
+            GuiController.responses_group_ref = responses_group
 
 
 def hidden_windows_setup():
@@ -169,8 +169,8 @@ def window_themes():
     with dpg.theme(tag="theme2"):
         with dpg.theme_component(dpg.mvCollapsingHeader):
             dpg.add_theme_color(dpg.mvThemeCol_Header, [28, 48, 97])
-            dpg.add_theme_color(dpg.mvThemeCol_HeaderHovered, [119, 61, 84])
-            dpg.add_theme_color(dpg.mvThemeCol_HeaderActive, [119, 44, 74])
+            dpg.add_theme_color(dpg.mvThemeCol_HeaderHovered, [48, 61, 184])
+            dpg.add_theme_color(dpg.mvThemeCol_HeaderActive, [48, 44, 174])
             dpg.add_theme_color(dpg.mvThemeCol_Text, [211, 211, 211])
 
 

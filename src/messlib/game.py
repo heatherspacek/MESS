@@ -52,10 +52,26 @@ class Actions:
     """organizing class used so elements can be accessed with e.g.
     `Actions.wavedash_shallow`."""
 
+    @staticmethod
     def all_actions():
         all_attributes = dir(Actions)
         return [attr for attr in all_attributes
                 if not (attr.startswith("__") or attr == "all_actions")]
+
+    def early_dair(
+            character: Character,
+            direction: FacingDirection,
+            angle: int | float,
+            drift: float
+            ):
+        # Jump with direction/angle specified:
+        sequence = [Inputs.jump(angle=angle)] * jumpsquat(character)-1
+        # TODO: how do we fit drift in here????
+        sequence.append(StochasticInput())
+        sequence.append(Inputs.down_air())
+        sequence.append(StochasticInput())
+        sequence.append(Inputs.fastfall())
+        return Action(sequence=sequence)
 
     def early_nair(
             character: Character,
@@ -64,10 +80,10 @@ class Actions:
             ):
         # Jump with a direction and angle specified by input arguments...
         sequence = [Inputs.jump()] * jumpsquat(character)-1
-        sequence.append(Inputs.nair)
+        sequence.append(Inputs.nair())
         # Put a spacer in here-- a StochasticInput
         sequence.append(StochasticInput())
-        sequence.append(Inputs.fastfall)
+        sequence.append(Inputs.fastfall())
         return Action(sequence=sequence)
 
     def falco_laser(

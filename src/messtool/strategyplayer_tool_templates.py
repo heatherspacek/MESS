@@ -1,14 +1,23 @@
+from __future__ import annotations
 import dearpygui.dearpygui as dpg
 from messlib.classes_abstract import (Trigger, TimeTrigger, DistanceTrigger,
-                                      ActionTrigger)
+                                      ActionTrigger, Response)
+from messlib.game import Actions  # for list of possible base Actions
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from messtool.strategyplayer_tool_classes import GuiController
 
 
-def trigger_template(GuiController, label, parent, trigger):
+def trigger_template(GuiController: GuiController,
+                     label: str,
+                     parent: int,
+                     trigger: Trigger):
     # based on the type of trigger, configure the template differently.
     with dpg.collapsing_header(label=label,
                                parent=parent,
-                               indent=20,
-                               default_open=True) as H1:
+                               indent=30,
+                               default_open=True):
 
         with dpg.group(horizontal=True):
             dpg.add_combo(
@@ -67,7 +76,35 @@ def trigger_template(GuiController, label, parent, trigger):
 
         # ### COMMON ####
         if type(trigger) is not Trigger:
+            with dpg.group(horizontal=True):
+                dpg.add_checkbox(
+                    label="conditional?",
+                    callback=lambda s, a, u: setattr(u, "conditional", a),
+                    user_data=trigger
+                )
+                dpg.set_value(dpg.last_item(), trigger.conditional)
+                if trigger.conditional:
+                    dpg.add_combo(label="against what condition?",
+                                  items=["pepis"])
             dpg.add_combo(
-                ["placeholder."]
+                items=GuiController.loaded_strategy.responses,
+                label="associated response",
+                callback=lambda s, a, u: setattr(u, "associated_response", a),
+                user_data=trigger
             )
-    return H1
+            dpg.set_value(dpg.last_item(), trigger.associated_response)
+
+
+def response_template(GuiController: GuiController,
+                      label: str,
+                      parent: int,
+                      response: Response):
+    with dpg.collapsing_header(label=label,
+                               parent=parent,
+                               indent=30,
+                               default_open=True):
+        # aim options?
+        dpg.add_combo(
+            label="base action",
+            items=Actions.all_actions()
+            )

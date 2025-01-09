@@ -70,9 +70,25 @@ class Action:
         input.do_input(controller)
 
 
+class Response:
+    """
+    A response is something done when a Trigger occurs; it is generally an
+    Action (or several Actions) with context. The "context" lets us aim moves
+    in response to stimuli, e.g. a Response to a certain space-trigger is to
+    aim a move
+
+    EXAMPLES:
+    dash up and aim a nair to overshoot
+    dair in place, drifting back
+
+    """
+    base_action: Action
+
+
 @dataclass
 class Trigger:
-    associated_action: Action | None = None
+    associated_response: Response | None = None
+    conditional: bool = False
 
     # Hacky way to keep nice things about @dataclass
     def __eq__(self, other): return False
@@ -107,11 +123,6 @@ class ActionTrigger(Trigger):
     reaction_animation: None = None
 
 
-@dataclass
-class Response:
-    pass
-
-
 @dataclass  # saves us from writing an __init__.
 class Strategy:
     """
@@ -126,6 +137,9 @@ class Strategy:
         trigger = Trigger()
         self.triggers.append(trigger)
         return trigger, len(self.triggers)
+
+    def add_new_response(self):
+        self.responses.append(Response())
 
     def change_trigger_type(self, trigger_ref: Trigger, new_type_string: str):
         list_position = self.triggers.index(trigger_ref)
@@ -142,3 +156,6 @@ class Strategy:
 
     def delete_trigger_by_reference(self, trigger_ref: Trigger):
         self.triggers.remove(trigger_ref)
+
+    def delete_response_by_reference(self, response_ref: Response):
+        self.responses.remove(response_ref)

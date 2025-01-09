@@ -17,7 +17,7 @@ class GuiController:
     character_combo_ref: int = None
     # --
     triggers_group_ref: int = None
-    actions_group_ref: int = None
+    responses_group_ref: int = None
     # --
     loaded_strategy: Strategy | None = None
 
@@ -27,14 +27,23 @@ class GuiController:
 
         # 1. delete everything
         dpg.delete_item(self.triggers_group_ref, children_only=True)
+        dpg.delete_item(self.responses_group_ref, children_only=True)
         print(self.loaded_strategy.triggers)
+        print(self.loaded_strategy.responses)
         # 2. consult the model and re-add all of them
         for i, tr in enumerate(self.loaded_strategy.triggers):
             tp8.trigger_template(
                 GuiController=self,
-                label="trigger#"+str(i),
+                label="trigger #"+str(i),
                 parent=self.triggers_group_ref,
                 trigger=tr
+            )
+        for i, re in enumerate(self.loaded_strategy.responses):
+            tp8.response_template(
+                GuiController=self,
+                label="response #"+str(i),
+                parent=self.responses_group_ref,
+                response=re
             )
 
     def add_trigger(self):
@@ -57,6 +66,14 @@ class GuiController:
             trigger_ref=user_data,
             new_type_string=value
             )
+        self.update_view()
+
+    def add_response(self, sender, value, user_data):
+        self.loaded_strategy.add_new_response()
+        self.update_view()
+
+    def delete_response(self, sender, value, user_data):
+        self.loaded_strategy.delete_response_by_reference(user_data)
         self.update_view()
 
     ####
