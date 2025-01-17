@@ -12,11 +12,16 @@ def layout_setup(GuiController: tool.GuiController):
     window_themes()
     window_fonts()
     hidden_windows_setup()
-    main_layout(GuiController)
+    # Window 1- strategy editor
+    strategy_editor_window(GuiController)
+    # Window 2- situation editor
+    situation_editor_window(GuiController)
+    # Window 3- game setup
+    game_setup_window(GuiController)
 
     dpg.create_viewport(
         title="MESS Strategy Editor",
-        width=700, height=600
+        width=1320, height=650
         )
     dpg.setup_dearpygui()
 
@@ -28,98 +33,84 @@ def layout_setup(GuiController: tool.GuiController):
     dpg.show_viewport()
 
 
-def main_layout(GuiController: tool.GuiController):
+def strategy_editor_window(GuiController: tool.GuiController):
+    with dpg.window(
+        label="MESS Strategy Editor",
+        tag="editorwnd",
+        width=500,
+        height=550,
+        min_size=(500, 550)
+            ):
+        GuiController.strat_name_ref = dpg.add_input_text(label="Strategy Name")
+        GuiController.character_combo_ref = dpg.add_combo(
+            list(melee.enums.Character), label="Character")
 
-    tab1str = "[1P, 1CPU] Play against a StrategyPlayer"
-    tab2str = "[0P, 2CPU] Init two StrategyPlayers"
-    tab1_1str = "Strategy Setup"
-    tab1_2str = "Situation Setup"
+        dpg.add_separator()
+        with dpg.collapsing_header(label="Triggers", default_open=True) as H_T:
+            dpg.bind_item_theme(H_T, "theme1")
+            with dpg.group(horizontal=True, horizontal_spacing=-1):
+                dpg.add_button(label="(+) Add Trigger",
+                               height=35,
+                               width=150,
+                               callback=GuiController.add_trigger)
+                dpg.add_spacer(width=50)
+                dpg.add_button(label="Collapse All",
+                               width=125,
+                               callback=GuiController.collapse_all)
+                dpg.add_button(label="Expand All",
+                               width=125,
+                               callback=GuiController.collapse_all)
+            with dpg.group() as triggers_group:
+                # Register this (empty) group with the Controller.
+                GuiController.triggers_group_ref = triggers_group
 
-    with dpg.window(label="MESS Strategy Editor", tag="topwnd"):
-        with dpg.group(horizontal=True):
-            dpg.add_loading_indicator(circle_count=6, radius=2, height=48)
-            dpg.add_text("Welcome to MESS! Status messages will show up here.")
-            dpg.add_button(label="debug console [global]",
-                           callback=lambda: pdb.set_trace())
-        with dpg.tab_bar():
-            with dpg.tab(label=tab1str):  # 1P 1CPU mode
-                with dpg.group(horizontal=True):
-                    dpg.add_button(
-                        label="Import Strategy...",
-                        callback=GuiController.load_strategy_from_file
-                        )
-                    dpg.add_button(
-                        label="Import Situation...",
-                        callback=lambda: dpg.show_item("situation_fileselect")
-                        )
-
-                with dpg.tab_bar():
-                    with dpg.tab(label=tab1_1str):  # SP Setup
-                        strategy_setup_section(GuiController)
-
-                    with dpg.tab(label=tab1_2str):  # Situation setup
-                        pass
-
-                dpg.add_button(label="LAUNCH MELEE (test)",
-                               callback=lambda: GuiController.setup_and_launch)
-            # -----
-            with dpg.tab(label=tab2str):
-                dpg.add_button(label="\nTest two\nStrategyPlayers\n")
-            #
-        dpg.add_text("=====")
-        dpg.add_button(label="Export Strategy",
-                       callback=GuiController.save_strategy_to_file,
-                       tag="importantbutton",
-                       )
-        dpg.add_button(label="connect p2",
-                       callback=(),
-                       tag="testingbutton",
-                       )
-
-    dpg.set_primary_window("topwnd", True)
+        with dpg.collapsing_header(label="Responses", default_open=True) as head2:
+            dpg.bind_item_theme(head2, "theme2")
+            with dpg.group(horizontal=True, horizontal_spacing=-1):
+                dpg.add_button(
+                    label="(+) Add Response",
+                    height=35,
+                    width=150,
+                    callback=GuiController.add_response
+                    )
+                dpg.add_spacer(width=150)
+                dpg.add_button(
+                    label="Collapse All",
+                    width=150,
+                    callback=GuiController.collapse_all
+                    )
+                dpg.add_button(
+                    label="Expand All",
+                    width=150,
+                    callback=GuiController.collapse_all
+                    )
+            with dpg.group() as responses_group:
+                # Register this group with the Controller.
+                GuiController.responses_group_ref = responses_group
 
 
-def strategy_setup_section(GuiController: tool.GuiController):
-    GuiController.strat_name_ref = dpg.add_input_text(label="Strategy Name")
-    GuiController.character_combo_ref = dpg.add_combo(
-        list(melee.enums.Character), label="Character")
+def situation_editor_window(GuiController: tool.GuiController):
+    with dpg.window(
+        label="Situation Setup",
+        tag="situationwnd",
+        width=500,
+        height=550,
+        min_size=(500, 550),
+        pos=(800, 0)
+            ):
+        ...
 
-    dpg.add_separator()
-    with dpg.collapsing_header(label="Triggers", default_open=True) as H_T:
-        dpg.bind_item_theme(H_T, "theme1")
-        with dpg.group(horizontal=True, horizontal_spacing=-1):
-            dpg.add_button(label="(+) Add Trigger",
-                           height=35,
-                           width=150,
-                           callback=GuiController.add_trigger)
-            dpg.add_spacer(width=150)
-            dpg.add_button(label="Collapse All",
-                           width=150,
-                           callback=GuiController.collapse_all)
-            dpg.add_button(label="Expand All",
-                           width=150,
-                           callback=GuiController.collapse_all)
-        with dpg.group() as triggers_group:
-            # Register this (empty) group with the Controller.
-            GuiController.triggers_group_ref = triggers_group
 
-    with dpg.collapsing_header(label="Responses", default_open=True) as head2:
-        dpg.bind_item_theme(head2, "theme2")
-        with dpg.group(horizontal=True, horizontal_spacing=-1):
-            dpg.add_button(label="(+) Add Response",
-                           height=35,
-                           width=150,
-                           callback=GuiController.add_response)
-            dpg.add_spacer(width=150)
-            dpg.add_button(label="Collapse All",
-                           width=150,
-                           callback=GuiController.collapse_all)
-            dpg.add_button(label="Expand All",
-                           width=150,
-                           callback=GuiController.collapse_all)
-        with dpg.group() as responses_group:
-            # Register this group with the Controller.
-            GuiController.responses_group_ref = responses_group
+def game_setup_window(GuiController: tool.GuiController):
+    with dpg.window(
+        label="---",
+        tag="gamewnd",
+        width=300,
+        height=400,
+        min_size=(300, 400),
+        pos=(500, 25)
+            ):
+        ...
 
 
 def hidden_windows_setup():

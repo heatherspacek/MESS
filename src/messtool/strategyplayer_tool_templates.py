@@ -16,7 +16,7 @@ def trigger_template(GuiController: GuiController,
     # based on the type of trigger, configure the template differently.
     with dpg.collapsing_header(label=label,
                                parent=parent,
-                               indent=30,
+                               indent=20,
                                default_open=True):
 
         with dpg.group(horizontal=True):
@@ -24,7 +24,8 @@ def trigger_template(GuiController: GuiController,
                     ["TimeTrigger", "DistanceTrigger", "ActionTrigger"],
                     label="Trigger Type",
                     callback=GuiController.trigger_type_select,
-                    user_data=trigger
+                    user_data=trigger,
+                    width=300
                     )
             if type(trigger) is Trigger:
                 dpg.set_value(dpg.last_item(), "")
@@ -101,10 +102,11 @@ def response_template(GuiController: GuiController,
                       response: Response):
     with dpg.collapsing_header(label=label,
                                parent=parent,
-                               indent=30,
+                               indent=20,
                                default_open=True):
         # aim options?
         dpg.add_combo(
             label="base action",
-            items=Actions.all_actions()
+            items=Actions.all_actions(),
+            width=300
             )
