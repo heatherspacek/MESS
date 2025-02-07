@@ -1,4 +1,5 @@
 import dearpygui.dearpygui as dpg
+import dearpygui.demo as dpgdemo
 import melee
 import os  # for os.path.join
 # -
@@ -34,6 +35,8 @@ if __name__ == "__main__":
 
     # View
     app_layout.layout_setup(GuiController)
+
+    dpgdemo.show_demo()
 
     dpg.start_dearpygui()
     dpg.destroy_context()

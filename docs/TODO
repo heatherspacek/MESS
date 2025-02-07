@@ -1,3 +1,4 @@
+- work towards MVP!!!
 - "dashdance builder"... or just advancing, retreating, in-place
 - nicer representations for triggers and responses
 - implement expand/collapse all
@@ -5,5 +6,4 @@
 - situation setup!
 - some non-control rendering, e.g. can i click and drag a little fox around a stage (to set initial position)?
 - logging console for live-testing
-- rework the window structure. editor and launcher
-- on paper, figure out a workflow for editor/launcher. 1P and 2P modes, etc
+- informative headers e.g. "Triggers (8 total)"

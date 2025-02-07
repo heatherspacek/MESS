@@ -1,7 +1,7 @@
 import dearpygui.dearpygui as dpg
 import ctypes  # for Windows high-dpi text rendering "fuzziness" fix
 import melee
-import os  # for os.path.join
+import os  # for os.path.join and os.listdir
 import pdb
 # --
 import messtool.strategyplayer_tool_classes as tool
@@ -9,6 +9,7 @@ import messtool.strategyplayer_tool_classes as tool
 
 def layout_setup(GuiController: tool.GuiController):
     dpg.create_context()
+    load_textures()
     window_themes()
     window_fonts()
     hidden_windows_setup()
@@ -20,7 +21,7 @@ def layout_setup(GuiController: tool.GuiController):
     game_setup_window(GuiController)
 
     dpg.create_viewport(
-        title="MESS Strategy Editor",
+        title="MESS",
         width=1320, height=650
         )
     dpg.setup_dearpygui()
@@ -98,7 +99,7 @@ def situation_editor_window(GuiController: tool.GuiController):
         min_size=(500, 550),
         pos=(800, 0)
             ):
-        ...
+        dpg.add_image("stage_bf")
 
 
 def game_setup_window(GuiController: tool.GuiController):
@@ -110,7 +111,32 @@ def game_setup_window(GuiController: tool.GuiController):
         min_size=(300, 400),
         pos=(500, 25)
             ):
-        ...
+        dpg.add_text(
+            """Welcome to MESS!
+            To get started, load a strategy or situation from file, 
+            or start editing your own!""")
+        dpg.add_separator()
+        dpg.add_image("zelda")
+
+        with dpg.group(horizontal=True):
+            with dpg.group():
+                # P1
+                dpg.add_image("placeholder")
+                dpg.add_combo(["strategyplayer", "human input"],
+                              default_value="strategyplayer",
+                              width=135)
+
+                dpg.add_text("[No strategy loaded.]", tag="status_p1")
+            with dpg.group():
+                # P2
+                dpg.add_image("placeholder")
+                dpg.add_combo(["strategyplayer"],
+                              default_value="strategyplayer",
+                              width=135)
+
+                dpg.add_text("[No strategy loaded.]", tag="status_p2")
+
+        
 
 
 def hidden_windows_setup():
@@ -176,3 +202,17 @@ def window_fonts():
                      20, tag="bold_font")
 
     dpg.bind_font("default_font")
+
+
+def load_textures():
+    print(os.listdir(os.path.join("res", "stock_icons")))
+
+    for png in os.listdir(os.path.join("res", "stock_icons")):
+        with dpg.texture_registry():
+            (w, h, c, d) = dpg.load_image(os.path.join("res", "stock_icons", png))
+            dpg.add_static_texture(width=w, height=h, default_value=d, tag=png.split(".")[0])
+
+    for png in os.listdir(os.path.join("res", "stages")):
+        with dpg.texture_registry():
+            (w, h, c, d) = dpg.load_image(os.path.join("res", "stages", png))
+            dpg.add_static_texture(width=w, height=h, default_value=d, tag="stage_"+png.split(".")[0])
