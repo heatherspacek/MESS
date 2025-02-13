@@ -1,0 +1,7 @@
+Reminders on how to do things with dearpygui. I keep forgetting.
+
+Change keyword attribute such as "show":
+--
+dpg.configure_item(tag, attribute) e.g. dpg.configure_item("modal_misc", show=False)
+
+

@@ -2,7 +2,6 @@ import dearpygui.dearpygui as dpg
 import ctypes  # for Windows high-dpi text rendering "fuzziness" fix
 import melee
 import os  # for os.path.join and os.listdir
-import pdb
 
 # --
 import messtool.strategyplayer_tool_classes as tool
@@ -96,8 +95,7 @@ def situation_editor_window(GuiController: tool.GuiController):
         min_size=(500, 550),
         pos=(800, 0),
     ):
-        dpg.add_image("stage_bf")
-
+        dpg.add_image(texture_tag="stage_bf", tag="stage_image")
         dpg.add_combo(
             [
                 "Battlefield",
@@ -107,12 +105,21 @@ def situation_editor_window(GuiController: tool.GuiController):
                 "Dream Land",
                 "Pokemon Stadium",
             ],
+            default_value="Battlefield",
             label="Stage",
             callback=change_stage,
         )
 
 
-def change_stage(sender, value, user_data): ...
+def change_stage(sender, value, user_data):
+    match value:
+        case "Battlefield": stage_texture_filename = "stage_bf"
+        case "Final Destination": stage_texture_filename = "stage_fd"
+        case "Yoshi's Story": stage_texture_filename = "stage_ys"
+        case "Fountain of Dreams": stage_texture_filename = "stage_fo"
+        case "Dream Land": stage_texture_filename = "stage_dl"
+        case "Pokemon Stadium": stage_texture_filename = "stage_ps"
+    dpg.configure_item("stage_image", texture_tag=stage_texture_filename)
 
 
 def game_setup_window(GuiController: tool.GuiController):
@@ -224,8 +231,6 @@ def window_fonts():
 
 
 def load_textures():
-    print(os.listdir(os.path.join("res", "stock_icons")))
-
     for png in os.listdir(os.path.join("res", "stock_icons")):
         with dpg.texture_registry():
             (w, h, c, d) = dpg.load_image(os.path.join("res", "stock_icons", png))
