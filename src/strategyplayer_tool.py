@@ -2,9 +2,11 @@ import dearpygui.dearpygui as dpg
 import dearpygui.demo as dpgdemo
 import melee
 import os  # for os.path.join
+
 # -
 import messtool.strategyplayer_tool_layout as app_layout
 import messtool.strategyplayer_tool_classes as app_classes
+
 # -
 from messlib.classes_functional import ConsoleInterface, StrategyPlayer
 from messlib.classes_abstract import Strategy
@@ -18,8 +20,9 @@ app entry point.
 if __name__ == "__main__":
 
     # Elements needed to launch/interact with melee
-    slippi_playback_path = os.path.join(os.environ["APPDATA"],
-                                        "Slippi Launcher", "playback")
+    slippi_playback_path = os.path.join(
+        os.environ["APPDATA"], "Slippi Launcher", "playback"
+    )
     Console = melee.Console(path=slippi_playback_path)
     Interface = ConsoleInterface(Console)
 

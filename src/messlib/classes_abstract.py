@@ -30,16 +30,12 @@ class Input:
             controller.press_button(self.button)
         if self.coordinates is not None:
             controller.tilt_analog(
-                Button.BUTTON_MAIN,
-                self.coordinates[0],
-                self.coordinates[1]
-                )
+                Button.BUTTON_MAIN, self.coordinates[0], self.coordinates[1]
+            )
         if self.c_coordinates is not None:
             controller.tilt_analog(
-                Button.BUTTON_C,
-                self.c_coordinates[0],
-                self.c_coordinates[1]
-                )
+                Button.BUTTON_C, self.c_coordinates[0], self.c_coordinates[1]
+            )
 
 
 class StochasticInput(Input):
@@ -61,10 +57,7 @@ class Action:
         if len(self.sequence) <= self.sequence_position:
             pass  # no new controller input needed
         else:
-            self.input_to_controller(
-                self.sequence[self.sequence_position],
-                controller
-                )
+            self.input_to_controller(self.sequence[self.sequence_position], controller)
 
     def input_to_controller(self, input: Input, controller: Controller):
         input.do_input(controller)
@@ -82,6 +75,7 @@ class Response:
     dair in place, drifting back
 
     """
+
     base_action: Action
 
 
@@ -91,7 +85,8 @@ class Trigger:
     conditional: bool = False
 
     # Hacky way to keep nice things about @dataclass
-    def __eq__(self, other): return False
+    def __eq__(self, other):
+        return False
 
 
 @dataclass
@@ -128,6 +123,7 @@ class Strategy:
     """
     A data structure that was specified through the builder UI.
     """
+
     name: str = "strategy1"
     character: Character = Character.CPTFALCON  # from melee.enums
     triggers: list[Trigger] = field(default_factory=list)

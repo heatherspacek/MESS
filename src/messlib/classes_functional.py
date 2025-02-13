@@ -1,13 +1,15 @@
 from messlib.classes_abstract import Strategy
+
 # --
 import melee
 
 
-class StrategyPlayer():
+class StrategyPlayer:
     """
     Entity that interfaces with a Strategy, which is just a data-structure.
     Holds a `controller`.
     """
+
     loaded_strategy: Strategy = None
     controller: melee.Controller = None
     # --
@@ -19,7 +21,9 @@ class StrategyPlayer():
     def connect_controller(self, controller):
         self.controller = controller
 
-    def perform_input(self, ):
+    def perform_input(
+        self,
+    ):
         pass
 
     def step(self, gamestate: melee.gamestate.GameState):
@@ -46,10 +50,11 @@ class StrategyPlayer():
         # 2. check remainder of Triggers
 
 
-class ConsoleInterface():
+class ConsoleInterface:
     """
     object exposing callables to interface with the libmelee `console`.
     """
+
     running = False
     console = None
     controller1 = None
@@ -59,15 +64,11 @@ class ConsoleInterface():
     def __init__(self, console: melee.Console):
         self.console = console
         self.controller1 = melee.Controller(
-            console=console,
-            port=1,
-            type=melee.ControllerType.GCN_ADAPTER
-            )
+            console=console, port=1, type=melee.ControllerType.GCN_ADAPTER
+        )
         self.controller2 = melee.Controller(
-            console=console,
-            port=2,
-            type=melee.ControllerType.STANDARD
-            )
+            console=console, port=2, type=melee.ControllerType.STANDARD
+        )
 
     def setup_oneplayer(self):
         self.console.run()

@@ -1,4 +1,5 @@
 import dearpygui.dearpygui as dpg
+
 # -
 import messtool.strategyplayer_tool_templates as tp8
 from messlib.classes_abstract import Strategy
@@ -34,16 +35,16 @@ class GuiController:
         for i, tr in enumerate(self.loaded_strategy.triggers):
             tp8.trigger_template(
                 GuiController=self,
-                label="trigger #"+str(i),
+                label="trigger #" + str(i),
                 parent=self.triggers_group_ref,
-                trigger=tr
+                trigger=tr,
             )
         for i, re in enumerate(self.loaded_strategy.responses):
             tp8.response_template(
                 GuiController=self,
-                label="response #"+str(i),
+                label="response #" + str(i),
                 parent=self.responses_group_ref,
-                response=re
+                response=re,
             )
 
     def add_trigger(self):
@@ -63,9 +64,8 @@ class GuiController:
     def trigger_type_select(self, sender, value, user_data):
         # Update the model. Trigger object is in user_data
         self.loaded_strategy.change_trigger_type(
-            trigger_ref=user_data,
-            new_type_string=value
-            )
+            trigger_ref=user_data, new_type_string=value
+        )
         self.update_view()
 
     def add_response(self, sender, value, user_data):
