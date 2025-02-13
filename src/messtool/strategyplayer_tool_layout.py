@@ -94,7 +94,12 @@ def situation_editor_window(GuiController: tool.GuiController):
         height=550,
         min_size=(500, 550),
         pos=(800, 0),
+        no_move=True
     ):
+        with dpg.handler_registry():
+            dpg.add_mouse_down_handler(callback=mouseclick_callback)
+            dpg.add_mouse_move_handler(callback=mousemove_callback)
+
         dpg.add_image(texture_tag="stage_bf", tag="stage_image")
         dpg.add_combo(
             [
@@ -110,8 +115,23 @@ def situation_editor_window(GuiController: tool.GuiController):
             callback=change_stage,
         )
 
+        dpg.add_text("testing...", tag="mouseclick_test")
+        dpg.add_text("", tag="mousecoords")
+        # dpg.bind_item_handler_registry("mouseclick_test", "handler")
+        # dpg.bind_item_handler_registry("mousecoords", "handler")
+        # ^ not needed cuz these are "global registry" things
+
+
+def mouseclick_callback(sender, app_data):
+    dpg.set_value("mouseclick_test", f"Mouse Button ID: {app_data}")
+
+
+def mousemove_callback(sender, app_data):
+    dpg.set_value("mousecoords", f"Mouse Position: {app_data}")
+
 
 def change_stage(sender, value, user_data):
+
     match value:
         case "Battlefield": stage_texture_filename = "stage_bf"
         case "Final Destination": stage_texture_filename = "stage_fd"
