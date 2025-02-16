@@ -56,7 +56,10 @@ def strategy_editor_window(GuiController: tool.GuiController):
                 )
                 dpg.add_spacer(width=50)
                 dpg.add_button(
-                    label="Collapse All", width=125, callback=GuiController.collapse_all
+                    label="Collapse All",
+                    width=125,
+                    callback=GuiController.collapse_all,
+                    user_data="triggers"
                 )
                 dpg.add_button(
                     label="Expand All", width=125, callback=GuiController.collapse_all
@@ -74,12 +77,15 @@ def strategy_editor_window(GuiController: tool.GuiController):
                     width=150,
                     callback=GuiController.add_response,
                 )
-                dpg.add_spacer(width=150)
+                dpg.add_spacer(width=50)
                 dpg.add_button(
-                    label="Collapse All", width=150, callback=GuiController.collapse_all
+                    label="Collapse All",
+                    width=125,
+                    callback=GuiController.collapse_all,
+                    user_data="responses"
                 )
                 dpg.add_button(
-                    label="Expand All", width=150, callback=GuiController.collapse_all
+                    label="Expand All", width=150, callback=GuiController.expand_all
                 )
             with dpg.group() as responses_group:
                 # Register this group with the Controller.
@@ -178,6 +184,9 @@ def game_setup_window(GuiController: tool.GuiController):
                 )
 
                 dpg.add_text("[No strategy loaded.]", tag="status_p2")
+
+        # Make this button say "start analysis" when in SP vs SP mode.
+        dpg.add_button(label="Start game", tag="startbutton")
 
 
 def hidden_windows_setup():

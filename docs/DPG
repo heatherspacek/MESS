@@ -4,4 +4,12 @@ Change keyword attribute such as "show":
 --
 dpg.configure_item(tag, attribute) e.g. dpg.configure_item("modal_misc", show=False)
 
+Defining callbacks as lambda functions to use all three inputs:
+--
+# In this example, user_data is attached and passed as "u"
+dpg.add_input_int(
+                label="time value (frames)",
+                callback=lambda s, a, u: setattr(u, "time_value", a),
+                user_data=trigger,
+            )
 

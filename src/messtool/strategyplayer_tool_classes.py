@@ -88,8 +88,10 @@ class GuiController:
     ####
     # View-only
 
-    def collapse_all(self):
-        pass
+    def collapse_all(self, sender, value, user_data):
+        ref = self.triggers_group_ref if user_data == "triggers" else self.responses_group_ref
+        for child in dpg.get_item_children(ref)[1]:
+            dpg.set_value(child, False)
 
     def expand_all(self):
         pass
