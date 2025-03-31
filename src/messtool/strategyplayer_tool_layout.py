@@ -127,6 +127,25 @@ def situation_editor_window(GuiController: tool.GuiController):
         # dpg.bind_item_handler_registry("mousecoords", "handler")
         # ^ not needed cuz these are "global registry" things
 
+        #####
+        # CONSTRAINTS - When does the "situation" end?
+        with dpg.collapsing_header(label="End situation when..."):
+            with dpg.group(horizontal=True):
+                dpg.add_checkbox(label="P1 is grabbed",
+                                 tag="constraint_p1grab", default_value=True)
+                dpg.add_checkbox(label="P2 is grabbed",
+                                 tag="constraint_p2grab", default_value=True)
+            with dpg.group(horizontal=True):
+                dpg.add_checkbox(label="P1 is knocked down",
+                                 tag="constraint_p1knock", default_value=True)
+                dpg.add_checkbox(label="P2 is knocked down",
+                                 tag="constraint_p2knock", default_value=True)
+            with dpg.group():
+                dpg.add_checkbox(label="Nothing has happened for N seconds",
+                                 tag="constraint_idle", default_value=True)
+                dpg.add_input_float(label="seconds", tag="constraint_idle_seconds",
+                                  default_value=4)
+
 
 def mouseclick_callback(sender, app_data):
     dpg.set_value("mouseclick_test", f"Mouse Button ID: {app_data}")
