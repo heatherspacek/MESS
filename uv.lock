@@ -73,6 +73,15 @@ wheels = [
 ]
 
 [[package]]
+name = "dearpygui-ext"
+version = "2.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/7f/38/e120a70acf4f187520a00df502e40e5773da1d909ac5f2764fef6bce24d8/dearpygui_ext-2.0.0.tar.gz", hash = "sha256:b2901b32d9c32e42d5a21e5079e527b7b4f77a5c6e37bce754ce5f6cbc7dbddd", size = 11161 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/35/04/8f42088305af28404cb803ee81432a44bc03f344d4125c7eb6e812bbb949/dearpygui_ext-2.0.0-py3-none-any.whl", hash = "sha256:6c0f4f941d4e03aed09a7b2775557139caf70e892e4effc7d191e3426b1d4583", size = 9290 },
+]
+
+[[package]]
 name = "melee"
 version = "0.41.1"
 source = { registry = "https://pypi.org/simple" }
@@ -93,6 +102,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "black" },
     { name = "dearpygui" },
+    { name = "dearpygui-ext" },
     { name = "melee" },
     { name = "pyyaml" },
 ]
@@ -101,6 +111,7 @@ dependencies = [
 requires-dist = [
     { name = "black", specifier = ">=25.1.0" },
     { name = "dearpygui", specifier = ">=1.11.1" },
+    { name = "dearpygui-ext", specifier = ">=2.0.0" },
     { name = "melee", specifier = ">=0.41.1" },
     { name = "pyyaml", specifier = ">=6.0.2" },
 ]

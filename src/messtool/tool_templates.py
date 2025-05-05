@@ -11,7 +11,7 @@ from messlib.game import Actions  # for list of possible base Actions
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from messtool.strategyplayer_tool_classes import GuiController
+    from messtool.tool_classes import GuiController
 
 
 def trigger_template(

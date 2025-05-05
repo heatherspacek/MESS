@@ -1,7 +1,7 @@
 import dearpygui.dearpygui as dpg
 
 # -
-import messtool.strategyplayer_tool_templates as tp8
+import messtool.tool_templates as tp8
 from messlib.classes_abstract import Strategy
 
 # get_value and set_value work on all dpg ui items, apparently.
@@ -89,7 +89,9 @@ class GuiController:
     # View-only
 
     def collapse_all(self, sender, value, user_data):
-        ref = self.triggers_group_ref if user_data == "triggers" else self.responses_group_ref
+        ref = self.triggers_group_ref if user_data == "triggers" else (
+            self.responses_group_ref
+        )
         for child in dpg.get_item_children(ref)[1]:
             dpg.set_value(child, False)
 

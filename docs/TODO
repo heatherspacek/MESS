@@ -7,3 +7,4 @@
 - some non-control rendering, e.g. can i click and drag a little fox around a stage (to set initial position)?
 - logging console for live-testing
 - informative headers e.g. "Triggers (8 total)"
+- x-platform installation interface for playback slippi
