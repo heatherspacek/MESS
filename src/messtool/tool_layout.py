@@ -3,11 +3,15 @@ import ctypes  # for Windows high-dpi text rendering "fuzziness" fix
 import os  # for os.path.join and os.listdir
 
 # --
-from messtool.windows import situation_editor, strategy_editor, game_setup
+from messtool.windows import (
+    situation_editor,
+    strategy_editor,
+    game_setup,
+    logging_window
+    )
 
 
 def layout_setup():
-    dpg.create_context()
     load_textures()
     window_themes()
     window_fonts()
@@ -19,7 +23,7 @@ def layout_setup():
     # Window 3- game setup
     game_setup.game_setup_window()
     # Window 4- logging
-    ...
+    logging_window.logging_window()
 
     dpg.create_viewport(title="MESS", width=1320, height=650)
     dpg.setup_dearpygui()
