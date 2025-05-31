@@ -54,7 +54,7 @@ if __name__ == "__main__":
     # logger.warning("waaarninggggg")
     # logger.critical("CRITICAL!")
 
-    # ###### dpgdemo.show_demo() ############################# DEMO WINDOW #####
+    # dpgdemo.show_demo() ############################# DEMO WINDOW #####
 
     # dpg.set_exit_callback(...)
 

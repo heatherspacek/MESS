@@ -7,7 +7,7 @@ import requests
 import sys
 import zipfile
 
-from messlib.uilogging import MESSHandler
+from .uilogging import MESSHandler
 
 
 class _Installer:
@@ -87,10 +87,9 @@ class _Installer:
             ...
             # log an error about not recognizing the current platform.
 
-    def update(self):
-        if not self._check_installation():
-            # All is well!
-            ...
+    def install(self):
+        if not self._check_current_installation():
+            self._install_latest_release()
 
 
 # Expose instance (singleton)

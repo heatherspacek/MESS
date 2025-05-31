@@ -36,12 +36,12 @@ class _Engine:
         try:
             while True:
                 # START Background process loop -----vvvvv
-                try:
+                # TODO: this runs at max speed, which sucks. need to re-think my
+                # comms strategy.
+                if not self._inbox.empty():
                     _ = self._inbox.get_nowait()
                     # examples of messages that could arrive from main process:
                     # -
-                except queue.Empty:
-                    pass
 
                 # END background process loop -----^^^^^
 

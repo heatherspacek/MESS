@@ -9,6 +9,7 @@ def strategy_editor_window():
         tag="editorwnd",
         width=500,
         height=550,
+        pos=(1, 27),
         min_size=(500, 550),
     ):
         GuiController.strat_name_ref = dpg.add_input_text(

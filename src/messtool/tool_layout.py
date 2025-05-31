@@ -7,7 +7,7 @@ from messtool.windows import (
     situation_editor,
     strategy_editor,
     game_setup,
-    logging_window
+    logging_window,
     )
 
 
@@ -24,6 +24,15 @@ def layout_setup():
     game_setup.game_setup_window()
     # Window 4- logging
     logging_window.logging_window()
+    # "Window" 5- status bar
+    with dpg.viewport_menu_bar():
+        dpg.add_text(
+            default_value="Welcome to MESS! Status messages will go here.",
+            tag="status_bar_text"
+            )
+        dpg.add_spacer(width=150)
+        with dpg.menu(label="View..."):
+            dpg.add_menu_item(label="Reset all windows")
 
     dpg.create_viewport(title="MESS", width=1320, height=650)
     dpg.setup_dearpygui()
