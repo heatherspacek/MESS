@@ -1,6 +1,5 @@
 import logging
 import melee
-import os
 from messlib.installer import Installer  # for installed Slippi path
 from messlib.uilogging import MESSHandler
 
@@ -12,12 +11,14 @@ problem with libmelee. (make the Installer module fix this?)
 make sure this is considered OK!!
 """
 
+
 class ConsoleInterface:
     """
     object exposing callables to interface with the libmelee `console`.
     """
 
     running = False
+    alive = False
     console: melee.Console | None = None
     controller1: melee.Controller | None = None
     controller2: melee.Controller | None = None
@@ -28,7 +29,7 @@ class ConsoleInterface:
         self.logger.addHandler(MESSHandler())
         self.logger.setLevel("DEBUG")
 
-        self.console = self._attempt_open_console(console_path)
+        self.alive = self._attempt_open_console(console_path)
 
     def _attempt_open_console(self, console_path: str):
         try:
@@ -39,23 +40,20 @@ class ConsoleInterface:
             self.controller2 = melee.Controller(
                 console=self.console, port=2, type=melee.ControllerType.STANDARD
             )
+            return True
         except FileNotFoundError:
             # Installation has not occurred yet.
             self.console = None
-            self.installation_flag = "notdone"
+            # Installer.install()
+            # self._attempt_open_console(self, console_path=console_path)
+            return False
 
     def setup_oneplayer(self):
+        if self.console is None:
+            # TODO: should prompt this first
+            Installer.install()
+            self._attempt_open_console()
         self.console.run()
-        print("Connecting to console...")
-        if not self.console.connect():
-            print("ERROR: Failed to connect to the console.")
-            raise RuntimeError
-        print("Console connected.")
-        if not self.controller2.connect():
-            print("ERROR: CPU controller failed to connect.")
-            raise RuntimeError
-        print("CPU controller connected.")
-        self.running = True
 
     def step(self):
         if self.running:

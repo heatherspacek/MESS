@@ -87,7 +87,11 @@ class _Installer:
             ...
             # log an error about not recognizing the current platform.
 
+    def _patch(self):
+        ...
+
     def install(self):
+        """check for an existing installation, and if it is not found, install"""
         if not self._check_current_installation():
             self._install_latest_release()
 
