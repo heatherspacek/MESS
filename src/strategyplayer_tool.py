@@ -42,10 +42,11 @@ if __name__ == "__main__":
     logger.setLevel("DEBUG")
 
     # View
+    import messlib.installer
     app_layout.layout_setup()
-    dpg.add_button(label="test",
+    dpg.add_button(label="install",
                    parent="gamewnd",
-                   callback=lambda _: Engine.start_bg_run()
+                   callback=lambda _: messlib.installer.Installer.install()
                    )
 
     # logger.error("error!!!")

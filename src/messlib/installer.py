@@ -1,9 +1,11 @@
 from platformdirs import PlatformDirs
 import github
 from packaging.version import Version
+import os
 import io
 import logging
 import requests
+import subprocess
 import sys
 import zipfile
 
@@ -82,13 +84,30 @@ class _Installer:
         elif sys.platform == "darwin":
             ...  # idk how to install a dmg lol
         elif sys.platform == "linux":
-            ...  # zip contains an "appimage". ill look into it later
+            correct_asset = [a for a in remote_assets if "Linux" in a.name]
+            if not any(correct_asset):
+                self.logger.error("no matching release asset found on Ishiruuka-Playback GitHub.")
+                return
+            correct_asset_url = correct_asset[0].browser_download_url
+            self.logger.info("starting download of latest Slippi Playback release...")
+            response = requests.get(correct_asset_url, allow_redirects=True)
+            if not response.ok:
+                self.logger.error("download from Ishiruuka-Playback GitHub failed.")
+                return
+            zip_file = zipfile.ZipFile(io.BytesIO(response.content))
+            zip_file.extractall(self.dirs.user_data_dir)
+            with open(self.dirs.user_data_path / ".version", 'w') as f:
+                f.write(self.remote_latest.tag_name)
+            appimage_path = self.dirs.user_data_path / "Slippi_Playback-x86_64.AppImage"
+            current_permissions = os.stat(appimage_path)
+            os.chmod(appimage_path, current_permissions.st_mode | 0o111)
+            # Additionally, perform a "appimage-extract" to expose config files
+            subprocess.Popen(["./Slippi_Playback-x86_64.AppImage", "--appimage-extract"],
+                             cwd=self.dirs.user_data_path)
         else:
             ...
             # log an error about not recognizing the current platform.
-
-    def _patch(self):
-        ...
+        self.logger.info("Slippi Playback download complete.")
 
     def install(self):
         """check for an existing installation, and if it is not found, install"""
