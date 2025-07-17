@@ -5,6 +5,7 @@ import os
 import io
 import logging
 import requests
+import shutil
 import subprocess
 import sys
 import zipfile
@@ -114,6 +115,23 @@ class _Installer:
         if not self._check_current_installation():
             self._install_latest_release()
 
+    def configure_slippi(self):
+        self.install()  # does nothing if already installed (desired)
+        ...
+        """note for later:
+        immediately after install (on linux),
+        squashfs-root/usr/bin/Sys/GameSettings/GALE01r2.ini DOES exist."""
+
+    def uninstall(self):
+        if self._check_current_installation():
+            print("about to uninstall local slippi installation! are you sure?")
+            user_input = input().lower()
+            if user_input == "y":
+                shutil.rmtree(self.dirs.user_data_path)
 
 # Expose instance (singleton)
 Installer = _Installer()
+
+if __name__ == "__main__":
+    Installer.uninstall()
+    Installer.install()

@@ -4,6 +4,11 @@ from dearpygui_ext import logger
 
 
 class MESSHandler(logging.Handler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        "necessary hack, or else is_dearpygui_running fails catastrophically"
+        dpg.create_context()
+
     def emit(self, record):
         if dpg.is_dearpygui_running(): 
             if dpg.does_item_exist("logging_container"):
