@@ -4,6 +4,7 @@ import github
 from packaging.version import Version
 import os
 import io
+import melee
 import importlib
 import logging
 import requests
@@ -14,6 +15,99 @@ import zipfile
 
 from .uilogging import MESSHandler
 
+# https://imgur.com/a/4EuIt
+CHARACTER_HEX_IDS = {
+    melee.enums.Character.MEWTWO:   "0A",
+    melee.enums.Character.NESS:     "0B",
+    melee.enums.Character.PEACH:    "0C",
+    melee.enums.Character.PIKACHU:  "0D",
+    melee.enums.Character.POPO:     "",
+    melee.enums.Character.PEACH:    "0C",
+    melee.enums.Character.PEACH:    "0C",
+
+    melee.enums.Character.PEACH:    "0C",
+    melee.enums.Character.PEACH:    "0C",
+    melee.enums.Character.PEACH:    "0C",
+    melee.enums.Character.PEACH:    "0C",
+    melee.enums.Character.PEACH:    "0C",
+    melee.enums.Character.PEACH:    "0C",
+    melee.enums.Character.PEACH:    "0C",
+    melee.enums.Character.PEACH:    "0C",
+    melee.enums.Character.PEACH:    "0C",
+    melee.enums.Character.PEACH:    "0C",
+    melee.enums.Character.PEACH:    "0C",
+    melee.enums.Character.PEACH:    "0C",
+    melee.enums.Character.PEACH:    "0C",
+}
+
+STAGE_HEX_IDS = {
+    melee.enums.Stage.FOUNTAIN_OF_DREAMS:   "02",
+    melee.enums.Stage.POKEMON_STADIUM:      "03",
+    melee.enums.Stage.YOSHIS_STORY:         "08",
+    melee.enums.Stage.DREAMLAND:            "1C",
+    melee.enums.Stage.BATTLEFIELD:          "1F",
+    melee.enums.Stage.FINAL_DESTINATION:    "20",
+}
+
+CONFIG_CODE = """\
+$MESS: Boot to Game [UnclePunch]
+*Check Player and Stage IDs for Custom Match to boot into.
+041a45c0 3860000E #Boot to In Game
+C21B148C 00000025
+3C608048 60630530
+48000021 7C8802A6
+38A000F0 3D808000
+618C31F4 7D8903A6
+4E800421 480000F8
+4E800021 2A08024C
+20000000 000000FF
+000000{0} 000001E0
+00000000 00000000
+00000000 FFFFFFFF
+FFFFFFFF 00000000
+3F800000 3F800000
+3F800000 00000000
+00000000 00000000
+00000000 00000000
+00000000 00000000
+00000000 00000000
+00000000 {1}000400#character 1
+00FF0000 09007800
+40000401 00{2}0000#starting percent
+00000000 3F800000
+3F800000 3F800000
+{3}000400 00FF0000#character 2
+09007800 40000401
+00{4}0000 00000000#starting percent
+3F800000 3F800000
+3F800000 09030400
+00FF0000 09007800
+40000401 00000000
+00000000 3F800000
+3F800000 3F800000
+09030400 00FF0000
+09007800 40000401
+00000000 00000000
+3F800000 3F800000
+3F800000 BB610014
+60000000 00000000
+"""
+
+"""
+04480590 {0}0000{1} #0 = P1 Character / 1 = P1 Color
+044805b4 {2}0000{3} #2 = P2 Character / 3 = P2 Color
+0416e7f4 386000{4} #4 = Stage ID
+0446db68 3201864c
+0416d904 38800004
+0416ddb4 380001E0
+0446db6c 83000000
+C216DD6C 00000005
+3DC08046 61CEDB68
+3C603200 6063864C
+906E0000 3C60C300
+906E0004 887F24C8
+60000000 00000000\
+"""
 
 class _Installer:
     """
@@ -22,15 +116,6 @@ class _Installer:
     Slippi Launcher Playback installations."""
     def __init__(self):
         self.dirs = PlatformDirs(appauthor=None, appname="MESS")
-        """ exposes:
-        Installer.dirs.user_data_dir
-                    ...user_config_dir
-                    ...user_cache_dir
-                    ...user_documents_dir
-                    ...user_log_dir
-        ...more: https://github.com/tox-dev/platformdirs
-        """
-
         """
         https://github.com/project-slippi/Ishiiruka-Playback/
         """
@@ -135,6 +220,15 @@ class _Installer:
         )
         custom_ini_res = importlib.resources.files() / "res" / "GALE01r2.ini"
         shutil.copyfile(custom_ini_res, gecko_ini_path)
+        dummy_options = (
+            "02", #stage
+            "00", #ch
+            "2A", # %
+            "01", #ch
+            "2A" # %
+        )
+        with open(gecko_ini_path, "a") as append_stream:
+            append_stream.write(CONFIG_CODE.format(*dummy_options))
 
     def uninstall(self):
         if self._check_current_installation():

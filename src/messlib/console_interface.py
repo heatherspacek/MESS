@@ -75,3 +75,6 @@ if sys.platform == "linux":
     _install_path = _install_path / "squashfs-root" / "usr" / "bin"
 
 Interface = ConsoleInterface(console_path=str(_install_path))
+
+if __name__ == "__main__":
+    Interface.setup_oneplayer()
