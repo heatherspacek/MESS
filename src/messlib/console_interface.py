@@ -1,5 +1,6 @@
 import logging
 import melee
+import sys
 from messlib.installer import Installer  # for installed Slippi path
 from messlib.uilogging import MESSHandler
 
@@ -19,6 +20,7 @@ class ConsoleInterface:
 
     running = False
     alive = False
+    iso_path: str | None = None
     console: melee.Console | None = None
     controller1: melee.Controller | None = None
     controller2: melee.Controller | None = None
@@ -30,10 +32,12 @@ class ConsoleInterface:
         self.logger.setLevel("DEBUG")
 
         self.alive = self._attempt_open_console(console_path)
+        # --- replace later.
+        self.iso_path = "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso"
 
     def _attempt_open_console(self, console_path: str):
         try:
-            self.console = melee.Console(path=console_path)
+            self.console = melee.Console(path=console_path, dolphin_home_path=console_path)
             self.controller1 = melee.Controller(
                 console=self.console, port=1, type=melee.ControllerType.GCN_ADAPTER
             )
@@ -53,7 +57,7 @@ class ConsoleInterface:
             # TODO: should prompt this first
             Installer.install()
             self._attempt_open_console()
-        self.console.run()
+        self.console.run(iso_path=self.iso_path)
 
     def step(self):
         if self.running:
@@ -62,4 +66,12 @@ class ConsoleInterface:
             self.gamestate = self.console.step()
 
 
-Interface = ConsoleInterface(console_path=str(Installer.dirs.user_data_path))
+# On linux, the installation path is not exactly the user_data_path.
+# We should actually ask the Installer what platform we are on, but doesnt hurt
+# to re-do. 
+
+_install_path = Installer.dirs.user_data_path
+if sys.platform == "linux":
+    _install_path = _install_path / "squashfs-root" / "usr" / "bin"
+
+Interface = ConsoleInterface(console_path=str(_install_path))

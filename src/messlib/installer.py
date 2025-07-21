@@ -1,8 +1,10 @@
+import importlib.resources
 from platformdirs import PlatformDirs
 import github
 from packaging.version import Version
 import os
 import io
+import importlib
 import logging
 import requests
 import shutil
@@ -114,13 +116,25 @@ class _Installer:
         """check for an existing installation, and if it is not found, install"""
         if not self._check_current_installation():
             self._install_latest_release()
+            self._configure_slippi()
 
-    def configure_slippi(self):
-        self.install()  # does nothing if already installed (desired)
-        ...
+    def _configure_slippi(self):
         """note for later:
         immediately after install (on linux),
-        squashfs-root/usr/bin/Sys/GameSettings/GALE01r2.ini DOES exist."""
+        squashfs-root/usr/bin/Sys/GameSettings/GALE01r2.ini DOES exist.
+        This is definitely platform-dependent, and may not be present
+        immediately after install on some systems. TODO"""
+        gecko_ini_path = (
+            self.dirs.user_data_path
+            / "squashfs-root"
+            / "usr"
+            / "bin"
+            / "Sys"
+            / "GameSettings"
+            / "GALE01r2.ini"
+        )
+        custom_ini_res = importlib.resources.files() / "res" / "GALE01r2.ini"
+        shutil.copyfile(custom_ini_res, gecko_ini_path)
 
     def uninstall(self):
         if self._check_current_installation():
@@ -128,6 +142,7 @@ class _Installer:
             user_input = input().lower()
             if user_input == "y":
                 shutil.rmtree(self.dirs.user_data_path)
+
 
 # Expose instance (singleton)
 Installer = _Installer()
