@@ -1,4 +1,4 @@
-from messlib.classes_abstract import Strategy
+from messlib.data_structures.classes import Strategy
 
 # --
 import melee

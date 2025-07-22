@@ -1,6 +1,6 @@
-from messlib.classes_abstract import Input, StochasticInput, Action, FacingDirection
+from messlib.data_structures.classes import Input, StochasticInput, Action, FacingDirection
+from messlib.data_structures.helpers import angle_to_meleecircle, jumpsquat
 from melee.enums import Button, Character
-from messlib.functions_aux import angle_to_meleecircle, jumpsquat
 
 
 class Inputs:

@@ -1,13 +1,13 @@
 from __future__ import annotations
 import dearpygui.dearpygui as dpg
-from messlib.classes_abstract import (
+from messlib.data_structures.classes import (
     Trigger,
     TimeTrigger,
     DistanceTrigger,
     ActionTrigger,
     Response,
 )
-from messlib.game import Actions  # for list of possible base Actions
+from messlib.data_structures.move_definitions import Actions  # for list of possible base Actions
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:

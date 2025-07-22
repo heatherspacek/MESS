@@ -1,6 +1,6 @@
 import dearpygui.dearpygui as dpg
 
-from messlib.console_interface import Interface
+from messlib.interfaces.console_interface import Interface
 # from messtool.singletons import GuiController
 
 

@@ -5,8 +5,6 @@ from melee.controller import Controller
 from enum import Enum
 from dataclasses import dataclass, field
 
-# TODO: come up with better category names than "abstract" and "functional"
-
 
 class FacingDirection(Enum):
     LEFT = "LEFT"

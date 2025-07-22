@@ -9,12 +9,12 @@ import dearpygui.demo as dpgdemo
 import messtool.tool_layout as app_layout
 import messtool.tool_classes as app_classes
 from messtool.singletons import GuiController
-from messlib.uilogging import MESSHandler
 
 # -
-from messlib.classes_functional import StrategyPlayer
-from messlib.classes_abstract import Strategy
-from messlib.engine import Engine
+from messlib.data_structures.classes import Strategy
+from messlib.interfaces.uilogging import MESSHandler
+from messlib.interfaces.strategy_player import StrategyPlayer
+from messlib.interfaces.engine import Engine
 
 
 """
@@ -42,11 +42,11 @@ if __name__ == "__main__":
     logger.setLevel("DEBUG")
 
     # View
-    import messlib.installer
+    import messlib.interfaces.installer
     app_layout.layout_setup()
     dpg.add_button(label="install",
                    parent="gamewnd",
-                   callback=lambda _: messlib.installer.Installer.install()
+                   callback=lambda _: messlib.interfaces.installer.Installer.install()
                    )
 
     # logger.error("error!!!")

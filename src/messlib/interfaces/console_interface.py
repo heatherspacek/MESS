@@ -1,8 +1,8 @@
 import logging
 import melee
 import sys
-from messlib.installer import Installer  # for installed Slippi path
-from messlib.uilogging import MESSHandler
+from messlib.interfaces.installer import Installer  # for installed Slippi path
+from messlib.interfaces.uilogging import MESSHandler
 
 """
 ISSUES:
