@@ -1,5 +1,8 @@
 import logging
 import melee
+import configparser
+import os
+import shutil
 import sys
 from messlib.interfaces.installer import Installer  # for installed Slippi path
 from messlib.interfaces.uilogging import MESSHandler
@@ -35,9 +38,31 @@ class ConsoleInterface:
         # --- replace later.
         self.iso_path = "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso"
 
+    def _patch_dolphin_config(self):
+        # TODO: this is only tested on Linux right now.
+        os.makedirs(Installer.dirs.user_config_path, exist_ok=True)
+        config = configparser.ConfigParser()
+        dolphin_ini_path = (
+            Installer.dirs.user_config_path / ".." / "SlippiPlayback"/ "Config"
+            / "Dolphin.ini"
+        )
+        if not os.path.isfile(dolphin_ini_path):
+            raise FileNotFoundError("dolphin.ini not found in the expected location."
+                                    f" Tried looking in {dolphin_ini_path}")
+        config.read(dolphin_ini_path)
+        config.set("Display", "RenderToMain", "True")
+        config.set("Input", "backgroundinput", "True")
+        config.set("Display", "Fullscreen", "False")
+        with open(dolphin_ini_path, "w") as dolphinfile:
+            config.write(dolphinfile)
+
     def _attempt_open_console(self, console_path: str):
         try:
-            self.console = melee.Console(path=console_path, dolphin_home_path=console_path)
+            self.console = melee.Console(
+                path=console_path,
+                dolphin_home_path=console_path,
+                tmp_home_directory=False
+                )
             self.controller1 = melee.Controller(
                 console=self.console, port=1, type=melee.ControllerType.GCN_ADAPTER
             )
