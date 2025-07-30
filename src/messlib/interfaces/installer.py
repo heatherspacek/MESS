@@ -218,7 +218,7 @@ class _Installer:
             / "GameSettings"
             / "GALE01r2.ini"
         )
-        custom_ini_res = importlib.resources.files() / "res" / "GALE01r2.ini"
+        custom_ini_res = importlib.resources.files() / ".." / "res" / "GALE01r2.ini"
         shutil.copyfile(custom_ini_res, gecko_ini_path)
         dummy_options = (
             "02", #stage

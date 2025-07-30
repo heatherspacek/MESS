@@ -42,11 +42,16 @@ if __name__ == "__main__":
     logger.setLevel("DEBUG")
 
     # View
-    import messlib.interfaces.installer
+    from messlib.interfaces.console_interface import Interface
+    from messlib.interfaces.engine import Engine
+    def testing_button():
+        Interface.setup_oneplayer()
+        Engine.start_bg_run()
+
     app_layout.layout_setup()
-    dpg.add_button(label="install",
+    dpg.add_button(label="testing button!",
                    parent="gamewnd",
-                   callback=lambda _: messlib.interfaces.installer.Installer.install()
+                   callback=lambda _: testing_button()
                    )
 
     # logger.error("error!!!")
@@ -62,10 +67,17 @@ if __name__ == "__main__":
     # dpg.start_dearpygui()
 
     # below replaces, start_dearpygui()
+    import time
     while dpg.is_dearpygui_running():
         # insert here any code you would like to run in the render loop
         # you can manually stop by using stop_dearpygui()
         # # # print("this will run every frame")
+        t1 = time.perf_counter()
         dpg.render_dearpygui_frame()
+        t2 = time.perf_counter()
+        print(
+            f"\nElapsed frame time: {t2-t1} sec "
+            f"\nEngine ticks: {Engine.i}"
+            )
 
     dpg.destroy_context()

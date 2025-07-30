@@ -34,7 +34,8 @@ class _Engine:
         try:
             while True:
                 # START Background process loop -----vvvvv
-                ...
+                Interface.step()
+                self.i += 1
                 # END background process loop -----^^^^^
 
         except Exception as e:

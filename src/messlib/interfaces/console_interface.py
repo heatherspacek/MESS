@@ -53,6 +53,12 @@ class ConsoleInterface:
         config.set("Display", "RenderToMain", "True")
         config.set("Input", "backgroundinput", "True")
         config.set("Display", "Fullscreen", "False")
+        config.set("Core", "BlockingPipes", "True")
+        config.set("DSP", "Backend", "No audio output")
+        # config.set("Core", "SpeedLimit", "Unlimited")
+        # config.set("Core", "OverclockEnable", "True")
+        # config.set("Core", "Overclock", "60")
+        
         with open(dolphin_ini_path, "w") as dolphinfile:
             config.write(dolphinfile)
 
@@ -82,7 +88,9 @@ class ConsoleInterface:
             # TODO: should prompt this first
             Installer.install()
             self._attempt_open_console()
+        Installer._configure_slippi()
         self.console.run(iso_path=self.iso_path)
+        self.running = self.console.connect()
 
     def step(self):
         if self.running:
@@ -102,4 +110,19 @@ if sys.platform == "linux":
 Interface = ConsoleInterface(console_path=str(_install_path))
 
 if __name__ == "__main__":
+    Installer._configure_slippi()
+    Interface._patch_dolphin_config()
     Interface.setup_oneplayer()
+    import time
+    nf = 0
+    cumulative = 0
+    while True:
+        t2 = time.perf_counter()
+        Interface.console.step()
+        te = time.perf_counter() - t2
+        nf += 1
+        cumulative += te
+        if cumulative > 1.000:
+            print(f"{nf} frames computed per second")
+            nf = 0
+            cumulative = 0
