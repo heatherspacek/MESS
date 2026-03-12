@@ -1,9 +1,8 @@
-from melee.enums import Character, Button
-from melee.controller import Controller
-
-
-from enum import Enum
 from dataclasses import dataclass, field
+from enum import Enum
+
+from melee.controller import Controller
+from melee.enums import Button, Character
 
 
 class FacingDirection(Enum):

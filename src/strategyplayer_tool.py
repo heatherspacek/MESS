@@ -5,17 +5,15 @@ import queue
 import dearpygui.dearpygui as dpg
 import dearpygui.demo as dpgdemo
 
+import messtool.tool_classes as app_classes
 # -
 import messtool.tool_layout as app_layout
-import messtool.tool_classes as app_classes
-from messtool.singletons import GuiController
-
 # -
 from messlib.data_structures.classes import Strategy
-from messlib.interfaces.uilogging import MESSHandler
-from messlib.interfaces.strategy_player import StrategyPlayer
 from messlib.interfaces.engine import Engine
-
+from messlib.interfaces.strategy_player import StrategyPlayer
+from messlib.interfaces.uilogging import MESSHandler
+from messtool.singletons import GuiController
 
 """
 ===============================================================================

@@ -2,7 +2,7 @@ import melee
 import numpy as np
 
 
-def jumpsquat(character: melee.enums.Character):
+def jumpsquat(character: melee.enums.Character) -> int:
     match character:
         case (
             melee.enums.Character.LINK

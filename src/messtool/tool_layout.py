@@ -1,14 +1,11 @@
-import dearpygui.dearpygui as dpg
 import ctypes  # for Windows high-dpi text rendering "fuzziness" fix
 import os  # for os.path.join and os.listdir
 
+import dearpygui.dearpygui as dpg
+
 # --
-from messtool.windows import (
-    situation_editor,
-    strategy_editor,
-    game_setup,
-    logging_window,
-    )
+from messtool.windows import (game_setup, logging_window, situation_editor,
+                              strategy_editor)
 
 
 def layout_setup():
