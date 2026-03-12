@@ -1,11 +1,12 @@
-import logging
-import melee
 import configparser
+import logging
 import os
-import shutil
 import sys
-from messlib.interfaces.installer import Installer  # for installed Slippi path
-from messlib.interfaces.uilogging import MESSHandler
+
+import melee
+
+from .installer import Installer  # for installed Slippi path
+from .uilogging import MESSHandler
 
 """
 ISSUES:
@@ -40,10 +41,12 @@ class ConsoleInterface:
 
     def _patch_dolphin_config(self):
         # TODO: this is only tested on Linux right now.
+        # TODO: the dolphin ini will not be there if the user has never
+        # opened Slippi Playback dolphin before.
         os.makedirs(Installer.dirs.user_config_path, exist_ok=True)
         config = configparser.ConfigParser()
         dolphin_ini_path = (
-            Installer.dirs.user_config_path / ".." / "SlippiPlayback"/ "Config"
+            Installer.dirs.user_config_path / ".." / "SlippiPlayback" / "Config"
             / "Dolphin.ini"
         )
         if not os.path.isfile(dolphin_ini_path):
@@ -58,7 +61,7 @@ class ConsoleInterface:
         # config.set("Core", "SpeedLimit", "Unlimited")
         # config.set("Core", "OverclockEnable", "True")
         # config.set("Core", "Overclock", "60")
-        
+
         with open(dolphin_ini_path, "w") as dolphinfile:
             config.write(dolphinfile)
 
@@ -101,7 +104,7 @@ class ConsoleInterface:
 
 # On linux, the installation path is not exactly the user_data_path.
 # We should actually ask the Installer what platform we are on, but doesnt hurt
-# to re-do. 
+# to re-do.
 
 _install_path = Installer.dirs.user_data_path
 if sys.platform == "linux":
@@ -111,6 +114,7 @@ Interface = ConsoleInterface(console_path=str(_install_path))
 
 if __name__ == "__main__":
     Installer._configure_slippi()
+
     Interface._patch_dolphin_config()
     Interface.setup_oneplayer()
     import time

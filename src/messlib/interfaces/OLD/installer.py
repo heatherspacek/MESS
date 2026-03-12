@@ -1,19 +1,20 @@
-import importlib.resources
-from platformdirs import PlatformDirs
-import github
-from packaging.version import Version
-import os
-import io
-import melee
 import importlib
+import importlib.resources
+import io
 import logging
-import requests
+import os
 import shutil
 import subprocess
 import sys
 import zipfile
 
-from .uilogging import MESSHandler
+import github
+import melee
+import requests
+from packaging.version import Version
+from platformdirs import PlatformDirs
+
+# from .uilogging import MESSHandler
 
 # https://imgur.com/a/4EuIt
 CHARACTER_HEX_IDS = {
@@ -109,11 +110,11 @@ C216DD6C 00000005
 60000000 00000000\
 """
 
+
 class _Installer:
     """
     Methods for downloading and configuring a Slippi installation for use with
-    MESS. It seems too inconvenient/intrusive to just tack on to users'
-    Slippi Launcher Playback installations."""
+    MESS."""
     def __init__(self):
         self.dirs = PlatformDirs(appauthor=None, appname="MESS")
         """
@@ -124,7 +125,7 @@ class _Installer:
         self.remote_latest = None
 
         self.logger = logging.getLogger(__name__)
-        self.logger.addHandler(MESSHandler())
+        # self.logger.addHandler(MESSHandler())
         self.logger.setLevel("DEBUG")
 
     def _query_github(self):
@@ -221,11 +222,11 @@ class _Installer:
         custom_ini_res = importlib.resources.files() / ".." / "res" / "GALE01r2.ini"
         shutil.copyfile(custom_ini_res, gecko_ini_path)
         dummy_options = (
-            "02", #stage
-            "00", #ch
-            "2A", # %
-            "01", #ch
-            "2A" # %
+            "02",  # stage
+            "00",  # ch
+            "2A",  # %
+            "01",  # ch
+            "2A"   # %
         )
         with open(gecko_ini_path, "a") as append_stream:
             append_stream.write(CONFIG_CODE.format(*dummy_options))

@@ -1,7 +1,7 @@
-from messlib.data_structures.classes import Strategy
-
 # --
 import melee
+
+from messlib.data_structures.classes import Strategy
 
 
 class StrategyPlayer:

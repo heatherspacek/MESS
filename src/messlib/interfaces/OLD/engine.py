@@ -3,8 +3,8 @@ import queue
 import threading
 import time
 
-from messlib.interfaces.uilogging import MESSHandler
 from messlib.interfaces.console_interface import Interface
+from messlib.interfaces.uilogging import MESSHandler
 
 
 class _Engine:

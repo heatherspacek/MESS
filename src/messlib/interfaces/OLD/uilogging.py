@@ -1,4 +1,5 @@
 import logging
+
 import dearpygui.dearpygui as dpg
 from dearpygui_ext import logger
 
@@ -10,7 +11,7 @@ class MESSHandler(logging.Handler):
         dpg.create_context()
 
     def emit(self, record):
-        if dpg.is_dearpygui_running(): 
+        if dpg.is_dearpygui_running():
             if dpg.does_item_exist("logging_container"):
                 # Log to the GUI window
                 Logger_ref: logger.mvLogger = dpg.get_item_user_data("logging_container")

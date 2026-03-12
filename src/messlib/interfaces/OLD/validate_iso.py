@@ -1,6 +1,5 @@
 import hashlib
 
-
 """ work copied from
 https://github.com/project-slippi/slippi-launcher/blob/main/src/main/verify_iso.ts
 Our requirements are probably not strictly the same as slippi-launcher's requirements,
