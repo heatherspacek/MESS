@@ -1,6 +1,5 @@
 
-CONFIG_CODE_BOOT_TO_GAME = """\
-$MESS: Boot to Game [UnclePunch]
+CONFIG_CODE_BOOT_TO_GAME = """$MESS: Boot to Game [UnclePunch]
 *Check Player and Stage IDs for Custom Match to boot into.
 041a45c0 3860000E #Boot to In Game
 C21B148C 00000025
@@ -41,40 +40,6 @@ FFFFFFFF 00000000
 3F800000 3F800000
 3F800000 BB610014
 60000000 00000000
-"""
-
-CONFIG_CODE_DPAD_PERCENTS = """$D-Pad Controls Damage (v1.02) [InternetExplorer]
-C206D1EC 0000001E
-3DE08047 61EF9C3F
-8A0F0000 2C100000
-41A200D8 3E60805A
-62737000 3A400000
-2C100001 4082000C
-3E40FFFF 3E80BF80
-2C100002 4082000C
-3E400001 3E803F80
-2C100004 4082000C
-3E40FFF6 3E80C120
-2C100008 4082000C
-3E40000A 3E804120
-92530000 92930008
-3E000000 9A0F0000
-3E200000 3DE08045
-61EF30E0 820F0000
-7E109214 2C100000
-40800008 3A000000
-920F0000 39EF0E90
-3A310001 2C110004
-4180FFDC 3DE080BD
-61EFA4A0 81EF0000
-3E000000 C0130008
-C02F1890 EC21002A
-C0130004 FC010000
-4080000C D00F1890
-48000008 D02F1890
-81EF0008 2C0F0000
-41820008 4BFFFFCC
-7C0802A6 00000000
 """
 
 CONFIG_CODE_SAVE_STATES = """$20XX Save States outside of 20XX [Altafen, Achilles]
@@ -338,6 +303,41 @@ A0640002 A084000A
 60000000 00000000
 """
 
+CONFIG_CODE_DPAD_PERCENTS = """$D-pad Damage but only Up and Down [Spelcheque]
+C206D1EC 0000001E
+3DE08047 61EF9C3F
+8A0F0000 2C100000
+41A200D8 3E60805A
+62737000 3A400000
+2C100001 4082000C
+3E40FFFF 3E80BF80
+2C100002 4082000C
+3E400001 3E803F80
+2C100004 4082000C
+3E40FFF6 3E80C120
+2C100008 4082000C
+3E40000A 3E804120
+92530000 92930008
+3E000000 9A0F0000
+3E200000 3DE08045
+61EF30E0 820F0000
+7E109214 2C100000
+40800008 3A000000
+920F0000 39EF0E90
+3A310001 2C110004
+4180FFDC 3DE080BD
+61EFA4A0 81EF0000
+3E000000 C0130008
+C02F1890 EC21002A
+C0130004 FC010000
+4080000C D00F1890
+48000008 D02F1890
+81EF0008 2C0F0000
+41820008 4BFFFFCC
+7C0802A6 00000000
+"""
+
+
 DEFAULT_INI_PATH = (
     "/home/heather/.local/share/MESS/squashfs-root/usr/bin/Sys/GameSettings/GALE01r2.ini"
 )
@@ -346,22 +346,33 @@ DEFAULT_INI_PATH = (
 def patch_installation(
     dest_ini_path=DEFAULT_INI_PATH
 ):
-    MESS_STRING = "$20XX Save States outside of 20XX\n"
-    MESS_STRING2 = "$D-Pad Controls Damage (v1.02)\n"
+    MESS_STRING = "$MESS: Boot to Game\n"
+    MESS_STRING2 = "$20XX Save States outside of 20XX\n"
+    MESS_STRING3 = "$D-pad Damage but only Up and Down\n"
 
     with open(dest_ini_path, 'r') as f:
         inilines = f.readlines()
-    if MESS_STRING in inilines:
-        return
+    # if MESS_STRING in inilines:
+    #     return
 
     anchor = inilines.index("[Gecko]\n")
-    inilines.insert(anchor-1, MESS_STRING)
+    # inilines.insert(anchor-1, MESS_STRING)
     # inilines.insert(anchor-1, MESS_STRING2)
+    inilines.insert(anchor-1, MESS_STRING3)
+
+    # inilines.remove("$Optional: Extract Menu Info\n")
 
     with open(dest_ini_path, 'w') as f:
         f.writelines(inilines)
 
+    dummy_options = (
+            "02",  # stage
+            "00",  # ch
+            "2A",  # %
+            "01",  # ch
+            "2A"   # %
+        )
     with open(dest_ini_path, 'a') as append_stream:
-        # append_stream.write(CONFIG_CODE.format(*dummy_options))
-        append_stream.write(CONFIG_CODE_SAVE_STATES)
-        # append_stream.write(CONFIG_CODE_DPAD_PERCENTS)
+        # append_stream.write(CONFIG_CODE_BOOT_TO_GAME.format(*dummy_options))
+        # append_stream.write(CONFIG_CODE_SAVE_STATES)
+        append_stream.write(CONFIG_CODE_DPAD_PERCENTS)

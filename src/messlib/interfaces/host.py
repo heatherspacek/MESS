@@ -17,7 +17,7 @@ class Host:
             path="/home/heather/.local/share/MESS/squashfs-root/usr/bin/dolphin-emu",
             gfx_backend="Null",
             disable_audio=True,
-            use_exi_inputs=True,
+            use_exi_inputs=False,
             enable_ffw=False,
             blocking_input=True,
             dolphin_home_path="/home/heather/.local/share/MESS/squashfs-root/usr/bin/Sys"
@@ -93,6 +93,8 @@ class Host:
                 self.p1.press_button(melee.enums.Button.BUTTON_D_DOWN)
             if 'l' in inp:
                 self.p1.press_button(melee.enums.Button.BUTTON_D_RIGHT)
+            if 'z' in inp:
+                self.p1.press_button(melee.enums.Button.BUTTON_A)
             self.p1.tilt_analog(melee.enums.Button.BUTTON_MAIN, x, y)
             self.p1.flush()
             gs = self.console.step()
