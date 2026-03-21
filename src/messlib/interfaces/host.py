@@ -75,6 +75,7 @@ class Host:
             x = 0.5
             y = 0.5
             self.p1.release_all()
+            self.p2.release_all()
             if 'a' in inp:
                 x -= 0.5
             if 's' in inp:
@@ -95,8 +96,12 @@ class Host:
                 self.p1.press_button(melee.enums.Button.BUTTON_D_RIGHT)
             if 'z' in inp:
                 self.p1.press_button(melee.enums.Button.BUTTON_A)
+            if 'K' in inp:
+                self.p2.press_button(melee.enums.Button.BUTTON_D_DOWN)
             self.p1.tilt_analog(melee.enums.Button.BUTTON_MAIN, x, y)
+            self.p2.tilt_analog(melee.enums.Button.BUTTON_MAIN, x, y)
             self.p1.flush()
+            self.p2.flush()
             gs = self.console.step()
             print_gamestate(gs)
 

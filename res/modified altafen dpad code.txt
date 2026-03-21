@@ -1,0 +1,102 @@
+# address: 8006D1EC
+# the original hooks the top of PlayerThink_Damage for some reason
+# may as well do the same
+
+.set BUTTONS, 0x80479C3F
+
+.set PLAYER_BLOCK_BASE, 0x80453080
+.set PLAYER_BLOCK_SIZE, 0xE90
+
+.set PLAYER_BLOCK_SLOT_TYPE, 0x8
+.set SLOT_TYPE_NA, 0x3
+.set PLAYER_BLOCK_DAMAGE, 0x60
+.set PLAYER_BLOCK_GOBJ, 0xB0
+.set GOBJ_USERDATA, 0x2C
+.set FIGHTER_DAMAGE, 0x1830
+
+.set DIGITAL_BUTTONS_OFFSET, 0x65C
+
+.set CONTROLLER_ONE, 0x804C1FAC
+.set CONTROLLER_OFFSET, 0x30
+
+.set PLAYER_TWO_BASE, 0x80453F10
+
+# r4: pointer to floats.
+# r5: pointer to buttons released this frame.
+# r6: buttons released this frame.
+# r7: integer damage delta. original code uses a word instead of a short.
+# f0: float damage delta. original code uses a gpr and converts but we'll just load from r4 instead.
+
+mflr r5
+bl code_start
+.float -1.0
+.float 1.0
+.float -10.0
+.float 10.0
+.float 0.0
+code_start:
+mflr r4
+mtlr r5
+
+lis r5, BUTTONS@h
+ori r5, r5, BUTTONS@l
+lbz r6, 0(r5)
+
+cmpwi r6, 4
+beq pos1
+b check2
+
+pos1:
+li r7, 1
+lfs f0, 0x4(r4)
+# clear (avoid retrigger)
+li r6, 0
+stb r6, 0(r5)
+
+lis r6, PLAYER_BLOCK_BASE@h
+ori r6, r6, PLAYER_BLOCK_BASE@l
+
+lwz r8, PLAYER_BLOCK_GOBJ(r6)
+lwz r8, GOBJ_USERDATA(r8)
+
+lhz r9, PLAYER_BLOCK_DAMAGE(r6)
+add r9, r9, r7
+sth r9, PLAYER_BLOCK_DAMAGE(r6)
+
+lfs f1, FIGHTER_DAMAGE(r8)
+fadd f1, f1, f0
+stfs f1, FIGHTER_DAMAGE(r8)
+
+check2:
+lis r5, BUTTONS@h
+ori r5, r5, BUTTONS@l
+lbz r6, CONTROLLER_OFFSET(r5)
+
+cmpwi r6, 4
+beq pos2
+b exit
+
+pos2:
+li r7, 1
+lfs f0, 0x4(r4)
+# clear
+li r6, 0
+stb r6, CONTROLLER_OFFSET(r5)
+
+lis r6, PLAYER_TWO_BASE@h
+ori r6, r6, PLAYER_TWO_BASE@l
+
+lwz r8, PLAYER_BLOCK_GOBJ(r6)
+lwz r8, GOBJ_USERDATA(r8)
+
+lhz r9, PLAYER_BLOCK_DAMAGE(r6)
+add r9, r9, r7
+sth r9, PLAYER_BLOCK_DAMAGE(r6)
+
+lfs f1, FIGHTER_DAMAGE(r8)
+fadd f1, f1, f0
+stfs f1, FIGHTER_DAMAGE(r8)
+
+exit:
+mflr r0
+
