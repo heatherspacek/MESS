@@ -303,37 +303,27 @@ A0640002 A084000A
 60000000 00000000
 """
 
-CONFIG_CODE_DPAD_PERCENTS = """$D-pad Damage but only Up and Down [Spelcheque]
-C206D1EC 0000001E
-3DE08047 61EF9C3F
-8A0F0000 2C100000
-41A200D8 3E60805A
-62737000 3A400000
-2C100001 4082000C
-3E40FFFF 3E80BF80
-2C100002 4082000C
-3E400001 3E803F80
-2C100004 4082000C
-3E40FFF6 3E80C120
-2C100008 4082000C
-3E40000A 3E804120
-92530000 92930008
-3E000000 9A0F0000
-3E200000 3DE08045
-61EF30E0 820F0000
-7E109214 2C100000
-40800008 3A000000
-920F0000 39EF0E90
-3A310001 2C110004
-4180FFDC 3DE080BD
-61EFA4A0 81EF0000
-3E000000 C0130008
-C02F1890 EC21002A
-C0130004 FC010000
-4080000C D00F1890
-48000008 D02F1890
-81EF0008 2C0F0000
-41820008 4BFFFFCC
+CONFIG_CODE_DPAD_PERCENTS = """$D-Pad Controls Damage v2 [Altafen, InternetExplorer]
+C206D1EC 00000014
+7CA802A6 48000019
+BF800000 3F800000
+C1200000 41200000
+00000000 7C8802A6
+7CA803A6 3CA08047
+60A59C3F 88C50000
+2C060004 41820014
+48000060 38E0FFFF
+C0040000 48000024
+38E00001 C0040004
+48000018 38E0FFF6
+C0040008 4800000C
+38E0000A C004000C
+38C00000 98C50000
+3CC08045 60C63080
+810600B0 8108002C
+A1260060 7D293A14
+B1260060 C0281830
+FC21002A D0281830
 7C0802A6 00000000
 """
 
@@ -348,7 +338,7 @@ def patch_installation(
 ):
     MESS_STRING = "$MESS: Boot to Game\n"
     MESS_STRING2 = "$20XX Save States outside of 20XX\n"
-    MESS_STRING3 = "$D-pad Damage but only Up and Down\n"
+    MESS_STRING3 = "$D-Pad Controls Damage v2\n"
 
     with open(dest_ini_path, 'r') as f:
         inilines = f.readlines()
@@ -357,22 +347,13 @@ def patch_installation(
 
     anchor = inilines.index("[Gecko]\n")
     # inilines.insert(anchor-1, MESS_STRING)
-    # inilines.insert(anchor-1, MESS_STRING2)
+    inilines.insert(anchor-1, MESS_STRING2)
     inilines.insert(anchor-1, MESS_STRING3)
-
-    # inilines.remove("$Optional: Extract Menu Info\n")
 
     with open(dest_ini_path, 'w') as f:
         f.writelines(inilines)
 
-    dummy_options = (
-            "02",  # stage
-            "00",  # ch
-            "2A",  # %
-            "01",  # ch
-            "2A"   # %
-        )
     with open(dest_ini_path, 'a') as append_stream:
         # append_stream.write(CONFIG_CODE_BOOT_TO_GAME.format(*dummy_options))
-        # append_stream.write(CONFIG_CODE_SAVE_STATES)
+        append_stream.write(CONFIG_CODE_SAVE_STATES)
         append_stream.write(CONFIG_CODE_DPAD_PERCENTS)
