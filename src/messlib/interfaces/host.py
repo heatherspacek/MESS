@@ -3,6 +3,9 @@ from melee.gamestate import GameState
 from melee.enums import Button
 from .patcher import patch_installation
 from ..data_structures.situation import Situation
+from ..data_structures.helpers import angle_to_meleecircle, jumpsquat
+
+from .vis import print_gamestate
 
 
 class Host:
@@ -71,11 +74,15 @@ class Host:
             raise RuntimeError("Console was never initialized.")
         if not self.console.connected:
             raise RuntimeError("Console reports that it is not connected.")
-        self._load_into_game(sitch)
-        self._set_percents(sitch)
-        self._goto(sitch)
+        gs = self._load_into_game(sitch)
+        print("Debug: successful load_into_game.")
+        gs = self._set_percents(sitch)
+        print("Debug: successful set_percents.")
+        gs = self._goto(sitch)
+        print("Debug: successful goto.")
+        return gs
 
-    def _load_into_game(self, sitch: Situation):
+    def _load_into_game(self, sitch: Situation) -> GameState:
         MAX_STEPS = 250
         menuhelper = melee.menuhelper.MenuHelper()
         gs = self.console.step()
@@ -106,7 +113,7 @@ class Host:
         # Ran out of iterations
         raise TimeoutError(f"Failed to start game within {MAX_STEPS} console steps.")
 
-    def _set_percents(self, sitch: Situation):
+    def _set_percents(self, sitch: Situation) -> GameState:
         # self.console is assumed alive.
         def clamp(i: int):
             if i > 999:
@@ -142,8 +149,72 @@ class Host:
             p2_current = int(gs.players[2].percent)
         return gs
 
-    def _goto(self, sitch: Situation):
-        ...
+    def _goto(self, sitch: Situation) -> GameState:
+        # TODO: validation checks --
+        # . are the x positions actually on stage?
+        # . are the platform x positions actually on platform?
+        # . did user ask for a platform position on FD?
+
+        # TODO: platform setup :)) I'm skipping over it!!
+        gs = self.console.step()
+        # stage = gs.stage
+        js1 = jumpsquat(gs.players[1].character)
+        js2 = jumpsquat(gs.players[2].character)
+        x1_tar = sitch.p1_x_position
+        x2_tar = sitch.p2_x_position
+
+        def xdiffs(gs):
+            return (x1_tar - gs.players[1].position.x, x2_tar - gs.players[2].position.x)
+
+        def distance_to_wd_angle(dist):
+            if dist < 1:
+                return 90
+            elif dist < 12:
+                return 72
+            else:
+                return 30
+
+        p1states = []
+        p2states = []
+        for wd_count in range(25):
+            p1_xdiff, p2_xdiff = xdiffs(gs)
+            for internal_count in range(20):
+                if internal_count == 0:
+                    self.p1.simple_press(0.5, 0.5, Button.BUTTON_X)
+                    self.p2.simple_press(0.5, 0.5, Button.BUTTON_X)
+                    self.p1.flush()
+                    self.p2.flush()
+
+                if internal_count == js1:
+                    quad = "BL" if p1_xdiff < 0 else "BR"
+                    angle = distance_to_wd_angle(abs(p1_xdiff))
+                    xc, yc = angle_to_meleecircle(angle, quad)
+                    self.p1.simple_press(xc, yc, Button.BUTTON_R)
+                    self.p1.flush()
+                else:
+                    self.p1.release_button(Button.BUTTON_R)
+                if internal_count == js2:
+                    quad = "BL" if p2_xdiff < 0 else "BR"
+                    angle = distance_to_wd_angle(abs(p2_xdiff))
+                    xc, yc = angle_to_meleecircle(angle, quad)
+                    self.p2.simple_press(xc, yc, Button.BUTTON_R)
+                    self.p2.flush()
+                else:
+                    self.p2.release_button(Button.BUTTON_R)
+
+                if internal_count == 12:
+                    p1states.append(gs.players[1].action)
+                    p2states.append(gs.players[2].action)
+                gs = self.console.step()
+
+            print([d for d in xdiffs(gs)])
+            if all(abs(d) < 1 for d in xdiffs(gs)):
+                return gs
+        breakpoint()
+        raise RuntimeError(
+            "Couldn't get to the specified init position in 25 wavedashes. "
+            "Check for impossible position?"
+        )
 
     def _debug_control(self):
         from .vis import print_gamestate
