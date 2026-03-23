@@ -1,18 +1,36 @@
 import melee
+from melee.gamestate import GameState
+from melee.enums import Button
 from .patcher import patch_installation
+from ..data_structures.situation import Situation
 
 
 class Host:
     """
     libmelee console host.
+
+    API surface:
+    =====
+    .p1, .p2, .console: libmelee objects.
+
+    .console_setup(): Start a fresh console relationship. Kill any stale
+    .step(): melee.console.step, but with a timeout in case something
+        has gone wrong with the console interface. Returns the GameState
+    .situation_setup(): Takes a Situation dataclass and attempts to
+        implement it. Returns the GameState
     """
+    iso_path = "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso"
 
     def __init__(self):
+        self.p1 = None
+        self.p2 = None
         self.console = None
-        # --- replace later.
-        self.iso_path = "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso"
 
-    def setup(self):
+    def console_setup(self) -> GameState:
+        """
+        TODO: add statefulness, e.g., in case a connection was already
+        open
+        """
         self.console = melee.Console(
             path="/home/heather/.local/share/MESS/squashfs-root/usr/bin/dolphin-emu",
             gfx_backend="Null",
@@ -45,26 +63,87 @@ class Host:
         self.p1.connect()
         self.p2.connect()
 
+        return self.console.step()
+
+    def situation_setup(self, sitch: Situation) -> GameState:
+        # <Check if console_setup has occurred...>
+        if self.console is None:
+            raise RuntimeError("Console was never initialized.")
+        if not self.console.connected:
+            raise RuntimeError("Console reports that it is not connected.")
+        self._load_into_game(sitch)
+        self._set_percents(sitch)
+        self._goto(sitch)
+
+    def _load_into_game(self, sitch: Situation):
+        MAX_STEPS = 250
         menuhelper = melee.menuhelper.MenuHelper()
         gs = self.console.step()
-        for _ in range(250):
-            if gs.menu_state == melee.enums.Menu.IN_GAME:
-                return
-            else:
-                for i, conch in enumerate((self.p1, self.p2)):
-                    menuhelper.menu_helper_simple(
-                        gs,
-                        conch,
-                        melee.Character.FOX,
-                        melee.Stage.YOSHIS_STORY,
-                        costume=i,
-                        autostart=True,
-                        swag=False
-                    )
-                gs = self.console.step()
 
+        for _ in range(MAX_STEPS):
+            if gs.menu_state == melee.enums.Menu.IN_GAME:
+                return gs
+            else:
+                menuhelper.menu_helper_simple(
+                    gs,
+                    self.p1,
+                    sitch.p1_character,
+                    sitch.stage,
+                    costume=1,
+                    autostart=True,
+                    swag=False,
+                )
+                menuhelper.menu_helper_simple(
+                    gs,
+                    self.p2,
+                    sitch.p2_character,
+                    sitch.stage,
+                    costume=2,
+                    autostart=True,
+                    swag=False
+                )
+                gs = self.console.step()
         # Ran out of iterations
-        raise RuntimeError("Failed to start game within 200 console steps. Sorry")
+        raise TimeoutError(f"Failed to start game within {MAX_STEPS} console steps.")
+
+    def _set_percents(self, sitch: Situation):
+        # self.console is assumed alive.
+        def clamp(i: int):
+            if i > 999:
+                return 999
+            elif i < 0:
+                return 0
+            else:
+                return i
+        p1_target = clamp(int(sitch.p1_percent))
+        p2_target = clamp(int(sitch.p2_percent))
+        # TODO: replace this with step-with-timeout, once it exists
+        gs = self.console.step()
+        p1_current = int(gs.players[1].percent)
+        p2_current = int(gs.players[2].percent)
+        if p1_current > p1_target or p2_current > p2_target:
+            raise ValueError(
+                "Target percent is lower than players' current percent."
+                "Codeset doesn't support this right now. Try resetting "
+                "the console."
+            )
+        while (p1_target != p1_current) or (p2_target != p2_current):
+            if gs.frame % 2 == 0:
+                self.p1.release_all()
+                self.p2.release_all()
+                gs = self.console.step()
+                continue
+            if (p1_target != p1_current):
+                self.p1.press_button(Button.BUTTON_D_DOWN)
+            if (p2_target != p2_current):
+                self.p2.press_button(Button.BUTTON_D_DOWN)
+            gs = self.console.step()
+            p1_current = int(gs.players[1].percent)
+            p2_current = int(gs.players[2].percent)
+        return gs
+
+    def _goto(self, sitch: Situation):
+        ...
 
     def _debug_control(self):
         from .vis import print_gamestate
@@ -108,11 +187,16 @@ class Host:
 
 if __name__ == "__main__":
     MeleeHost = Host()
-    MeleeHost.setup()
+    MeleeHost.console_setup()
 
     for _ in range(500):
         # Advance time to make sure we're off the respawn plat.
         MeleeHost.console.step()
+
+    from ..data_structures.situation import sample_situation
+    s1 = sample_situation()
+
+    MeleeHost.situation_setup(s1)
 
     MeleeHost._debug_control()
 
