@@ -112,7 +112,7 @@ class Actions:
         for _ in range(jumpsquat(character)):
             sequence.append(Inputs.jump())
         sequence.append(Inputs.up_smash())
-        return sequence
+        return Action(sequence=sequence)
 
     def sh_back_air(
         character: Character,
@@ -129,7 +129,7 @@ class Actions:
         # TODO: How long is each character in the air off a SH?
         sequence.extend([Inputs.null()] * 25)
         sequence.insert(ff_frame, Inputs.fastfall())
-        return sequence
+        return Action(sequence=sequence)
 
     def wavedash(character: Character, direction: FacingDirection, angle: int | float):
         sequence = [Inputs.jump()] * jumpsquat(character)
