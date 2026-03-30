@@ -22,24 +22,23 @@ class Inputs:
             button=Button.BUTTON_R, coordinates=angle_to_meleecircle(angle, quadrant)
         )
 
-    def analog_jump(angle: float):
-        return Input(button=Button.BUTTON_X, coordinates=(0.5, 0.7))
-
     def back_air(direction: FacingDirection):
-        backwards = (0.5, 0.0) if direction == FacingDirection.LEFT else (0.5, 1.0)
-        return Input(c_coordinates=backwards)
+        return Input(c_coordinates=_backwards(direction))
+
+    def dash(direction: FacingDirection):
+        return Input(coordinates=_forwards(direction))
 
     def down_air():
-        return Input(c_coordinates=(0.0, 0.0))
+        return Input(c_coordinates=(0.5, 0.0))
 
     def fastfall():
         return Input(coordinates=(0.5, 0.0))
 
     def forward_air(direction: FacingDirection):
-        forwards = (0.5, 0.0) if direction == FacingDirection.RIGHT else (0.5, 1.0)
-        return Input(c_coordinates=forwards)
+        return Input(c_coordinates=_forwards(direction))
 
     def jump(angle: int | float = 90, quadrant: str = "UR"):
+        # TODO: analog angle(?)
         return Input(button=Button.BUTTON_X)
 
     def laser():
@@ -52,7 +51,10 @@ class Inputs:
         return Input()  # No input
 
     def up_air():
-        return Input(c_coordinates=(0.0, 1.0))
+        return Input(c_coordinates=(0.5, 1.0))
+
+    def up_smash():
+        return Input(c_coordinates=(0.5, 1.0))
 
 
 class Actions:
@@ -100,6 +102,16 @@ class Actions:
         sequence.append(Inputs.laser)
         sequence.append(Inputs.fastfall)
         return Action(sequence=sequence)
+
+    def jump_cancelled_upsmash(
+        character: Character,
+        direction: FacingDirection,
+        frames_dashing: int
+    ):
+        sequence = [Inputs.dash(direction=direction) for _ in range(frames_dashing)]
+        for _ in range(jumpsquat(character)):
+            sequence.append(Inputs.jump)
+        sequence.append(Inputs.up_smash)
 
     def wavedash(character: Character, direction: FacingDirection, angle: int | float):
         sequence = [Inputs.jump()] * jumpsquat(character)
