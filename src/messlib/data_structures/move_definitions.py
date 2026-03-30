@@ -112,6 +112,24 @@ class Actions:
         for _ in range(jumpsquat(character)):
             sequence.append(Inputs.jump)
         sequence.append(Inputs.up_smash)
+        return sequence
+
+    def sh_back_air(
+        character: Character,
+        direction: FacingDirection,
+        angle: int | float,
+        drift: float,
+        slack_frames: int,
+        ff_frame: int,
+    ):
+        sequence: list = [Inputs.jump(angle=angle)] * jumpsquat(character) - 1
+        sequence.extend([Inputs.null()] * slack_frames)
+        # TODO: drift.
+        sequence.append(Inputs.back_air(direction))
+        # TODO: How long is each character in the air off a SH?
+        sequence.extend([Inputs.null()] * 25)
+        sequence.insert(ff_frame, Inputs.fastfall())
+        return sequence
 
     def wavedash(character: Character, direction: FacingDirection, angle: int | float):
         sequence = [Inputs.jump()] * jumpsquat(character)
