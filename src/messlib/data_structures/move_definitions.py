@@ -5,6 +5,13 @@ from messlib.data_structures.classes import (Action, FacingDirection, Input,
 from messlib.data_structures.helpers import angle_to_meleecircle, jumpsquat
 
 
+def _forwards(direction: FacingDirection) -> tuple[float]:
+    return (1.0, 0.5) if direction == FacingDirection.LEFT else (0.0, 0.5)
+
+def _backwards(direction: FacingDirection) -> tuple[float]:
+    return (0.0, 0.5) if direction == FacingDirection.LEFT else (1.0, 0.5)
+
+
 class Inputs:
     """Organizing class used so elements can be accessed with e.g.
     `Inputs.jump`.
