@@ -1,12 +1,12 @@
 from melee.enums import Button, Character
 
-from messlib.data_structures.classes import (Action, FacingDirection, Input,
-                                             StochasticInput)
-from messlib.data_structures.helpers import angle_to_meleecircle, jumpsquat
+from .classes import (Action, FacingDirection, Input, StochasticInput)
+from .helpers import angle_to_meleecircle, jumpsquat
 
 
 def _forwards(direction: FacingDirection) -> tuple[float]:
     return (1.0, 0.5) if direction == FacingDirection.LEFT else (0.0, 0.5)
+
 
 def _backwards(direction: FacingDirection) -> tuple[float]:
     return (0.0, 0.5) if direction == FacingDirection.LEFT else (1.0, 0.5)
@@ -77,7 +77,7 @@ class Actions:
         drift: float,
     ):
         # Jump with direction/angle specified:
-        sequence = [Inputs.jump(angle=angle)] * jumpsquat(character) - 1
+        sequence = [Inputs.jump(angle=angle)] * (jumpsquat(character) - 1)
         # TODO: how do we fit drift in here????
         sequence.append(StochasticInput())
         sequence.append(Inputs.down_air())
@@ -89,7 +89,7 @@ class Actions:
         character: Character, direction: FacingDirection, angle: int | float
     ):
         # Jump with a direction and angle specified by input arguments...
-        sequence = [Inputs.jump()] * jumpsquat(character) - 1
+        sequence = [Inputs.jump()] * (jumpsquat(character) - 1)
         sequence.append(Inputs.nair())
         # Put a spacer in here-- a StochasticInput
         sequence.append(StochasticInput())
@@ -110,8 +110,8 @@ class Actions:
     ):
         sequence = [Inputs.dash(direction=direction) for _ in range(frames_dashing)]
         for _ in range(jumpsquat(character)):
-            sequence.append(Inputs.jump)
-        sequence.append(Inputs.up_smash)
+            sequence.append(Inputs.jump())
+        sequence.append(Inputs.up_smash())
         return sequence
 
     def sh_back_air(
@@ -122,7 +122,7 @@ class Actions:
         slack_frames: int,
         ff_frame: int,
     ):
-        sequence: list = [Inputs.jump(angle=angle)] * jumpsquat(character) - 1
+        sequence: list = [Inputs.jump(angle=angle)] * (jumpsquat(character) - 1)
         sequence.extend([Inputs.null()] * slack_frames)
         # TODO: drift.
         sequence.append(Inputs.back_air(direction))
