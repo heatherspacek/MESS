@@ -28,6 +28,8 @@ class Host:
         self.p1 = None
         self.p2 = None
         self.console = None
+        # Immediately perform setup.
+        _ = self.console_setup()
 
     def console_setup(self) -> GameState:
         """
@@ -67,6 +69,23 @@ class Host:
         self.p2.connect()
 
         return self.console.step()
+
+    def save_savestate(self) -> GameState:
+        """\
+        Saves positions and percents to be restored with load_last_savestate.
+        currently this takes a frame, but I don't think this is mandatory
+        """
+        self.p1.press_button(Button.BUTTON_D_RIGHT)
+        gs = self.console.step()
+        self.p1.release_button(Button.BUTTON_D_RIGHT)
+        return gs
+
+    def load_last_savestate(self) -> GameState:
+        """Restores positions and percents to last saved. does no safety checks."""
+        self.p1.press_button(Button.BUTTON_D_LEFT)
+        gs = self.console.step()
+        self.p1.release_button(Button.BUTTON_D_LEFT)
+        return gs
 
     def situation_setup(self, sitch: Situation) -> GameState:
         # <Check if console_setup has occurred...>
@@ -217,7 +236,6 @@ class Host:
         )
 
     def _debug_control(self):
-        from .vis import print_gamestate
         while True:
             inp = input(">")
             if 'q' in inp:
@@ -249,7 +267,6 @@ class Host:
             if 'K' in inp:
                 self.p2.press_button(melee.enums.Button.BUTTON_D_DOWN)
             self.p1.tilt_analog(melee.enums.Button.BUTTON_MAIN, x, y)
-            self.p2.tilt_analog(melee.enums.Button.BUTTON_MAIN, x, y)
             self.p1.flush()
             self.p2.flush()
             gs = self.console.step()
@@ -304,7 +321,6 @@ if __name__ == "__main__":
 
     MeleeHost.console.stop()
     """
-
 
     """
     for _ in range(10):
