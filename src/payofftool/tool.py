@@ -13,10 +13,10 @@ def ptool_setup_window(settings_struct, settings_callback):
     with dpg.window(tag="win"):
         stages = [f"{e.name}({e.value})" for e in Stage]
         chars = [f"{c.name}({c.value})" for c in Character]
-        dpg.add_combo(items=stages, label="Stage", tag="stg", default_value=stages[2])
-        dpg.add_combo(items=chars, label="P1 Char", tag="p1c", default_value=chars[2])
+        dpg.add_combo(items=stages, label="Stage", tag="stg", default_value=stages[1])
+        dpg.add_combo(items=chars, label="P1 Char", tag="p1c", default_value=chars[1])
         dpg.add_slider_float(label="P1 Percent", tag="p1p", max_value=300)
-        dpg.add_combo(items=chars, label="P2 Char", tag="p2c", default_value=chars[2])
+        dpg.add_combo(items=chars, label="P2 Char", tag="p2c", default_value=chars[22])
         dpg.add_slider_float(label="P2 Percent", tag="p2p", max_value=300)
 
         dpg.add_separator()

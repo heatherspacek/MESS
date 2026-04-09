@@ -12,6 +12,8 @@ from ..messlib.data_structures.move_definitions import Inputs, Actions
 # debug imports
 from ..messlib.interfaces.vis import print_gamestate
 from melee.enums import Character
+from melee.enums import Action as MeleeAction
+
 
 
 class PayoffSolver:
@@ -25,8 +27,8 @@ class PayoffSolver:
         self.host.situation_setup(self.situation)
         gs_init = self.host.save_savestate()
         # ^ what is this useful for?
-        dash_timings = range(5, 12)
-        aerial_timings = range(1, 6)
+        dash_timings = range(2, 10)
+        aerial_timings = range(1, 8)
         n_sims = len(list(itertools.product(dash_timings, aerial_timings)))
         input_sets = self.compose_sims(dash_timings, aerial_timings)
         results = self.run_sims(input_sets)
@@ -36,16 +38,26 @@ class PayoffSolver:
         results = {}
         for keys, sim_data in tqdm(input_sets.items()):
             print(keys)
-            self.host.load_last_savestate()
+            gs_loaded = self.host.load_last_savestate()
             p1_action: Action = sim_data[0]
             p2_action: Action = sim_data[1]
+            p1_action.sequence_position = 0
+            p2_action.sequence_position = 0
+            res = "Whiff"
             for frame_cnt in range(60):
                 p1_action.send_next_input(self.host.p1)
                 p2_action.send_next_input(self.host.p2)
                 gs = self.host.console.step()  # someday, replace with the host-step.
                 print_gamestate(gs)
-                breakpoint()
-            results[keys] = ...
+
+                if "DAMAGE" in str(gs.players[1].action):
+                    res = "Falco win"
+                    break
+                if "DAMAGE" in str(gs.players[2].action):
+                    res = "Fox win"
+                    break
+            results[keys] = res
+        return results
 
     def compose_sims(self, dash_timings, aerial_timings):
         fox_partial = functools.partial(
