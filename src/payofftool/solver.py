@@ -1,6 +1,9 @@
 from ..messlib.interfaces.host import Host
 from ..messlib.data_structures.situation import Situation
 import itertools
+import functools
+
+from tqdm import tqdm
 
 # Legacy (?) imports
 from ..messlib.data_structures.classes import Input, Action, FacingDirection
@@ -22,26 +25,48 @@ class PayoffSolver:
         self.host.situation_setup(self.situation)
         gs_init = self.host.save_savestate()
         # ^ what is this useful for?
-        self.compose_sims()
-
-    def run_sims(self):
-        ...
-
-    def compose_sims(self):
-        fox_action = Actions.jump_cancelled_upsmash(
-            Character.FOX,
-            FacingDirection.RIGHT,
-            12
-        )
-        falco_action = Actions.sh_back_air(
-            Character.FALCO,
-            FacingDirection.RIGHT,
-            0.0,  # dummy
-            0.0,  # dummy,
-            3,
-            22,
-        )
+        dash_timings = range(5, 12)
+        aerial_timings = range(1, 6)
+        n_sims = len(list(itertools.product(dash_timings, aerial_timings)))
+        input_sets = self.compose_sims(dash_timings, aerial_timings)
+        results = self.run_sims(input_sets)
         breakpoint()
+
+    def run_sims(self, input_sets):
+        results = {}
+        for keys, sim_data in tqdm(input_sets.items()):
+            print(keys)
+            self.host.load_last_savestate()
+            p1_action: Action = sim_data[0]
+            p2_action: Action = sim_data[1]
+            for frame_cnt in range(60):
+                p1_action.send_next_input(self.host.p1)
+                p2_action.send_next_input(self.host.p2)
+                gs = self.host.console.step()  # someday, replace with the host-step.
+                print_gamestate(gs)
+                breakpoint()
+            results[keys] = ...
+
+    def compose_sims(self, dash_timings, aerial_timings):
+        fox_partial = functools.partial(
+            Actions.jump_cancelled_upsmash,
+            character=Character.FOX,
+            direction=FacingDirection.RIGHT,
+        )
+        falco_partial = functools.partial(
+            Actions.sh_back_air,
+            character=Character.FALCO,
+            direction=FacingDirection.RIGHT,
+            angle=0.0,
+            drift=0.0,
+            ff_frame=22,
+        )
+
+        return {
+            (t1, t2):
+            (fox_partial(frames_dashing=t1), falco_partial(slack_frames=t2))
+            for t1, t2 in itertools.product(dash_timings, aerial_timings)
+        }
 
 
 """
