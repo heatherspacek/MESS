@@ -25,6 +25,8 @@ class Input:
     def do_input(self, controller: Controller):
         if self.button is not None:
             controller.press_button(self.button)
+        else:
+            controller.release_all()
         if self.coordinates is not None:
             controller.tilt_analog(
                 Button.BUTTON_MAIN, self.coordinates[0], self.coordinates[1]
