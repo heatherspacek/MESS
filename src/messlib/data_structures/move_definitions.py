@@ -109,7 +109,7 @@ class Actions:
         frames_dashing: int
     ):
         sequence = [Inputs.dash(direction=direction) for _ in range(frames_dashing)]
-        for _ in range(jumpsquat(character)):
+        for _ in range(jumpsquat(character)-1):
             sequence.append(Inputs.jump())
         sequence.append(Inputs.up_smash())
         return Action(sequence=sequence)
@@ -122,7 +122,7 @@ class Actions:
         slack_frames: int,
         ff_frame: int,
     ):
-        sequence: list = [Inputs.jump(angle=angle)] * (jumpsquat(character) - 1)
+        sequence: list = [Inputs.jump(angle=angle)] * (jumpsquat(character) - 2)
         sequence.extend([Inputs.null()] * slack_frames)
         # TODO: drift.
         sequence.append(Inputs.back_air(direction))
