@@ -55,6 +55,7 @@ class Action:
             pass  # no new controller input needed
         else:
             self.input_to_controller(self.sequence[self.sequence_position], controller)
+            self.sequence_position += 1
 
     def input_to_controller(self, input: Input, controller: Controller):
         input.do_input(controller)
