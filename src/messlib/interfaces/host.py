@@ -82,6 +82,9 @@ class Host:
 
     def load_last_savestate(self) -> GameState:
         """Restores positions and percents to last saved. does no safety checks."""
+        self.p1.release_all()
+        self.p2.release_all()
+
         self.p1.press_button(Button.BUTTON_D_LEFT)
         gs = self.console.step()
         self.p1.release_button(Button.BUTTON_D_LEFT)
@@ -228,8 +231,12 @@ class Host:
 
             print([d for d in xdiffs(gs)])
             if all(abs(d) < 1 for d in xdiffs(gs)):
+                # Final of init: stand back up, theyre crouching rn
+                self.p1.release_all()
+                self.p2.release_all()
+                for _ in range(15):
+                    gs = self.console.step()
                 return gs
-        breakpoint()
         raise RuntimeError(
             "Couldn't get to the specified init position in 25 wavedashes. "
             "Check for impossible position?"
