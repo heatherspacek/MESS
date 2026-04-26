@@ -22,8 +22,9 @@ class PayoffSolver:
     def __init__(self, host: Host, situation: Situation):
         self.host = host
         self.situation = situation
+        self.results = None
 
-    def initial_setup(self):
+    def _debug_solve(self):
         self.host.situation_setup(self.situation)
         gs_init = self.host.save_savestate()
         # ^ what is this useful for?
@@ -31,8 +32,7 @@ class PayoffSolver:
         aerial_timings = range(1, 8)
         n_sims = len(list(itertools.product(dash_timings, aerial_timings)))
         input_sets = self.compose_sims(dash_timings, aerial_timings)
-        results = self.run_sims(input_sets)
-        breakpoint()
+        self.results = self.run_sims(input_sets)
 
     def run_sims(self, input_sets):
         results = {}
