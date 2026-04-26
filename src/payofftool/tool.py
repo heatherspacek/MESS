@@ -61,13 +61,15 @@ def ptool_results_window():
 
     with dpg.window(tag="win_res", show=False):
         dpg.add_text("(Results go here.)", tag="resultsprint")
-
-        with dpg.plot(label="Heat Series", no_mouse_pos=True, height=400, width=-1, tag="PLT"):
-            dpg.add_plot_axis(dpg.mvXAxis, label="x", lock_min=True, lock_max=True, no_gridlines=True, no_tick_marks=True)
-            with dpg.plot_axis(dpg.mvYAxis, label="y", no_gridlines=True, no_tick_marks=True, lock_min=True, lock_max=True):
-                dpg.add_heat_series([1.0, 0.0, 2.0, -1.0], 2, 2)
-                with dpg.tooltip(dpg.last_item()):
-                    dpg.add_text("Tooltip text.")
+        with dpg.group(horizontal=True):
+            with dpg.drawlist(width=300, height=200, tag="canvas", parent="ttip"):
+                dpg.draw_rectangle(pmin=[10, 10], pmax=[290, 190])
+            with dpg.plot(no_mouse_pos=True, height=200, width=300, tag="PLT"):
+                dpg.add_plot_axis(dpg.mvXAxis, label="fox timing", lock_min=True, lock_max=True)
+                with dpg.plot_axis(dpg.mvYAxis, label="falco timing", lock_min=True, lock_max=True):
+                    dpg.add_heat_series([1.0, 0.0, 0.4, 0.5], 2, 2)
+                    with dpg.tooltip(dpg.last_item(), tag="ttip"):
+                        dpg.add_text("Tooltip text.", tag="tooltext")
 
 
 def go_callback():
@@ -102,7 +104,22 @@ if __name__ == "__main__":
     dpg.set_item_user_data("solver_dummy", static_solver)
 
     while dpg.is_dearpygui_running():
+        if dpg.is_item_shown("canvas"):
+            mouse_coords = dpg.get_plot_mouse_pos()
+            res = dpg.get_item_user_data("solver_dummy").results
+
+            # value_under_mouse = res[tuple(mouse_coords)]
+            value_under_mouse = mouse_coords
+            dpg.set_value("tooltext", str(value_under_mouse))
+            dpg.delete_item("canvas", children_only=True)
+            dpg.draw_rectangle(pmin=[10, 10], pmax=[290, 190], parent="canvas")
+            dpg.draw_circle(
+                center=(100 * mouse_coords[0], 200-(100 * mouse_coords[1])),
+                radius=10,
+                parent="canvas"
+            )
+            # if mouse_coords[0] > 0.1:
+            #     breakpoint()
+
         dpg.render_dearpygui_frame()
-        if dpg.is_item_enabled("PLT"):
-            print(dpg.get_plot_mouse_pos())
     dpg.destroy_context()

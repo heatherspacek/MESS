@@ -28,8 +28,8 @@ class PayoffSolver:
         self.host.situation_setup(self.situation)
         gs_init = self.host.save_savestate()
         # ^ what is this useful for?
-        dash_timings = range(2, 10)
-        aerial_timings = range(1, 8)
+        dash_timings = range(2, 4)
+        aerial_timings = range(3, 6)
         n_sims = len(list(itertools.product(dash_timings, aerial_timings)))
         input_sets = self.compose_sims(dash_timings, aerial_timings)
         self.results = self.run_sims(input_sets)
