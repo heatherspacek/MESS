@@ -1,0 +1,18 @@
+design of the main interface(s) to melee.
+=====
+situation setup will entail setting percents, stage position, characters, and stage.
+ -> little TUI to select em? Sufficient for dev purposes.
+ -> under the hood: Host, and functions that operate on the host's .p1/.p2
+    .. e.g., goto(..., Host) and setpercents(..., Host)
+    also seems reasonable to say Host.situation_setup_simple()
+    ^ pack everything in there. wait for angel platform and everything.
+    give host a bit of statefulness. Lets also save ourselves the ctrl+C on exit.   
+ -> speaking of: Host.save_state(), Host.load_state() btw.
+    Can return the state (but only kind of)
+
+next step after that: hand-off to a "Solver" ?
+ -> most trivial solver-- given two moves chosen at the same time, compute the payoff
+    by repeatedly saving and loading state, and executing with time fuzzing.
+
+
+who should remember "state"?

@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import Enum, StrEnum
 
 from melee.controller import Controller
 from melee.enums import Button, Character
 
 
-class FacingDirection(Enum):
+class FacingDirection(StrEnum):
     LEFT = "LEFT"
     RIGHT = "RIGHT"
 
