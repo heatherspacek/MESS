@@ -56,7 +56,7 @@ def parse_from_window_settings() -> Situation:
         p2_character=Character(p2c_idx),
         p2_percent=int(dpg.get_value("p2p")),
         p2_platform=False,
-        p2_x_position=-10.0,
+        p2_x_position=-19.0,
     )
 
 
@@ -135,10 +135,10 @@ def mouseover_plot_react(mouse_coords):
     dpg.set_item_user_data("resultsprint", hover_key)
 
 
-def dpg_draw_capsule(y1, z1, y2, z2, size):
+def dpg_draw_capsule(y1, z1, y2, z2, size, color=(255, 255, 255, 255)):
     for t in [a/9 for a in range(10)]:
         x, y = lerp_2d((y1, z1), (y2, z2), t)
-        dpg.draw_circle([x, y], size, parent="canvas")
+        dpg.draw_circle([x, y], size, parent="canvas", color=color)
 
 
 def draw_replay_frame():
@@ -151,23 +151,53 @@ def draw_replay_frame():
         results_index_tuple = list(res.keys())[0]
 
     replay = res[results_index_tuple][1]
-    repl_frame_to_draw: PayoffReplayFrame = replay[dpg.get_frame_count() % len(replay)]
+    replay_emph = replay.copy()
+    for _ in range(5):
+        replay_emph.append(replay_emph[-1])
+    repl_frame_to_draw: PayoffReplayFrame = replay_emph[
+        (dpg.get_frame_count() // 2) % len(replay_emph)
+    ]
 
     p1x = repl_frame_to_draw.p1_pos.x
+    p1y = repl_frame_to_draw.p1_pos.y
     p2x = repl_frame_to_draw.p2_pos.x
+    p2y = repl_frame_to_draw.p2_pos.y
+
+    from mess.animations.data import retrieve_character_data
+    from ..messlib.data_structures.translations import LIBMELEE_TO_DEMANGLED
+    animations_list_ch1, _, _ = retrieve_character_data(
+        "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso",
+        1,
+    )
+    animations_list_ch2, _, _ = retrieve_character_data(
+        "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso",
+        22,
+    )
 
     hurts1, hits1 = retrieve_move_data(
         "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso",
         1,
-        repl_frame_to_draw.p1_game_action.value
+        animations_list_ch1.index(
+            LIBMELEE_TO_DEMANGLED[repl_frame_to_draw.p1_game_action]
+        )
     )
     hurts2, hits2 = retrieve_move_data(
         "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso",
         22,
-        repl_frame_to_draw.p2_game_action.value
+        animations_list_ch2.index(
+            LIBMELEE_TO_DEMANGLED[repl_frame_to_draw.p2_game_action]
+        )
     )
 
-    hurts1_thisframe: list[HurtBoxProcessed] = hurts1[repl_frame_to_draw.p1_game_action_frame]
+    # try:
+    #     _ = LIBMELEE_TO_DEMANGLED[repl_frame_to_draw.p1_game_action]
+    #     _ = LIBMELEE_TO_DEMANGLED[repl_frame_to_draw.p2_game_action]
+    # except KeyError:
+    #     print(repl_frame_to_draw.p1_game_action, repl_frame_to_draw.p2_game_action)
+
+    hurts1_thisframe: list[HurtBoxProcessed] = hurts1[
+        repl_frame_to_draw.p1_game_action_frame
+    ]
     hurts2_thisframe: list[HurtBoxProcessed] = hurts2[repl_frame_to_draw.p2_game_action_frame]
 
     dpg.delete_item("canvas", children_only=True)
@@ -179,11 +209,24 @@ def draw_replay_frame():
         x2, y2, z2 = hx.pos_b
         scale = hx.size
         dpg_draw_capsule(
-            (10+z1+p1x) * DRAW_SCALE,
-            135-y1 * DRAW_SCALE,
-            (10+z2+p1x) * DRAW_SCALE,
-            135-y2 * DRAW_SCALE,
-            scale * DRAW_SCALE
+            (35-z1+p1x) * DRAW_SCALE,
+            (30-y1-p1y) * DRAW_SCALE,
+            (35-z2+p1x) * DRAW_SCALE,
+            (30-y2-p1y) * DRAW_SCALE,
+            scale * DRAW_SCALE,
+            color=(200, 200, 255, 255)
+        )
+    for hx in hurts2_thisframe:
+        x1, y1, z1 = hx.pos_a
+        x2, y2, z2 = hx.pos_b
+        scale = hx.size
+        dpg_draw_capsule(
+            (35-z1+p2x) * DRAW_SCALE,
+            (30-y1-p2y) * DRAW_SCALE,
+            (35-z2+p2x) * DRAW_SCALE,
+            (30-y2-p2y) * DRAW_SCALE,
+            scale * DRAW_SCALE,
+            color=(200, 255, 200, 255)
         )
 
 
