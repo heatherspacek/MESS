@@ -17,39 +17,66 @@ def ptool_setup_window():
 
     with dpg.font_registry():
         dpg.add_font("res/NotoSans-Regular.ttf", 16 * 2, tag="default_font")
+        dpg.add_font("res/NotoSans-Regular.ttf", 24 * 2, tag="header_font")
         dpg.add_font("res/NotoSans-Bold.ttf", 16 * 2, tag="bold_font")
         dpg.bind_font("default_font")
         dpg.set_global_font_scale(0.5)
 
-    with dpg.window(tag="win_setup", pos=(0, 0)):
-        dpg.add_spacer(tag="host_dummy")
-        dpg.add_spacer(tag="solver_dummy")
-
-        stages = [f"{e.name}({e.value})" for e in Stage]
-        chars = [f"{c.name}({c.value})" for c in Character]
-        dpg.add_combo(items=stages, label="Stage", tag="stg", default_value=stages[1])
-        dpg.add_combo(items=chars, label="P1 Char", tag="p1c", default_value=chars[1])
-        dpg.add_slider_float(label="P1 Percent", tag="p1p", max_value=300)
-        dpg.add_combo(items=chars, label="P2 Char", tag="p2c", default_value=chars[22])
-        dpg.add_slider_float(label="P2 Percent", tag="p2p", max_value=300)
+    with dpg.window(tag="win_setup", pos=(0, 0), width=600, height=500):
+        with dpg.group(horizontal=True):
+            with dpg.group(width=150):
+                dpg.add_spacer(tag="host_dummy")
+                dpg.add_spacer(tag="solver_dummy")
+                dpg.add_text("Situation setup")
+                dpg.bind_item_font(dpg.last_item(), "header_font")
+                stages = [f"{e.name}({e.value})" for e in Stage]
+                chars = [f"{c.name}({c.value})" for c in Character]
+                dpg.add_combo(
+                    items=stages, label="Stage", tag="stg", default_value=stages[1]
+                )
+                dpg.add_combo(
+                    items=chars, label="P1 Char", tag="p1c", default_value=chars[1]
+                )
+                dpg.add_slider_float(label="P1 Percent", tag="p1p", max_value=200)
+                dpg.add_combo(
+                    items=chars, label="P2 Char", tag="p2c", default_value=chars[22]
+                )
+                dpg.add_slider_float(label="P2 Percent", tag="p2p", max_value=200)
+            with dpg.group(width=200):
+                dpg.add_colormap_button(label=" RUN ", callback=go_callback, height=65)
+                dpg.bind_colormap(dpg.last_item(), dpg.mvPlotColormap_Viridis)
+                dpg.add_input_intx(
+                    size=2,
+                    default_value=(1, 8),
+                    label="P1 Attack Timing",
+                    tag="p1range",
+                )
+                dpg.add_input_intx(
+                    size=2,
+                    default_value=(1, 8),
+                    label="P2 Attack Timing",
+                    tag="p2range",
+                )
 
         dpg.add_separator()
         with dpg.drawlist(tag="setup_dlist", width=250, height=200):
             dpg.draw_rectangle(pmin=(5, 5), pmax=(245, 195))
+            dpg.draw_text(pos=(100, 100), text="<stage preview will go here!>")
 
-        dpg.add_button(label="Close and run sim", callback=go_callback)
 
 def ptool_progress_popup():
     with dpg.window(modal=True, show=False, pos=(200, 200), tag="win_progress"):
         dpg.add_text("", tag="progress_text")
         dpg.add_progress_bar(tag="progress_bar")
 
-def parse_from_window_settings() -> Situation:
 
-    def bracket_extract(in_str: str):
-        leftbracky = in_str.find("(")
-        rightbracky = in_str.find(")")
-        return in_str[leftbracky + 1 : rightbracky]
+def bracket_extract(in_str: str):
+    leftbracky = in_str.find("(")
+    rightbracky = in_str.find(")")
+    return in_str[leftbracky + 1 : rightbracky]
+
+
+def parse_from_window_settings() -> Situation:
 
     stg_idx = int(bracket_extract(dpg.get_value("stg")))
     p1c_idx = int(bracket_extract(dpg.get_value("p1c")))
@@ -97,10 +124,21 @@ def ptool_results_window():
 def go_callback():
     # compose Situation Struct from the window contents:
     slvr: PayoffSolver = dpg.get_item_user_data("solver_dummy")
-    slvr.situation = parse_from_window_settings()
-    slvr._debug_solve()
+    sitch = parse_from_window_settings()
+    slvr.host.situation_setup(sitch)
+    slvr.host.save_savestate()
+    # ^ surely this can go in situation_setup someday.
 
-    # dpg.set_value("resultsprint", slvr.results)
+    input_sets = slvr.compose_sims(range(1, 8), range(1, 8))
+    dpg.show_item("win_progress")
+    slvr.results = slvr.run_sims(
+        input_sets,
+        lambda x: dpg.set_value("progress_text", x),
+        lambda x: dpg.set_value("progress_bar", x),
+    )
+    dpg.hide_item("win_progress")
+    slvr.host.console.stop()
+
     dpg.show_item("win_res")
     display_results(slvr.results)
 
@@ -172,7 +210,6 @@ def draw_replay_frame():
         indices_loop.append(indices_loop[-1])
 
     frame_loop_i = indices_loop[(dpg.get_frame_count() // 2) % len(indices_loop)]
-    print(frame_loop_i)
     repl_frame_to_draw: PayoffReplayFrame = replay[frame_loop_i]
 
     p1x = repl_frame_to_draw.p1_pos.x
@@ -195,39 +232,39 @@ def draw_replay_frame():
 
     animations_list_ch1, _, _ = retrieve_character_data(
         "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso",
-        1,
+        int(bracket_extract(dpg.get_value("p1c"))),
     )
     animations_list_ch2, _, _ = retrieve_character_data(
         "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso",
-        22,
+        int(bracket_extract(dpg.get_value("p2c"))),
     )
 
     hurts1, hits1 = retrieve_move_data(
         "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso",
-        1,
+        int(bracket_extract(dpg.get_value("p1c"))),
         animations_list_ch1.index(
             LIBMELEE_TO_DEMANGLED[repl_frame_to_draw.p1_game_action]
         ),
     )
     hurts2, hits2 = retrieve_move_data(
         "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso",
-        22,
+        int(bracket_extract(dpg.get_value("p2c"))),
         animations_list_ch2.index(
             LIBMELEE_TO_DEMANGLED[repl_frame_to_draw.p2_game_action]
         ),
     )
 
     hurts1_thisframe: list[HurtBoxProcessed] = hurts1[
-        (repl_frame_to_draw.p1_game_action_frame + 1) % len(hurts1)
+        (repl_frame_to_draw.p1_game_action_frame) % len(hurts1)
     ]
     hurts2_thisframe: list[HurtBoxProcessed] = hurts2[
-        (repl_frame_to_draw.p2_game_action_frame + 1) % len(hurts2)
+        (repl_frame_to_draw.p2_game_action_frame) % len(hurts2)
     ]
     hits1_thisframe = [
-        h for h in hits1 if h.frame_i == repl_frame_to_draw.p1_game_action_frame + 1
+        h for h in hits1 if h.frame_i == repl_frame_to_draw.p1_game_action_frame
     ]
     hits2_thisframe = [
-        h for h in hits2 if h.frame_i == repl_frame_to_draw.p2_game_action_frame + 1
+        h for h in hits2 if h.frame_i == repl_frame_to_draw.p2_game_action_frame
     ]
 
     dpg.delete_item("canvas", children_only=True)
