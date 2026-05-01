@@ -236,7 +236,7 @@ class Host:
                     p2states.append(gs.players[2].action)
                 gs = self.console.step()
 
-            print([d for d in xdiffs(gs)])
+            # print([d for d in xdiffs(gs)])
             if all(abs(d) < 1 for d in xdiffs(gs)):
                 # Final of init: stand back up, theyre crouching rn
                 self.p1.release_all()
