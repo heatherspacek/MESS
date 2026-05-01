@@ -16,6 +16,7 @@ LIBMELEE_TO_DEMANGLED = {
     A.DAMAGE_FLY_TOP: "DamageFlyTop",
     A.BAIR_LANDING: "LandingAirB",
     A.DAIR_LANDING: "LandingAirLw",
+    A.LANDING: "Landing",  # this one breaks something?
 }
 
 _all = [

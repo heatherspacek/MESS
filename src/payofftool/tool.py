@@ -201,17 +201,11 @@ def draw_replay_frame():
         ),
     )
 
-    # try:
-    #     _ = LIBMELEE_TO_DEMANGLED[repl_frame_to_draw.p1_game_action]
-    #     _ = LIBMELEE_TO_DEMANGLED[repl_frame_to_draw.p2_game_action]
-    # except KeyError:
-    #     print(repl_frame_to_draw.p1_game_action, repl_frame_to_draw.p2_game_action)
-
     hurts1_thisframe: list[HurtBoxProcessed] = hurts1[
-        repl_frame_to_draw.p1_game_action_frame
+        repl_frame_to_draw.p1_game_action_frame % len(hurts1)
     ]
     hurts2_thisframe: list[HurtBoxProcessed] = hurts2[
-        repl_frame_to_draw.p2_game_action_frame
+        repl_frame_to_draw.p2_game_action_frame % len(hurts2)
     ]
 
     dpg.delete_item("canvas", children_only=True)
