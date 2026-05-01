@@ -163,7 +163,7 @@ def draw_replay_frame():
         results_index_tuple = list(res.keys())[0]
 
     replay = res[results_index_tuple][1]
-    indices_loop = list(range(1, len(replay)))
+    indices_loop = list(range(len(replay)))
     for _ in range(7):
         indices_loop.append(indices_loop[-1])
 
