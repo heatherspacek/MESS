@@ -22,6 +22,7 @@ class Host:
     .situation_setup(): Takes a Situation dataclass and attempts to
         implement it. Returns the GameState
     """
+
     iso_path = "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso"
 
     def __init__(self):
@@ -43,23 +44,25 @@ class Host:
             use_exi_inputs=False,
             enable_ffw=False,
             blocking_input=True,
-            dolphin_home_path="/home/heather/.local/share/MESS/squashfs-root/usr/bin/Sys"
+            dolphin_home_path="/home/heather/.local/share/MESS/squashfs-root/usr/bin/Sys",
         )
 
         # this libmelee fork does Gecko code insertion at constructor.
         # So, we need to patch HERE.
-        patch_installation(dest_ini_path=self.console.dolphin_home_path + "/GameSettings/GALE01r2.ini")
+        patch_installation(
+            dest_ini_path=self.console.dolphin_home_path + "/GameSettings/GALE01r2.ini"
+        )
         self.p1 = melee.Controller(
             console=self.console,
             port=1,
             type=melee.ControllerType.STANDARD,
-            fix_analog_inputs=False
+            fix_analog_inputs=False,
         )
         self.p2 = melee.Controller(
             console=self.console,
             port=2,
             type=melee.ControllerType.STANDARD,
-            fix_analog_inputs=False
+            fix_analog_inputs=False,
         )
 
         self.console.run(iso_path=self.iso_path)
@@ -129,7 +132,7 @@ class Host:
                     sitch.stage,
                     costume=2,
                     autostart=True,
-                    swag=False
+                    swag=False,
                 )
                 gs = self.console.step()
         # Ran out of iterations
@@ -144,6 +147,7 @@ class Host:
                 return 0
             else:
                 return i
+
         p1_target = clamp(int(sitch.p1_percent))
         p2_target = clamp(int(sitch.p2_percent))
         # TODO: replace this with step-with-timeout, once it exists
@@ -162,9 +166,9 @@ class Host:
                 self.p2.release_all()
                 gs = self.console.step()
                 continue
-            if (p1_target != p1_current):
+            if p1_target != p1_current:
                 self.p1.press_button(Button.BUTTON_D_DOWN)
-            if (p2_target != p2_current):
+            if p2_target != p2_current:
                 self.p2.press_button(Button.BUTTON_D_DOWN)
             gs = self.console.step()
             p1_current = int(gs.players[1].percent)
@@ -186,7 +190,10 @@ class Host:
         x2_tar = sitch.p2_x_position
 
         def xdiffs(gs):
-            return (x1_tar - gs.players[1].position.x, x2_tar - gs.players[2].position.x)
+            return (
+                x1_tar - gs.players[1].position.x,
+                x2_tar - gs.players[2].position.x,
+            )
 
         def distance_to_wd_angle(dist):
             if dist < 1:
@@ -245,33 +252,33 @@ class Host:
     def _debug_control(self):
         while True:
             inp = input(">")
-            if 'q' in inp:
+            if "q" in inp:
                 break
             x = 0.5
             y = 0.5
             self.p1.release_all()
             self.p2.release_all()
-            if 'a' in inp:
+            if "a" in inp:
                 x -= 0.5
-            if 's' in inp:
+            if "s" in inp:
                 y -= 0.5
-            if 'd' in inp:
+            if "d" in inp:
                 x += 0.5
-            if 'w' in inp:
+            if "w" in inp:
                 y += 0.5
-            if 'r' in inp:
+            if "r" in inp:
                 self.p1.press_button(melee.enums.Button.BUTTON_R)
-            if 'i' in inp:
+            if "i" in inp:
                 self.p1.press_button(melee.enums.Button.BUTTON_D_UP)
-            if 'j' in inp:
+            if "j" in inp:
                 self.p1.press_button(melee.enums.Button.BUTTON_D_LEFT)
-            if 'k' in inp:
+            if "k" in inp:
                 self.p1.press_button(melee.enums.Button.BUTTON_D_DOWN)
-            if 'l' in inp:
+            if "l" in inp:
                 self.p1.press_button(melee.enums.Button.BUTTON_D_RIGHT)
-            if 'z' in inp:
+            if "z" in inp:
                 self.p1.press_button(melee.enums.Button.BUTTON_A)
-            if 'K' in inp:
+            if "K" in inp:
                 self.p2.press_button(melee.enums.Button.BUTTON_D_DOWN)
             self.p1.tilt_analog(melee.enums.Button.BUTTON_MAIN, x, y)
             self.p1.flush()
@@ -289,6 +296,7 @@ if __name__ == "__main__":
         MeleeHost.console.step()
 
     from ..data_structures.situation import sample_situation
+
     s1 = sample_situation()
 
     MeleeHost.situation_setup(s1)

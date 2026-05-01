@@ -14,7 +14,9 @@ class MESSHandler(logging.Handler):
         if dpg.is_dearpygui_running():
             if dpg.does_item_exist("logging_container"):
                 # Log to the GUI window
-                Logger_ref: logger.mvLogger = dpg.get_item_user_data("logging_container")
+                Logger_ref: logger.mvLogger = dpg.get_item_user_data(
+                    "logging_container"
+                )
                 if record.levelname == "ERROR":
                     Logger_ref.log_error(record.msg)
                 elif record.levelname == "WARNING":

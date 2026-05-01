@@ -9,7 +9,6 @@ from messlib.data_structures.classes import Strategy
 
 
 class GuiController:
-
     # Exposes callables for UI elements that will make changes to the Strategy.
     # User input -> a button in the View -> GuiController -> ...
     #   changes to the Model -> the View retrieves the changes from the Model.
@@ -89,8 +88,10 @@ class GuiController:
     # View-only
 
     def collapse_all(self, sender, value, user_data):
-        ref = self.triggers_group_ref if user_data == "triggers" else (
-            self.responses_group_ref
+        ref = (
+            self.triggers_group_ref
+            if user_data == "triggers"
+            else (self.responses_group_ref)
         )
         for child in dpg.get_item_children(ref)[1]:
             dpg.set_value(child, False)

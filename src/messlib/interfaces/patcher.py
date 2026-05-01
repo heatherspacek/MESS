@@ -1,4 +1,3 @@
-
 CONFIG_CODE_BOOT_TO_GAME = """$MESS: Boot to Game [UnclePunch]
 *Check Player and Stage IDs for Custom Match to boot into.
 041a45c0 3860000E #Boot to In Game
@@ -334,32 +333,28 @@ D0281830 7C0802A6
 """
 
 
-DEFAULT_INI_PATH = (
-    "/home/heather/.local/share/MESS/squashfs-root/usr/bin/Sys/GameSettings/GALE01r2.ini"
-)
+DEFAULT_INI_PATH = "/home/heather/.local/share/MESS/squashfs-root/usr/bin/Sys/GameSettings/GALE01r2.ini"
 
 
-def patch_installation(
-    dest_ini_path=DEFAULT_INI_PATH
-):
+def patch_installation(dest_ini_path=DEFAULT_INI_PATH):
     MESS_STRING = "$MESS: Boot to Game\n"
     MESS_STRING2 = "$20XX Save States outside of 20XX\n"
     MESS_STRING3 = "$D-Pad Controls Damage v2\n"
 
-    with open(dest_ini_path, 'r') as f:
+    with open(dest_ini_path, "r") as f:
         inilines = f.readlines()
     # if MESS_STRING in inilines:
     #     return
 
     anchor = inilines.index("[Gecko]\n")
     # inilines.insert(anchor-1, MESS_STRING)
-    inilines.insert(anchor-1, MESS_STRING2)
-    inilines.insert(anchor-1, MESS_STRING3)
+    inilines.insert(anchor - 1, MESS_STRING2)
+    inilines.insert(anchor - 1, MESS_STRING3)
 
-    with open(dest_ini_path, 'w') as f:
+    with open(dest_ini_path, "w") as f:
         f.writelines(inilines)
 
-    with open(dest_ini_path, 'a') as append_stream:
+    with open(dest_ini_path, "a") as append_stream:
         # append_stream.write(CONFIG_CODE_BOOT_TO_GAME.format(*dummy_options))
         append_stream.write(CONFIG_CODE_SAVE_STATES)
         append_stream.write(CONFIG_CODE_DPAD_PERCENTS)

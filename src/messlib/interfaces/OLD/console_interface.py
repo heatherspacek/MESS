@@ -37,7 +37,9 @@ class ConsoleInterface:
 
         self.alive = self._attempt_open_console(console_path)
         # --- replace later.
-        self.iso_path = "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso"
+        self.iso_path = (
+            "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso"
+        )
 
     def _patch_dolphin_config(self):
         # TODO: this is only tested on Linux right now.
@@ -46,12 +48,17 @@ class ConsoleInterface:
         os.makedirs(Installer.dirs.user_config_path, exist_ok=True)
         config = configparser.ConfigParser()
         dolphin_ini_path = (
-            Installer.dirs.user_config_path / ".." / "SlippiPlayback" / "Config"
+            Installer.dirs.user_config_path
+            / ".."
+            / "SlippiPlayback"
+            / "Config"
             / "Dolphin.ini"
         )
         if not os.path.isfile(dolphin_ini_path):
-            raise FileNotFoundError("dolphin.ini not found in the expected location."
-                                    f" Tried looking in {dolphin_ini_path}")
+            raise FileNotFoundError(
+                "dolphin.ini not found in the expected location."
+                f" Tried looking in {dolphin_ini_path}"
+            )
         config.read(dolphin_ini_path)
         config.set("Display", "RenderToMain", "True")
         config.set("Input", "backgroundinput", "True")
@@ -70,8 +77,8 @@ class ConsoleInterface:
             self.console = melee.Console(
                 path=console_path,
                 dolphin_home_path=console_path,
-                tmp_home_directory=False
-                )
+                tmp_home_directory=False,
+            )
             self.controller1 = melee.Controller(
                 console=self.console, port=1, type=melee.ControllerType.GCN_ADAPTER
             )
@@ -118,6 +125,7 @@ if __name__ == "__main__":
     Interface._patch_dolphin_config()
     Interface.setup_oneplayer()
     import time
+
     nf = 0
     cumulative = 0
     while True:

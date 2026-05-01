@@ -4,10 +4,16 @@ from typing import TYPE_CHECKING
 
 import dearpygui.dearpygui as dpg
 
-from messlib.data_structures.classes import (ActionTrigger, DistanceTrigger,
-                                             Response, TimeTrigger, Trigger)
-from messlib.data_structures.move_definitions import \
-    Actions  # for list of possible base Actions
+from messlib.data_structures.classes import (
+    ActionTrigger,
+    DistanceTrigger,
+    Response,
+    TimeTrigger,
+    Trigger,
+)
+from messlib.data_structures.move_definitions import (
+    Actions,
+)  # for list of possible base Actions
 
 if TYPE_CHECKING:
     from messtool.tool_classes import GuiController
@@ -20,7 +26,6 @@ def trigger_template(
     with dpg.collapsing_header(
         label=label, parent=parent, indent=20, default_open=True
     ):
-
         with dpg.group(horizontal=True):
             dpg.add_combo(
                 ["TimeTrigger", "DistanceTrigger", "ActionTrigger"],

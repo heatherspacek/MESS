@@ -13,9 +13,7 @@ def strategy_editor_window():
         pos=(1, 27),
         min_size=(500, 550),
     ):
-        GuiController.strat_name_ref = dpg.add_input_text(
-            label="Strategy Name"
-        )
+        GuiController.strat_name_ref = dpg.add_input_text(label="Strategy Name")
         GuiController.character_combo_ref = dpg.add_combo(
             list(melee.enums.Character), label="Character"
         )
@@ -46,9 +44,7 @@ def strategy_editor_window():
                 # Register this (empty) group with the Controller.
                 GuiController.triggers_group_ref = triggers_group
 
-        with dpg.collapsing_header(
-            label="Responses", default_open=True
-        ) as head2:
+        with dpg.collapsing_header(label="Responses", default_open=True) as head2:
             dpg.bind_item_theme(head2, "theme2")
             with dpg.group(horizontal=True, horizontal_spacing=-1):
                 dpg.add_button(

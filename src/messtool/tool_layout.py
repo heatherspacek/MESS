@@ -4,8 +4,12 @@ import os  # for os.path.join and os.listdir
 import dearpygui.dearpygui as dpg
 
 # --
-from messtool.windows import (game_setup, logging_window, situation_editor,
-                              strategy_editor)
+from messtool.windows import (
+    game_setup,
+    logging_window,
+    situation_editor,
+    strategy_editor,
+)
 
 
 def layout_setup():
@@ -25,8 +29,8 @@ def layout_setup():
     with dpg.viewport_menu_bar():
         dpg.add_text(
             default_value="Welcome to MESS! Status messages will go here.",
-            tag="status_bar_text"
-            )
+            tag="status_bar_text",
+        )
         dpg.add_spacer(width=150)
         with dpg.menu(label="View..."):
             dpg.add_menu_item(label="Reset all windows")

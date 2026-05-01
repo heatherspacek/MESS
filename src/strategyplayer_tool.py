@@ -6,8 +6,10 @@ import dearpygui.dearpygui as dpg
 import dearpygui.demo as dpgdemo
 
 import messtool.tool_classes as app_classes
+
 # -
 import messtool.tool_layout as app_layout
+
 # -
 from messlib.data_structures.classes import Strategy
 from messlib.interfaces.engine import Engine
@@ -22,7 +24,6 @@ app entry point.
 """
 
 if __name__ == "__main__":
-
     # Model
     EmptyStrategy = Strategy()
     Player1 = StrategyPlayer()
@@ -42,15 +43,15 @@ if __name__ == "__main__":
     # View
     from messlib.interfaces.console_interface import Interface
     from messlib.interfaces.engine import Engine
+
     def testing_button():
         Interface.setup_oneplayer()
         Engine.start_bg_run()
 
     app_layout.layout_setup()
-    dpg.add_button(label="testing button!",
-                   parent="gamewnd",
-                   callback=lambda _: testing_button()
-                   )
+    dpg.add_button(
+        label="testing button!", parent="gamewnd", callback=lambda _: testing_button()
+    )
 
     # logger.error("error!!!")
     # logger.info("info.")
@@ -66,6 +67,7 @@ if __name__ == "__main__":
 
     # below replaces, start_dearpygui()
     import time
+
     while dpg.is_dearpygui_running():
         # insert here any code you would like to run in the render loop
         # you can manually stop by using stop_dearpygui()
@@ -73,9 +75,6 @@ if __name__ == "__main__":
         t1 = time.perf_counter()
         dpg.render_dearpygui_frame()
         t2 = time.perf_counter()
-        print(
-            f"\nElapsed frame time: {t2-t1} sec "
-            f"\nEngine ticks: {Engine.i}"
-            )
+        print(f"\nElapsed frame time: {t2 - t1} sec \nEngine ticks: {Engine.i}")
 
     dpg.destroy_context()

@@ -15,6 +15,7 @@ class Situation:
     oh god i remembver, DEFAULT FACTORIES
     TODO later: is this a good use of "pydantic"? probably overkill
     """
+
     stage: Stage
 
     p1_character: Character
@@ -31,14 +32,12 @@ class Situation:
 def sample_situation():
     return Situation(
         stage=Stage.YOSHIS_STORY,
-
         p1_character=Character.FOX,
-        p1_percent=20.,
+        p1_percent=20.0,
         p1_x_position=5.7,
         p1_platform=False,
-
         p2_character=Character.FALCO,
-        p2_percent=5.,
+        p2_percent=5.0,
         p2_x_position=-20.6,
         p2_platform=False,
     )

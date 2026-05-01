@@ -11,6 +11,7 @@ class _Engine:
     """
     Central engine to store various states (interface connection information),
     handles to threaded processes, and run-result/gamestate information."""
+
     def __init__(self):
         self._thread = None
         self._bg_running = False

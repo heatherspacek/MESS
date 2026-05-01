@@ -18,8 +18,8 @@ from melee.enums import Action as MeleeAction
 
 
 class PayoffSolver:
-    """
-    """
+    """ """
+
     def __init__(self, host: Host, situation: Situation):
         self.host = host
         self.situation = situation
@@ -77,8 +77,7 @@ class PayoffSolver:
         )
 
         return {
-            (t1, t2):
-            (fox_partial(frames_dashing=t1), falco_partial(slack_frames=t2))
+            (t1, t2): (fox_partial(frames_dashing=t1), falco_partial(slack_frames=t2))
             for t1, t2 in itertools.product(dash_timings, aerial_timings)
         }
 
@@ -106,11 +105,11 @@ class ParameterizedAction:
 
     scope is tbd, i did not whiteboard this yet
     """
+
     def __init__(self, *args):
         self.highlevel_seq = []
         for arg in args:
             self.highlevel_seq.append(arg)
         self.frame_seq = self._determine_frames(self.highlevel_seq)
 
-    def _determine_frames(self, highlevel_sequence):
-        ...
+    def _determine_frames(self, highlevel_sequence): ...

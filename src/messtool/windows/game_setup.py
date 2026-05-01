@@ -43,5 +43,6 @@ or start editing your own!"""
                 dpg.add_text("[No strategy loaded.]", tag="status_p2")
 
         # Make this button say "start analysis" when in SP vs SP mode.
-        dpg.add_button(label="Start game", tag="startbutton",
-                       callback=Interface.setup_oneplayer)
+        dpg.add_button(
+            label="Start game", tag="startbutton", callback=Interface.setup_oneplayer
+        )

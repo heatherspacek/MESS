@@ -7,4 +7,4 @@ host.setup()
 for _ in range(500):
     _ = host.console.step()
 
-goto(0,0,False,False,host)
+goto(0, 0, False, False, host)

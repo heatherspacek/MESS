@@ -38,7 +38,9 @@ class Installer2:
             try:
                 self.dolphin_repo = self.github_client.get_repo(self.PLAYBACK_REPO)
             except requests.exceptions.ConnectionError:
-                self.logger.error("Error connecting to GitHub to check for Dolphin updates.")
+                self.logger.error(
+                    "Error connecting to GitHub to check for Dolphin updates."
+                )
                 return
             self.remote_latest = self.dolphin_repo.get_latest_release()
 
@@ -78,15 +80,14 @@ class Installer2:
                     progress_bar.update(len(data))
                     file.write(data)
 
-        with open(self.dirs.user_data_path / ".version", 'w') as f:
+        with open(self.dirs.user_data_path / ".version", "w") as f:
             f.write(self.remote_latest.tag_name)
 
         # Additionally, perform a "appimage-extract" to expose config files
         current_permissions = os.stat(appimage_path)
         os.chmod(appimage_path, current_permissions.st_mode | 0o111)
         subprocess.Popen(
-            [f"./{asset.name}", "--appimage-extract"],
-            cwd=self.dirs.user_data_path
+            [f"./{asset.name}", "--appimage-extract"], cwd=self.dirs.user_data_path
         )
 
     def uninstall(self):

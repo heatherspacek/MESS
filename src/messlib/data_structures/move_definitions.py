@@ -1,6 +1,6 @@
 from melee.enums import Button, Character
 
-from .classes import (Action, FacingDirection, Input, StochasticInput)
+from .classes import Action, FacingDirection, Input, StochasticInput
 from .helpers import angle_to_meleecircle, jumpsquat
 
 
@@ -104,12 +104,10 @@ class Actions:
         return Action(sequence=sequence)
 
     def jump_cancelled_upsmash(
-        character: Character,
-        direction: FacingDirection,
-        frames_dashing: int
+        character: Character, direction: FacingDirection, frames_dashing: int
     ):
         sequence = [Inputs.dash(direction=direction) for _ in range(frames_dashing)]
-        for _ in range(jumpsquat(character)-1):
+        for _ in range(jumpsquat(character) - 1):
             sequence.append(Inputs.jump())
         sequence.append(Inputs.up_smash())
         return Action(sequence=sequence)

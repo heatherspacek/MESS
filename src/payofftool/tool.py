@@ -30,10 +30,7 @@ def ptool_setup_window():
         with dpg.drawlist(tag="setup_dlist", width=250, height=200):
             dpg.draw_rectangle(pmin=(5, 5), pmax=(245, 195))
 
-        dpg.add_button(
-            label="Close and run sim",
-            callback=go_callback
-        )
+        dpg.add_button(label="Close and run sim", callback=go_callback)
 
 
 def parse_from_window_settings() -> Situation:
@@ -41,7 +38,7 @@ def parse_from_window_settings() -> Situation:
     def bracket_extract(in_str: str):
         leftbracky = in_str.find("(")
         rightbracky = in_str.find(")")
-        return in_str[leftbracky+1:rightbracky]
+        return in_str[leftbracky + 1 : rightbracky]
 
     stg_idx = int(bracket_extract(dpg.get_value("stg")))
     p1c_idx = int(bracket_extract(dpg.get_value("p1c")))
@@ -67,8 +64,20 @@ def ptool_results_window():
             with dpg.drawlist(width=300, height=200, tag="canvas"):
                 dpg.draw_rectangle(pmin=[10, 10], pmax=[290, 190])
             with dpg.plot(no_mouse_pos=True, height=200, width=300, tag="PLT"):
-                dpg.add_plot_axis(dpg.mvXAxis, label="fox timing", lock_min=True, lock_max=True, tag="plt_xaxis")
-                with dpg.plot_axis(dpg.mvYAxis, label="falco timing", lock_min=True, lock_max=True, tag="plt_yaxis"):
+                dpg.add_plot_axis(
+                    dpg.mvXAxis,
+                    label="fox timing",
+                    lock_min=True,
+                    lock_max=True,
+                    tag="plt_xaxis",
+                )
+                with dpg.plot_axis(
+                    dpg.mvYAxis,
+                    label="falco timing",
+                    lock_min=True,
+                    lock_max=True,
+                    tag="plt_yaxis",
+                ):
                     dpg.add_heat_series([0.0], 1, 1, tag="plt_series", col_major=True)
                     with dpg.tooltip(dpg.last_item(), tag="ttip"):
                         dpg.add_text("", tag="tooltext")
@@ -89,11 +98,7 @@ def display_results(solver_results):
     """Configure the results window, the plot series, the replay view,
     etc etc. The structure of solver_results is {k: v} where k is the
     tuple of (x,y) to plot, and v is (outcome, [frames_list])"""
-    OUTCOME_MAPPING = {
-        "Falco win": 1.0,
-        "Fox win": 0.0,
-        "Whiff": 0.5
-    }
+    OUTCOME_MAPPING = {"Falco win": 1.0, "Fox win": 0.0, "Whiff": 0.5}
     outcomes_numeric = [OUTCOME_MAPPING[v[0]] for v in solver_results.values()]
     outcomes_x = set([k[0] for k in solver_results.keys()])
     outcomes_y = set([k[1] for k in solver_results.keys()])
@@ -104,11 +109,11 @@ def display_results(solver_results):
         x=outcomes_numeric,
     )
     dpg.set_item_user_data("plt_series", outcomes_numeric)
-    autoticks_x = np.arange(0, 1, 0.5/(len(outcomes_x)))[1::2]
+    autoticks_x = np.arange(0, 1, 0.5 / (len(outcomes_x)))[1::2]
     tickmap_x = tuple((str(k), v) for k, v in zip(sorted(outcomes_x), autoticks_x))
     dpg.set_axis_ticks("plt_xaxis", label_pairs=tickmap_x)
     dpg.set_item_user_data("plt_xaxis", tickmap_x)
-    autoticks_y = np.arange(0, 1, 0.5/(len(outcomes_y)))[1::2]
+    autoticks_y = np.arange(0, 1, 0.5 / (len(outcomes_y)))[1::2]
     tickmap_y = tuple((str(k), v) for k, v in zip(sorted(outcomes_y), autoticks_y))
     dpg.set_axis_ticks("plt_yaxis", label_pairs=tickmap_y)
     dpg.set_item_user_data("plt_yaxis", tickmap_y)
@@ -123,7 +128,7 @@ def mouseover_plot_react(mouse_coords):
     shaped = np.reshape(plt_val, (len(plt_x), len(plt_y)))
     sel_x = np.argmax(bound_x > mouse_coords[0]) - 1
     sel_y = np.argmax(bound_y > mouse_coords[1]) - 1
-    shaped[sel_x, -sel_y-1] = 0.27
+    shaped[sel_x, -sel_y - 1] = 0.27
     dpg.configure_item("plt_series", x=shaped.flatten().tolist())
 
     res = dpg.get_item_user_data("solver_dummy").results
@@ -136,13 +141,13 @@ def mouseover_plot_react(mouse_coords):
 
 
 def dpg_draw_capsule(y1, z1, y2, z2, size, color=(255, 255, 255, 255)):
-    for t in [a/9 for a in range(10)]:
+    for t in [a / 9 for a in range(10)]:
         x, y = lerp_2d((y1, z1), (y2, z2), t)
         dpg.draw_circle([x, y], size, parent="canvas", color=color)
 
 
 def draw_replay_frame():
-    res = dpg.get_item_user_data("solver_dummy").results    
+    res = dpg.get_item_user_data("solver_dummy").results
     if res is None:
         return  # no results yet.
 
@@ -165,6 +170,7 @@ def draw_replay_frame():
 
     from mess.animations.data import retrieve_character_data
     from ..messlib.data_structures.translations import LIBMELEE_TO_DEMANGLED
+
     animations_list_ch1, _, _ = retrieve_character_data(
         "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso",
         1,
@@ -179,14 +185,14 @@ def draw_replay_frame():
         1,
         animations_list_ch1.index(
             LIBMELEE_TO_DEMANGLED[repl_frame_to_draw.p1_game_action]
-        )
+        ),
     )
     hurts2, hits2 = retrieve_move_data(
         "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso",
         22,
         animations_list_ch2.index(
             LIBMELEE_TO_DEMANGLED[repl_frame_to_draw.p2_game_action]
-        )
+        ),
     )
 
     # try:
@@ -198,7 +204,9 @@ def draw_replay_frame():
     hurts1_thisframe: list[HurtBoxProcessed] = hurts1[
         repl_frame_to_draw.p1_game_action_frame
     ]
-    hurts2_thisframe: list[HurtBoxProcessed] = hurts2[repl_frame_to_draw.p2_game_action_frame]
+    hurts2_thisframe: list[HurtBoxProcessed] = hurts2[
+        repl_frame_to_draw.p2_game_action_frame
+    ]
 
     dpg.delete_item("canvas", children_only=True)
     dpg.draw_rectangle(pmin=[10, 10], pmax=[290, 190], parent="canvas")
@@ -209,29 +217,28 @@ def draw_replay_frame():
         x2, y2, z2 = hx.pos_b
         scale = hx.size
         dpg_draw_capsule(
-            (35-z1+p1x) * DRAW_SCALE,
-            (30-y1-p1y) * DRAW_SCALE,
-            (35-z2+p1x) * DRAW_SCALE,
-            (30-y2-p1y) * DRAW_SCALE,
+            (35 - z1 + p1x) * DRAW_SCALE,
+            (30 - y1 - p1y) * DRAW_SCALE,
+            (35 - z2 + p1x) * DRAW_SCALE,
+            (30 - y2 - p1y) * DRAW_SCALE,
             scale * DRAW_SCALE,
-            color=(200, 200, 255, 255)
+            color=(200, 200, 255, 255),
         )
     for hx in hurts2_thisframe:
         x1, y1, z1 = hx.pos_a
         x2, y2, z2 = hx.pos_b
         scale = hx.size
         dpg_draw_capsule(
-            (35-z1+p2x) * DRAW_SCALE,
-            (30-y1-p2y) * DRAW_SCALE,
-            (35-z2+p2x) * DRAW_SCALE,
-            (30-y2-p2y) * DRAW_SCALE,
+            (35 - z1 + p2x) * DRAW_SCALE,
+            (30 - y1 - p2y) * DRAW_SCALE,
+            (35 - z2 + p2x) * DRAW_SCALE,
+            (30 - y2 - p2y) * DRAW_SCALE,
             scale * DRAW_SCALE,
-            color=(200, 255, 200, 255)
+            color=(200, 255, 200, 255),
         )
 
 
 if __name__ == "__main__":
-
     # Window layouts
     dpg.create_context()
     ptool_setup_window()

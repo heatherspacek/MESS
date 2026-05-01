@@ -18,36 +18,35 @@ from platformdirs import PlatformDirs
 
 # https://imgur.com/a/4EuIt
 CHARACTER_HEX_IDS = {
-    melee.enums.Character.MEWTWO:   "0A",
-    melee.enums.Character.NESS:     "0B",
-    melee.enums.Character.PEACH:    "0C",
-    melee.enums.Character.PIKACHU:  "0D",
-    melee.enums.Character.POPO:     "",
-    melee.enums.Character.PEACH:    "0C",
-    melee.enums.Character.PEACH:    "0C",
-
-    melee.enums.Character.PEACH:    "0C",
-    melee.enums.Character.PEACH:    "0C",
-    melee.enums.Character.PEACH:    "0C",
-    melee.enums.Character.PEACH:    "0C",
-    melee.enums.Character.PEACH:    "0C",
-    melee.enums.Character.PEACH:    "0C",
-    melee.enums.Character.PEACH:    "0C",
-    melee.enums.Character.PEACH:    "0C",
-    melee.enums.Character.PEACH:    "0C",
-    melee.enums.Character.PEACH:    "0C",
-    melee.enums.Character.PEACH:    "0C",
-    melee.enums.Character.PEACH:    "0C",
-    melee.enums.Character.PEACH:    "0C",
+    melee.enums.Character.MEWTWO: "0A",
+    melee.enums.Character.NESS: "0B",
+    melee.enums.Character.PEACH: "0C",
+    melee.enums.Character.PIKACHU: "0D",
+    melee.enums.Character.POPO: "",
+    melee.enums.Character.PEACH: "0C",
+    melee.enums.Character.PEACH: "0C",
+    melee.enums.Character.PEACH: "0C",
+    melee.enums.Character.PEACH: "0C",
+    melee.enums.Character.PEACH: "0C",
+    melee.enums.Character.PEACH: "0C",
+    melee.enums.Character.PEACH: "0C",
+    melee.enums.Character.PEACH: "0C",
+    melee.enums.Character.PEACH: "0C",
+    melee.enums.Character.PEACH: "0C",
+    melee.enums.Character.PEACH: "0C",
+    melee.enums.Character.PEACH: "0C",
+    melee.enums.Character.PEACH: "0C",
+    melee.enums.Character.PEACH: "0C",
+    melee.enums.Character.PEACH: "0C",
 }
 
 STAGE_HEX_IDS = {
-    melee.enums.Stage.FOUNTAIN_OF_DREAMS:   "02",
-    melee.enums.Stage.POKEMON_STADIUM:      "03",
-    melee.enums.Stage.YOSHIS_STORY:         "08",
-    melee.enums.Stage.DREAMLAND:            "1C",
-    melee.enums.Stage.BATTLEFIELD:          "1F",
-    melee.enums.Stage.FINAL_DESTINATION:    "20",
+    melee.enums.Stage.FOUNTAIN_OF_DREAMS: "02",
+    melee.enums.Stage.POKEMON_STADIUM: "03",
+    melee.enums.Stage.YOSHIS_STORY: "08",
+    melee.enums.Stage.DREAMLAND: "1C",
+    melee.enums.Stage.BATTLEFIELD: "1F",
+    melee.enums.Stage.FINAL_DESTINATION: "20",
 }
 
 CONFIG_CODE = """\
@@ -115,6 +114,7 @@ class _Installer:
     """
     Methods for downloading and configuring a Slippi installation for use with
     MESS."""
+
     def __init__(self):
         self.dirs = PlatformDirs(appauthor=None, appname="MESS")
         """
@@ -132,9 +132,13 @@ class _Installer:
         if self.remote_latest is None:
             self.github_client = github.Github()
             try:
-                self.dolphin_repo = self.github_client.get_repo("project-slippi/Ishiiruka-Playback")
+                self.dolphin_repo = self.github_client.get_repo(
+                    "project-slippi/Ishiiruka-Playback"
+                )
             except requests.exceptions.ConnectionError:
-                self.logger.error("Error connecting to GitHub to check for Dolphin updates.")
+                self.logger.error(
+                    "Error connecting to GitHub to check for Dolphin updates."
+                )
                 return
             self.remote_latest = self.dolphin_repo.get_latest_release()
 
@@ -166,7 +170,7 @@ class _Installer:
             zip_file = zipfile.ZipFile(io.BytesIO(response.content))
             zip_file.extractall(self.dirs.user_data_dir)
             # ... log: extraction complete/successful!
-            with open(self.dirs.user_data_path / ".version", 'w') as f:
+            with open(self.dirs.user_data_path / ".version", "w") as f:
                 f.write(self.remote_latest.tag_name)
 
             # --- end windows handling ---
@@ -175,7 +179,9 @@ class _Installer:
         elif sys.platform == "linux":
             correct_asset = [a for a in remote_assets if "Linux" in a.name]
             if not any(correct_asset):
-                self.logger.error("no matching release asset found on Ishiruuka-Playback GitHub.")
+                self.logger.error(
+                    "no matching release asset found on Ishiruuka-Playback GitHub."
+                )
                 return
             correct_asset_url = correct_asset[0].browser_download_url
             self.logger.info("starting download of latest Slippi Playback release...")
@@ -185,14 +191,16 @@ class _Installer:
                 return
             zip_file = zipfile.ZipFile(io.BytesIO(response.content))
             zip_file.extractall(self.dirs.user_data_dir)
-            with open(self.dirs.user_data_path / ".version", 'w') as f:
+            with open(self.dirs.user_data_path / ".version", "w") as f:
                 f.write(self.remote_latest.tag_name)
             appimage_path = self.dirs.user_data_path / "Slippi_Playback-x86_64.AppImage"
             current_permissions = os.stat(appimage_path)
             os.chmod(appimage_path, current_permissions.st_mode | 0o111)
             # Additionally, perform a "appimage-extract" to expose config files
-            subprocess.Popen(["./Slippi_Playback-x86_64.AppImage", "--appimage-extract"],
-                             cwd=self.dirs.user_data_path)
+            subprocess.Popen(
+                ["./Slippi_Playback-x86_64.AppImage", "--appimage-extract"],
+                cwd=self.dirs.user_data_path,
+            )
         else:
             ...
             # log an error about not recognizing the current platform.
@@ -226,7 +234,7 @@ class _Installer:
             "00",  # ch
             "2A",  # %
             "01",  # ch
-            "2A"   # %
+            "2A",  # %
         )
         with open(gecko_ini_path, "a") as append_stream:
             append_stream.write(CONFIG_CODE.format(*dummy_options))
