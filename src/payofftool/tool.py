@@ -174,8 +174,16 @@ def draw_replay_frame():
     p2x = repl_frame_to_draw.p2_pos.x
     p2y = repl_frame_to_draw.p2_pos.y
 
-    from mess.animations.data import retrieve_character_data
     from ..messlib.data_structures.translations import LIBMELEE_TO_DEMANGLED
+
+    p1color = (200, 200, 255, 255)
+    p2color = (200, 255, 200, 255)
+    if "DAMAGE" in repl_frame_to_draw.p1_game_action.name:
+        p1color = (200, 200 / 1.3, 255 / 1.3, 255)
+    if "DAMAGE" in repl_frame_to_draw.p2_game_action.name:
+        p2color = (200, 255 / 1.3, 200 / 1.3, 255)
+
+    from mess.animations.data import retrieve_character_data
 
     animations_list_ch1, _, _ = retrieve_character_data(
         "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso",
@@ -202,11 +210,13 @@ def draw_replay_frame():
     )
 
     hurts1_thisframe: list[HurtBoxProcessed] = hurts1[
-        repl_frame_to_draw.p1_game_action_frame % len(hurts1)
+        (repl_frame_to_draw.p1_game_action_frame + 1) % len(hurts1)
     ]
     hurts2_thisframe: list[HurtBoxProcessed] = hurts2[
-        repl_frame_to_draw.p2_game_action_frame % len(hurts2)
+        (repl_frame_to_draw.p2_game_action_frame + 1) % len(hurts2)
     ]
+    hits1_thisframe = [h for h in hits1 if h.frame_i == frame_loop_i]
+    hits2_thisframe = [h for h in hits2 if h.frame_i == frame_loop_i]
 
     dpg.delete_item("canvas", children_only=True)
     dpg.draw_rectangle(pmin=[10, 10], pmax=[290, 190], parent="canvas")
@@ -217,24 +227,46 @@ def draw_replay_frame():
         x2, y2, z2 = hx.pos_b
         scale = hx.size
         dpg_draw_capsule(
-            (35 - z1 + p1x) * DRAW_SCALE,
-            (30 - y1 - p1y) * DRAW_SCALE,
-            (35 - z2 + p1x) * DRAW_SCALE,
-            (30 - y2 - p1y) * DRAW_SCALE,
+            +p1x + (35 - z1) * DRAW_SCALE,
+            +p1y + (30 - y1) * DRAW_SCALE,
+            +p1x + (35 - z2) * DRAW_SCALE,
+            +p1y + (30 - y2) * DRAW_SCALE,
             scale * DRAW_SCALE,
-            color=(200, 200, 255, 255),
+            color=p1color,
         )
     for hx in hurts2_thisframe:
         x1, y1, z1 = hx.pos_a
         x2, y2, z2 = hx.pos_b
         scale = hx.size
         dpg_draw_capsule(
-            (35 - z1 + p2x) * DRAW_SCALE,
-            (30 - y1 - p2y) * DRAW_SCALE,
-            (35 - z2 + p2x) * DRAW_SCALE,
-            (30 - y2 - p2y) * DRAW_SCALE,
+            +p2x + (35 - z1) * DRAW_SCALE,
+            +p2y + (30 - y1) * DRAW_SCALE,
+            +p2x + (35 - z2) * DRAW_SCALE,
+            +p2y + (30 - y2) * DRAW_SCALE,
             scale * DRAW_SCALE,
-            color=(200, 255, 200, 255),
+            color=p2color,
+        )
+    for htx in hits1_thisframe:
+        _, y, z = htx.pos
+        dpg.draw_circle(
+            (
+                +p1x + (35 - z) * DRAW_SCALE,
+                +p1y + (30 - y) * DRAW_SCALE,
+            ),
+            htx.size * DRAW_SCALE,
+            parent="canvas",
+            color=(255, 0, 0, 255),
+        )
+    for htx in hits2_thisframe:
+        _, y, z = htx.pos
+        dpg.draw_circle(
+            (
+                +p2x + (35 - z) * DRAW_SCALE,
+                +p2y + (30 - y) * DRAW_SCALE,
+            ),
+            htx.size * DRAW_SCALE,
+            parent="canvas",
+            color=(255, 0, 0, 255),
         )
 
 
