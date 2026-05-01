@@ -162,12 +162,12 @@ def draw_replay_frame():
         results_index_tuple = list(res.keys())[0]
 
     replay = res[results_index_tuple][1]
-    replay_emph = replay.copy()
-    for _ in range(5):
-        replay_emph.append(replay_emph[-1])
-    repl_frame_to_draw: PayoffReplayFrame = replay_emph[
-        (dpg.get_frame_count() // 2) % len(replay_emph)
-    ]
+    indices_loop = list(range(len(replay)))
+    for _ in range(7):
+        indices_loop.append(indices_loop[-1])
+
+    frame_loop_i = indices_loop[(dpg.get_frame_count() // 4) % len(indices_loop)]
+    repl_frame_to_draw: PayoffReplayFrame = replay[frame_loop_i]
 
     p1x = repl_frame_to_draw.p1_pos.x
     p1y = repl_frame_to_draw.p1_pos.y
