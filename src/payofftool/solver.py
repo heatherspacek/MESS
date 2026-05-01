@@ -53,8 +53,12 @@ class PayoffSolver:
                 # print_gamestate(gs)
                 framelist.append(gs_to_replayframe(gs))
                 if "DAMAGE" in str(gs.players[1].action):
-                    res = "Falco win"
-                    break
+                    if "DAMAGE" in str(gs.players[2].action):
+                        res = "Trade"
+                        break
+                    else:
+                        res = "Falco win"
+                        break
                 if "DAMAGE" in str(gs.players[2].action):
                     res = "Fox win"
                     break

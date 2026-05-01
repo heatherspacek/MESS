@@ -104,7 +104,7 @@ def display_results(solver_results):
     """Configure the results window, the plot series, the replay view,
     etc etc. The structure of solver_results is {k: v} where k is the
     tuple of (x,y) to plot, and v is (outcome, [frames_list])"""
-    OUTCOME_MAPPING = {"Falco win": 1.0, "Fox win": 0.0, "Whiff": 0.5}
+    OUTCOME_MAPPING = {"Falco win": 0.0, "Fox win": 1.0, "Whiff": 0.4, "Trade": 0.6}
     outcomes_numeric = [OUTCOME_MAPPING[v[0]] for v in solver_results.values()]
     outcomes_x = set([k[0] for k in solver_results.keys()])
     outcomes_y = set([k[1] for k in solver_results.keys()])
