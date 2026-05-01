@@ -3,7 +3,7 @@ from ..messlib.data_structures.situation import Situation
 import itertools
 import functools
 
-from tqdm import tqdm
+# from tqdm import tqdm
 
 # Legacy (?) imports
 from ..messlib.data_structures.classes import Input, Action, FacingDirection
@@ -36,9 +36,13 @@ class PayoffSolver:
         self.results = self.run_sims(input_sets)
         self.host.console.stop()
 
-    def run_sims(self, input_sets):
+    def run_sims(self, input_sets, cbk_text=None, cbk_bar=None):
         results = {}
-        for keys, sim_data in tqdm(input_sets.items()):
+        for i, (keys, sim_data) in enumerate(input_sets.items()):
+            if cbk_text:
+                cbk_text(f"{i}/{len(input_sets)}")
+            if cbk_bar:
+                cbk_bar(i / len(input_sets))
             gs_loaded = self.host.load_last_savestate()
             p1_action: Action = sim_data[0]
             p2_action: Action = sim_data[1]

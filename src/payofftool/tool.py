@@ -39,6 +39,10 @@ def ptool_setup_window():
 
         dpg.add_button(label="Close and run sim", callback=go_callback)
 
+def ptool_progress_popup():
+    with dpg.window(modal=True, show=False, pos=(200, 200), tag="win_progress"):
+        dpg.add_text("", tag="progress_text")
+        dpg.add_progress_bar(tag="progress_bar")
 
 def parse_from_window_settings() -> Situation:
 
@@ -65,7 +69,7 @@ def parse_from_window_settings() -> Situation:
 
 
 def ptool_results_window():
-    with dpg.window(tag="win_res", show=False):
+    with dpg.window(tag="win_res", pos=(400, 0), show=False):
         dpg.add_text("(Results go here.)", tag="resultsprint")
         with dpg.group(horizontal=True):
             with dpg.drawlist(width=300, height=200, tag="canvas"):
@@ -293,9 +297,10 @@ if __name__ == "__main__":
     dpg.create_context()
     ptool_setup_window()
     ptool_results_window()
+    ptool_progress_popup()
 
     # Viewport and final setup
-    dpg.create_viewport(title="Tool1", width=300, height=200)
+    dpg.create_viewport(title="Payoff Tool", width=700, height=550)
     dpg.setup_dearpygui()
     dpg.show_viewport()
 
