@@ -14,6 +14,12 @@ import numpy as np
 
 def ptool_setup_window():
 
+    with dpg.font_registry():
+        dpg.add_font("res/NotoSans-Regular.ttf", 16 * 2, tag="default_font")
+        dpg.add_font("res/NotoSans-Bold.ttf", 16 * 2, tag="bold_font")
+        dpg.bind_font("default_font")
+        dpg.set_global_font_scale(0.5)
+
     with dpg.window(tag="win_setup", pos=(0, 0)):
         dpg.add_spacer(tag="host_dummy")
         dpg.add_spacer(tag="solver_dummy")
