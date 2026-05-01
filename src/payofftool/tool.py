@@ -3,6 +3,7 @@ from melee.enums import Stage, Character
 
 from ..messlib.interfaces.host import Host
 from ..messlib.data_structures.situation import Situation
+from ..messlib.data_structures.classes import FacingDirection
 from .solver import PayoffSolver
 
 from mess.animations.vis import lerp_2d
@@ -162,17 +163,20 @@ def draw_replay_frame():
         results_index_tuple = list(res.keys())[0]
 
     replay = res[results_index_tuple][1]
-    indices_loop = list(range(len(replay)))
+    indices_loop = list(range(1, len(replay)))
     for _ in range(7):
         indices_loop.append(indices_loop[-1])
 
-    frame_loop_i = indices_loop[(dpg.get_frame_count() // 4) % len(indices_loop)]
+    frame_loop_i = indices_loop[(dpg.get_frame_count() // 2) % len(indices_loop)]
+    print(frame_loop_i)
     repl_frame_to_draw: PayoffReplayFrame = replay[frame_loop_i]
 
     p1x = repl_frame_to_draw.p1_pos.x
     p1y = repl_frame_to_draw.p1_pos.y
+    p1f = repl_frame_to_draw.p1_facing
     p2x = repl_frame_to_draw.p2_pos.x
     p2y = repl_frame_to_draw.p2_pos.y
+    p2f = repl_frame_to_draw.p2_facing
 
     from ..messlib.data_structures.translations import LIBMELEE_TO_DEMANGLED
 
@@ -215,22 +219,36 @@ def draw_replay_frame():
     hurts2_thisframe: list[HurtBoxProcessed] = hurts2[
         (repl_frame_to_draw.p2_game_action_frame + 1) % len(hurts2)
     ]
-    hits1_thisframe = [h for h in hits1 if h.frame_i == frame_loop_i]
-    hits2_thisframe = [h for h in hits2 if h.frame_i == frame_loop_i]
+    hits1_thisframe = [
+        h for h in hits1 if h.frame_i == repl_frame_to_draw.p1_game_action_frame + 1
+    ]
+    hits2_thisframe = [
+        h for h in hits2 if h.frame_i == repl_frame_to_draw.p2_game_action_frame + 1
+    ]
 
     dpg.delete_item("canvas", children_only=True)
     dpg.draw_rectangle(pmin=[10, 10], pmax=[290, 190], parent="canvas")
 
     DRAW_SCALE = 4
+    X_DRAW_OFFSET = 35
+    Y_DRAW_OFFSET = 30
+
+    def x_tform(x, world_x, facing: FacingDirection):
+        x_faced = -x if facing == "LEFT" else x
+        return DRAW_SCALE * (X_DRAW_OFFSET + world_x + x_faced)
+
+    def y_tform(y, world_y):
+        return DRAW_SCALE * (Y_DRAW_OFFSET - (world_y + y))
+
     for hx in hurts1_thisframe:
         x1, y1, z1 = hx.pos_a
         x2, y2, z2 = hx.pos_b
         scale = hx.size
         dpg_draw_capsule(
-            +p1x + (35 - z1) * DRAW_SCALE,
-            +p1y + (30 - y1) * DRAW_SCALE,
-            +p1x + (35 - z2) * DRAW_SCALE,
-            +p1y + (30 - y2) * DRAW_SCALE,
+            x_tform(z1, p1x, p1f),
+            y_tform(y1, p1y),
+            x_tform(z2, p1x, p1f),
+            y_tform(y2, p1y),
             scale * DRAW_SCALE,
             color=p1color,
         )
@@ -239,10 +257,10 @@ def draw_replay_frame():
         x2, y2, z2 = hx.pos_b
         scale = hx.size
         dpg_draw_capsule(
-            +p2x + (35 - z1) * DRAW_SCALE,
-            +p2y + (30 - y1) * DRAW_SCALE,
-            +p2x + (35 - z2) * DRAW_SCALE,
-            +p2y + (30 - y2) * DRAW_SCALE,
+            x_tform(z1, p2x, p2f),
+            y_tform(y1, p2y),
+            x_tform(z2, p2x, p2f),
+            y_tform(y2, p2y),
             scale * DRAW_SCALE,
             color=p2color,
         )
@@ -250,8 +268,8 @@ def draw_replay_frame():
         _, y, z = htx.pos
         dpg.draw_circle(
             (
-                +p1x + (35 - z) * DRAW_SCALE,
-                +p1y + (30 - y) * DRAW_SCALE,
+                x_tform(z, p1x, p1f),
+                y_tform(y, p1y),
             ),
             htx.size * DRAW_SCALE,
             parent="canvas",
@@ -261,8 +279,8 @@ def draw_replay_frame():
         _, y, z = htx.pos
         dpg.draw_circle(
             (
-                +p2x + (35 - z) * DRAW_SCALE,
-                +p2y + (30 - y) * DRAW_SCALE,
+                x_tform(z, p2x, p2f),
+                y_tform(y, p2y),
             ),
             htx.size * DRAW_SCALE,
             parent="canvas",
