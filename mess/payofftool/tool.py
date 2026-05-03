@@ -1,3 +1,6 @@
+import tkinter as tk
+from tkinter import filedialog
+
 import dearpygui.dearpygui as dpg
 from melee.enums import Stage, Character
 
@@ -12,6 +15,52 @@ from .structures import PayoffReplayFrame
 
 import numpy as np
 
+from platformdirs import user_cache_path
+
+CACHE_PATH = user_cache_path("mess.payofftool", "Heather Spacek", ensure_exists=True)
+
+
+def tkinter_file_chooser() -> tuple[bool, str]:
+    root = tk.Tk()
+    root.withdraw()
+    folder_selected = filedialog.askopenfilename(
+        title="Choose location of SSBM backup image...",
+        initialdir=".",
+        filetypes=[("GameCube Disk Image Backup", "*.iso")],
+    )
+    if folder_selected is not None:
+        try:
+            _ = retrieve_move_data(folder_selected, 1, 55)
+        except Exception:
+            return (False, "Issue reading selected file.")
+        else:
+            with open(CACHE_PATH / "last_seen_iso_path", "w") as f:
+                f.write(folder_selected)
+            return (True, folder_selected)
+    return (False, "No file selected.")
+
+
+def ptool_choose_iso_window():
+
+    def first_time_choose_iso():
+        success, path = tkinter_file_chooser()
+        if success:
+            dpg.set_value("loaded_iso_path", path)
+            dpg.hide_item("win_iso_browse")
+        else:
+            dpg.set_value("iso_browse_result_text", path)
+
+    if dpg.does_item_exist("win_iso_browse"):
+        dpg.show_item("win_iso_browse")
+    else:
+        with dpg.window(modal=True, tag="win_iso_browse"):
+            dpg.add_button(
+                label="Browse for SSBM backup image...",
+                height=55,
+                callback=first_time_choose_iso,
+            )
+            dpg.add_text("", tag="iso_browse_result_text")
+
 
 def ptool_setup_window():
 
@@ -22,7 +71,27 @@ def ptool_setup_window():
         dpg.bind_font("default_font")
         dpg.set_global_font_scale(0.5)
 
-    with dpg.window(tag="win_setup", pos=(0, 0), width=600, height=500):
+    # TODO: get pretty :]
+    with dpg.theme(tag="default_theme"):
+        with dpg.theme_component(dpg.mvAll):
+            dpg.add_theme_color(
+                dpg.mvThemeCol_FrameBg, (255, 140, 23), category=dpg.mvThemeCat_Core
+            )
+            dpg.add_theme_style(
+                dpg.mvStyleVar_FrameRounding, 5, category=dpg.mvThemeCat_Core
+            )
+
+    # dpg.bind_theme("default_theme")
+    # dpg.show_style_editor()
+
+    with dpg.window(tag="win_setup", pos=(0, 0), width=700, height=500, no_close=True):
+        with dpg.group(horizontal=True):
+            dpg.add_text("SSBM Backup Path: ")
+            dpg.add_text(tag="loaded_iso_path")
+            dpg.add_button(
+                label="(Click to change)", small=True, callback=ptool_choose_iso_window
+            )
+
         with dpg.group(horizontal=True):
             with dpg.group(width=150):
                 dpg.add_spacer(tag="host_dummy")
@@ -43,7 +112,7 @@ def ptool_setup_window():
                 )
                 dpg.add_slider_float(label="P2 Percent", tag="p2p", max_value=200)
             with dpg.group(width=200):
-                dpg.add_colormap_button(label=" RUN ", callback=go_callback, height=65)
+                dpg.add_colormap_button(label=" RUN ", callback=go_callback, height=45)
                 dpg.bind_colormap(dpg.last_item(), dpg.mvPlotColormap_Viridis)
                 dpg.add_input_intx(
                     size=2,
@@ -136,9 +205,9 @@ def go_callback():
         lambda x: dpg.set_value("progress_text", x),
         lambda x: dpg.set_value("progress_bar", x),
     )
-    dpg.hide_item("win_progress")
     slvr.host.console.stop()
-
+    dpg.hide_item("win_progress")
+    dpg.configure_item("win_setup", collapsed=True)
     dpg.show_item("win_res")
     display_results(slvr.results)
 
@@ -330,11 +399,25 @@ def draw_replay_frame():
 
 
 if __name__ == "__main__":
-    # Window layouts
     dpg.create_context()
+
+    # Window layouts
     ptool_setup_window()
     ptool_results_window()
     ptool_progress_popup()
+
+    # Modal pop-up on first load
+    try:
+        with open(CACHE_PATH / "last_seen_iso_path", "r") as f:
+            last_seen_iso_path = f.read()
+    except FileNotFoundError:
+        # no last-seen
+        dpg.set_value("loaded_iso_path", "")
+    else:
+        dpg.set_value("loaded_iso_path", last_seen_iso_path)
+
+    if not dpg.get_value("loaded_iso_path"):
+        ptool_choose_iso_window()
 
     # Viewport and final setup
     dpg.create_viewport(title="Payoff Tool", width=700, height=550)
