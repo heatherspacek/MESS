@@ -299,7 +299,7 @@ def draw_replay_frame():
 
     from mess.animations.data import retrieve_character_data
 
-    isopath = dpg.get_item_value("loaded_iso_path")
+    isopath = dpg.get_value("loaded_iso_path")
 
     animations_list_ch1, _, _ = retrieve_character_data(
         isopath,
