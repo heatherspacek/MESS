@@ -3,18 +3,11 @@ from ..messlib.data_structures.situation import Situation
 import itertools
 import functools
 
-# from tqdm import tqdm
-
-# Legacy (?) imports
+from melee.enums import Character
 from ..messlib.data_structures.classes import Input, Action, FacingDirection
 from ..messlib.data_structures.move_definitions import Inputs, Actions
 
 from .structures import PayoffReplayFrame, gs_to_replayframe
-
-# debug imports
-from ..messlib.interfaces.vis import print_gamestate
-from melee.enums import Character
-from melee.enums import Action as MeleeAction
 
 
 class PayoffSolver:
@@ -25,16 +18,16 @@ class PayoffSolver:
         self.situation = situation
         self.results = None
 
-    def _debug_solve(self):
-        self.host.situation_setup(self.situation)
-        gs_init = self.host.save_savestate()
-        # ^ what is this useful for?
-        dash_timings = range(1, 8)
-        aerial_timings = range(1, 8)
-        # n_sims = len(list(itertools.product(dash_timings, aerial_timings)))
-        input_sets = self.compose_sims(dash_timings, aerial_timings)
-        self.results = self.run_sims(input_sets)
-        self.host.console.stop()
+    # def _debug_solve(self):
+    #     self.host.situation_setup(self.situation)
+    #     _ = self.host.save_savestate()
+    #     # ^ what could the value be useful for?
+    #     dash_timings = range(1, 8)
+    #     aerial_timings = range(1, 8)
+    #     # n_sims = len(list(itertools.product(dash_timings, aerial_timings)))
+    #     input_sets = self.compose_sims(dash_timings, aerial_timings)
+    #     self.results = self.run_sims(input_sets)
+    #     self.host.console.stop()
 
     def run_sims(self, input_sets, cbk_text=None, cbk_bar=None):
         results = {}
