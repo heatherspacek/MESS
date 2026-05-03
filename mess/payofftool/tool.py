@@ -84,7 +84,7 @@ def ptool_setup_window():
     # dpg.bind_theme("default_theme")
     # dpg.show_style_editor()
 
-    with dpg.window(tag="win_setup", pos=(0, 0), width=690, height=500, no_close=True):
+    with dpg.window(tag="win_setup", pos=(0, 0), width=690, height=-1, no_close=True):
         with dpg.group(horizontal=True):
             dpg.add_text("SSBM Backup Path: ")
             dpg.add_text(tag="loaded_iso_path")
@@ -101,7 +101,11 @@ def ptool_setup_window():
                 stages = [f"{e.name}({e.value})" for e in Stage]
                 chars = [f"{c.name}({c.value})" for c in Character]
                 dpg.add_combo(
-                    items=stages, label="Stage", tag="stg", default_value=stages[1]
+                    items=stages,
+                    label="Stage",
+                    tag="stg",
+                    default_value=stages[1],
+                    callback=lambda a, b, x: print(b),
                 )
                 dpg.add_combo(
                     items=chars, label="P1 Char", tag="p1c", default_value=chars[1]
@@ -111,14 +115,19 @@ def ptool_setup_window():
                     items=chars, label="P2 Char", tag="p2c", default_value=chars[22]
                 )
                 dpg.add_slider_int(label="P2 Percent", tag="p2p", max_value=200)
-                dpg.add_slider_float(label="p1 x pos")
+                dpg.add_slider_float(
+                    label="p1 x pos", min_value=-75, max_value=75, default_value=0
+                )
                 dpg.add_checkbox(label="p1 plat?")
-                dpg.add_slider_float(label="p2 x pos")
+                dpg.add_slider_float(
+                    label="p2 x pos", min_value=-75, max_value=75, default_value=0
+                )
                 dpg.add_checkbox(label="p2 plat?")
-                dpg.add_text("Current Actions:\nP1: bair | P2: dash, usmash")
+                dpg.add_text("Current Actions:")
+                dpg.add_text("P1: bair | P2: dash, usmash")
                 dpg.add_button(
                     label="CLICK TO EDIT ACTIONS \n& PARAMETERS",
-                    callback=None,
+                    callback=lambda x: dpg.show_item("win_actions"),
                 )
             #
             with dpg.drawlist(tag="setup_dlist", width=370, height=300):
@@ -131,9 +140,17 @@ def ptool_setup_window():
 
 
 def ptool_progress_popup():
-    with dpg.window(modal=True, show=False, pos=(200, 200), tag="win_progress"):
+    with dpg.window(modal=True, show=False, pos=(50, 50), tag="win_progress"):
         dpg.add_text("", tag="progress_text")
         dpg.add_progress_bar(tag="progress_bar")
+
+
+def ptool_actions_popup():
+    """The window for the user to define the actions each player should
+    do, and the parameterization for each."""
+    with dpg.window(tag="win_actions", show=False):
+        dpg.add_combo([], label="P1 Base Action")
+        dpg.add_combo([], label="P2 Base Action")
 
 
 def bracket_extract(in_str: str):
@@ -400,10 +417,11 @@ def draw_replay_frame():
 if __name__ == "__main__":
     dpg.create_context()
 
-    # Window layouts
+    # Window layouts, including hidden
     ptool_setup_window()
     ptool_results_window()
     ptool_progress_popup()
+    ptool_actions_popup()
 
     # Modal pop-up on first load
     try:
