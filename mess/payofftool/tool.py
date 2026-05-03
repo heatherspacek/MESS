@@ -84,7 +84,7 @@ def ptool_setup_window():
     # dpg.bind_theme("default_theme")
     # dpg.show_style_editor()
 
-    with dpg.window(tag="win_setup", pos=(0, 0), width=700, height=500, no_close=True):
+    with dpg.window(tag="win_setup", pos=(0, 0), width=690, height=500, no_close=True):
         with dpg.group(horizontal=True):
             dpg.add_text("SSBM Backup Path: ")
             dpg.add_text(tag="loaded_iso_path")
@@ -93,7 +93,7 @@ def ptool_setup_window():
             )
 
         with dpg.group(horizontal=True):
-            with dpg.group(width=150):
+            with dpg.group(width=200):
                 dpg.add_spacer(tag="host_dummy")
                 dpg.add_spacer(tag="solver_dummy")
                 dpg.add_text("Situation setup")
@@ -106,31 +106,28 @@ def ptool_setup_window():
                 dpg.add_combo(
                     items=chars, label="P1 Char", tag="p1c", default_value=chars[1]
                 )
-                dpg.add_slider_float(label="P1 Percent", tag="p1p", max_value=200)
+                dpg.add_slider_int(label="P1 Percent", tag="p1p", max_value=200)
                 dpg.add_combo(
                     items=chars, label="P2 Char", tag="p2c", default_value=chars[22]
                 )
-                dpg.add_slider_float(label="P2 Percent", tag="p2p", max_value=200)
-            with dpg.group(width=200):
-                dpg.add_colormap_button(label=" RUN ", callback=go_callback, height=45)
-                dpg.bind_colormap(dpg.last_item(), dpg.mvPlotColormap_Viridis)
-                dpg.add_input_intx(
-                    size=2,
-                    default_value=(1, 8),
-                    label="P1 Attack Timing",
-                    tag="p1range",
+                dpg.add_slider_int(label="P2 Percent", tag="p2p", max_value=200)
+                dpg.add_slider_float(label="p1 x pos")
+                dpg.add_checkbox(label="p1 plat?")
+                dpg.add_slider_float(label="p2 x pos")
+                dpg.add_checkbox(label="p2 plat?")
+                dpg.add_text("Current Actions:\nP1: bair | P2: dash, usmash")
+                dpg.add_button(
+                    label="CLICK TO EDIT ACTIONS \n& PARAMETERS",
+                    callback=None,
                 )
-                dpg.add_input_intx(
-                    size=2,
-                    default_value=(1, 8),
-                    label="P2 Attack Timing",
-                    tag="p2range",
-                )
-
+            #
+            with dpg.drawlist(tag="setup_dlist", width=370, height=300):
+                dpg.draw_rectangle(pmin=(5, 5), pmax=(365, 295))
+        #
         dpg.add_separator()
-        with dpg.drawlist(tag="setup_dlist", width=250, height=200):
-            dpg.draw_rectangle(pmin=(5, 5), pmax=(245, 195))
-            dpg.draw_text(pos=(100, 100), text="<stage preview will go here!>")
+        with dpg.group(horizontal=True):
+            dpg.add_button(label=" RUN ", callback=go_callback, height=65, width=-1)
+            dpg.bind_item_font(dpg.last_item(), "large_font")
 
 
 def ptool_progress_popup():
