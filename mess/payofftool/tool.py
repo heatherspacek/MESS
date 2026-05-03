@@ -299,24 +299,26 @@ def draw_replay_frame():
 
     from mess.animations.data import retrieve_character_data
 
+    isopath = dpg.get_item_value("loaded_iso_path")
+
     animations_list_ch1, _, _ = retrieve_character_data(
-        "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso",
+        isopath,
         int(bracket_extract(dpg.get_value("p1c"))),
     )
     animations_list_ch2, _, _ = retrieve_character_data(
-        "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso",
+        isopath,
         int(bracket_extract(dpg.get_value("p2c"))),
     )
 
     hurts1, hits1 = retrieve_move_data(
-        "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso",
+        isopath,
         int(bracket_extract(dpg.get_value("p1c"))),
         animations_list_ch1.index(
             LIBMELEE_TO_DEMANGLED[repl_frame_to_draw.p1_game_action]
         ),
     )
     hurts2, hits2 = retrieve_move_data(
-        "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso",
+        isopath,
         int(bracket_extract(dpg.get_value("p2c"))),
         animations_list_ch2.index(
             LIBMELEE_TO_DEMANGLED[repl_frame_to_draw.p2_game_action]
