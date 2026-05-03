@@ -148,9 +148,24 @@ def ptool_progress_popup():
 def ptool_actions_popup():
     """The window for the user to define the actions each player should
     do, and the parameterization for each."""
+
     with dpg.window(tag="win_actions", show=False):
-        dpg.add_combo([], label="P1 Base Action")
-        dpg.add_combo([], label="P2 Base Action")
+        dpg.add_combo(
+            ["floop"],
+            label="P1 Base Action",
+            callback=lambda x: dpg.add_checkbox(
+                label="bweh", parent="p1act_dynamicgroup"
+            ),
+        )
+        dpg.add_group(tag="p1act_dynamicgroup")
+        dpg.add_combo(
+            ["gloop"],
+            label="P2 Base Action",
+            callback=lambda x: dpg.add_checkbox(
+                label="bweh", parent="p2act_dynamicgroup"
+            ),
+        )
+        dpg.add_group(tag="p2act_dynamicgroup")
 
 
 def bracket_extract(in_str: str):
