@@ -88,36 +88,3 @@ class PayoffSolver:
             (t1, t2): (fox_partial(frames_dashing=t1), falco_partial(slack_frames=t2))
             for t1, t2 in itertools.product(dash_timings, aerial_timings)
         }
-
-
-"""
-let's do something "trivial":
-
-fox aim jc up smash,
-falco AC bair.
-
-for fox, parameters are:
- - AIM: how far to run
- - TIGHTNESS: which frame to input JCUS
-
-for falco, parameters are:
- - AIM: jump angle
- - TIGHTNESS: aerial frame
- - TIGHTNESS: ff frame
-"""
-
-
-class ParameterizedAction:
-    """
-    data and visibility type. no ability to "send to game"
-
-    scope is tbd, i did not whiteboard this yet
-    """
-
-    def __init__(self, *args):
-        self.highlevel_seq = []
-        for arg in args:
-            self.highlevel_seq.append(arg)
-        self.frame_seq = self._determine_frames(self.highlevel_seq)
-
-    def _determine_frames(self, highlevel_sequence): ...
