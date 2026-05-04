@@ -1,7 +1,7 @@
 from melee.enums import Button, Character
 
-from .classes import Action, FacingDirection, Input, StochasticInput
-from .helpers import angle_to_meleecircle, jumpsquat
+from .classes import Action, FacingDirection, Input, StochasticInput, Drift
+from .helpers import angle_to_meleecircle, drift_to_meleecircle, jumpsquat
 
 
 def _forwards(direction: FacingDirection) -> tuple[float]:
@@ -28,6 +28,9 @@ class Inputs:
     def dash(direction: FacingDirection):
         return Input(coordinates=_forwards(direction))
 
+    def double_jump(facing: FacingDirection, drift: Drift = "NEUTRAL"):
+        return Input(coordinates=drift_to_meleecircle(drift=drift, facing=facing))
+
     def down_air():
         return Input(c_coordinates=(0.5, 0.0))
 
@@ -37,9 +40,11 @@ class Inputs:
     def forward_air(direction: FacingDirection):
         return Input(c_coordinates=_forwards(direction))
 
-    def jump(angle: int | float = 90, quadrant: str = "UR"):
-        # TODO: analog angle(?)
+    def jump():
         return Input(button=Button.BUTTON_X)
+
+    def jump_trajectory(facing: FacingDirection, drift: Drift = "NEUTRAL"):
+        return Input(coordinates=drift_to_meleecircle(drift=drift, facing=facing))
 
     def laser():
         return Input(button=Button.BUTTON_B, coordinates=(0.5, 0.5))
@@ -115,14 +120,15 @@ class Actions:
     def sh_back_air(
         character: Character,
         direction: FacingDirection,
-        angle: int | float,
-        drift: float,
+        jump_angle: Drift,
+        drift: Drift,
         slack_frames: int,
         ff_frame: int,
     ):
-        sequence: list = [Inputs.jump(angle=angle)] * (jumpsquat(character) - 2)
+        sequence: list = [Inputs.jump()] * (jumpsquat(character) - 1)
+        sequence.append(Inputs.jump_trajectory(facing=direction, drift=jump_angle))
         sequence.extend([Inputs.null()] * slack_frames)
-        # TODO: drift.
+        # TODO: midair drift.
         sequence.append(Inputs.back_air(direction))
         # TODO: How long is each character in the air off a SH?
         sequence.extend([Inputs.null()] * 25)

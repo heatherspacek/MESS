@@ -1,6 +1,8 @@
 import melee
 import numpy as np
 
+from .classes import Drift, FacingDirection
+
 
 def jumpsquat(character: melee.enums.Character) -> int:
     match character:
@@ -43,7 +45,18 @@ def jumpsquat(character: melee.enums.Character) -> int:
             return 3
 
 
-def angle_to_meleecircle(angle: int, quadrant: str):
+def drift_to_meleecircle(drift: Drift, facing: FacingDirection) -> tuple[float, float]:
+    if drift == "NEUTRAL":
+        return (0.5, 0.5)
+    elif drift == "FULLFWDS":
+        xc = 1.0 if facing == FacingDirection.RIGHT else 0.0
+        return (xc, 0.5)
+    elif drift == "FULLBACK":
+        xc = 1.0 if facing == FacingDirection.LEFT else 0.0
+        return (xc, 0.5)
+
+
+def angle_to_meleecircle(angle: int, quadrant: str) -> tuple[float, float]:
     """returns an X and Y that are on the rim of the unit circle.
     input in degrees. intended for use with DI and WDs"""
     if (angle > 90.0) or (angle < 0.0):
