@@ -176,6 +176,7 @@ class Host:
         return gs
 
     def _goto(self, sitch: Situation) -> GameState:
+        ACCEPTANCE_ABS = 1.5
         # TODO: validation checks --
         # . are the x positions actually on stage?
         # . are the platform x positions actually on platform?
@@ -196,7 +197,7 @@ class Host:
             )
 
         def distance_to_wd_angle(dist):
-            if dist < 1:
+            if dist < ACCEPTANCE_ABS:
                 return 90
             elif dist < 12:
                 return 72
@@ -236,8 +237,8 @@ class Host:
                     p2states.append(gs.players[2].action)
                 gs = self.console.step()
 
-            # print([d for d in xdiffs(gs)])
-            if all(abs(d) < 1 for d in xdiffs(gs)):
+            print([d for d in xdiffs(gs)])
+            if all(abs(d) < ACCEPTANCE_ABS for d in xdiffs(gs)):
                 # Final of init: stand back up, theyre crouching rn
                 self.p1.release_all()
                 self.p2.release_all()
