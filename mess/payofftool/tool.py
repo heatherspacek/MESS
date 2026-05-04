@@ -116,11 +116,19 @@ def ptool_setup_window():
                 )
                 dpg.add_slider_int(label="P2 Percent", tag="p2p", max_value=200)
                 dpg.add_slider_float(
-                    label="p1 x pos", min_value=-75, max_value=75, default_value=0
+                    label="p1 x pos",
+                    min_value=-75,
+                    max_value=75,
+                    default_value=15,
+                    tag="p1x",
                 )
                 dpg.add_checkbox(label="p1 plat?")
                 dpg.add_slider_float(
-                    label="p2 x pos", min_value=-75, max_value=75, default_value=0
+                    label="p2 x pos",
+                    min_value=-75,
+                    max_value=75,
+                    default_value=-15,
+                    tag="p2x",
                 )
                 dpg.add_checkbox(label="p2 plat?")
                 dpg.add_text("Current Actions:")
@@ -135,8 +143,8 @@ def ptool_setup_window():
         #
         dpg.add_separator()
         with dpg.group(horizontal=True):
-            dpg.add_button(label=" RUN ", callback=go_callback, height=65, width=-1)
-            dpg.bind_item_font(dpg.last_item(), "large_font")
+            dpg.add_button(label=" RUN ", callback=go_callback, height=45, width=-1)
+            dpg.bind_item_font(dpg.last_item(), "header_font")
 
 
 def ptool_progress_popup():
@@ -185,11 +193,11 @@ def parse_from_window_settings() -> Situation:
         p1_character=Character(p1c_idx),
         p1_percent=int(dpg.get_value("p1p")),
         p1_platform=False,
-        p1_x_position=5.0,
+        p1_x_position=dpg.get_value("p1x"),
         p2_character=Character(p2c_idx),
         p2_percent=int(dpg.get_value("p2p")),
         p2_platform=False,
-        p2_x_position=-19.0,
+        p2_x_position=dpg.get_value("p2x"),
     )
 
 
@@ -317,7 +325,7 @@ def draw_replay_frame():
     p2y = repl_frame_to_draw.p2_pos.y
     p2f = repl_frame_to_draw.p2_facing
 
-    from ..messlib.data_structures.translations import LIBMELEE_TO_DEMANGLED
+    from ..messlib.data_structures.translations import best_match_anim
 
     p1color = (200, 200, 255, 255)
     p2color = (200, 255, 200, 255)
@@ -338,19 +346,18 @@ def draw_replay_frame():
         isopath,
         int(bracket_extract(dpg.get_value("p2c"))),
     )
-
     hurts1, hits1 = retrieve_move_data(
         isopath,
         int(bracket_extract(dpg.get_value("p1c"))),
         animations_list_ch1.index(
-            LIBMELEE_TO_DEMANGLED[repl_frame_to_draw.p1_game_action]
+            best_match_anim(repl_frame_to_draw.p1_game_action, animations_list_ch1)
         ),
     )
     hurts2, hits2 = retrieve_move_data(
         isopath,
         int(bracket_extract(dpg.get_value("p2c"))),
         animations_list_ch2.index(
-            LIBMELEE_TO_DEMANGLED[repl_frame_to_draw.p2_game_action]
+            best_match_anim(repl_frame_to_draw.p2_game_action, animations_list_ch2)
         ),
     )
 
