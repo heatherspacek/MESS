@@ -1,28 +1,41 @@
 from melee.enums import Action as A
 
 LIBMELEE_TO_DEMANGLED = {
-    A.DASHING: "Dash",
-    A.KNEE_BEND: "Squat",  # not true but idk where kneebend is!
-    A.UPSMASH: "AttackHi4",
-    A.JUMPING_FORWARD: "JumpF",
-    A.BAIR: "AttackAirB",
-    A.FAIR: "AttackAirF",
-    A.DAIR: "AttackAirLw",
-    A.DAMAGE_NEUTRAL_2: "DamageN2",
-    A.DAMAGE_LOW_2: "DamageLw2",
-    A.DAMAGE_LOW_3: "DamageLw3",
-    A.DAMAGE_HIGH_2: "DamageHi2",
-    A.DAMAGE_HIGH_3: "DamageHi3",
-    A.DAMAGE_AIR_2: "DamageAir2",
-    A.DAMAGE_AIR_3: "DamageAir3",
-    A.STANDING: "Wait1",
-    A.TURNING: "Turn",
-    A.DAMAGE_FLY_TOP: "DamageFlyTop",
-    A.BAIR_LANDING: "LandingAirB",
-    A.FAIR_LANDING: "LandingAirF",
-    A.DAIR_LANDING: "LandingAirLw",
-    A.LANDING: "Landing",  # this one breaks something?
+    A.DASHING: ("Dash",),
+    A.KNEE_BEND: ("Squat",),  # not true but idk where kneebend is!
+    A.UPSMASH: ("AttackHi4",),
+    A.JUMPING_FORWARD: ("JumpF",),
+    A.JUMPING_BACKWARD: ("JumpB",),
+    A.BAIR: ("AttackAirB",),
+    A.FAIR: ("AttackAirF",),
+    A.DAIR: ("AttackAirLw",),
+    A.DAMAGE_NEUTRAL_1: ("DamageN1",),
+    A.DAMAGE_NEUTRAL_2: ("DamageN2",),
+    A.DAMAGE_LOW_1: ("DamageLw1",),
+    A.DAMAGE_LOW_2: ("DamageLw2",),
+    A.DAMAGE_LOW_3: ("DamageLw3",),
+    A.DAMAGE_HIGH_2: ("DamageHi2",),
+    A.DAMAGE_HIGH_3: ("DamageHi3",),
+    A.DAMAGE_AIR_2: ("DamageAir2",),
+    A.DAMAGE_AIR_3: ("DamageAir3",),
+    A.STANDING: ("Wait1", "Wait2", "Wait"),
+    A.TURNING: ("Turn",),
+    A.DAMAGE_FLY_TOP: ("DamageFlyTop",),
+    A.BAIR_LANDING: ("LandingAirB",),
+    A.FAIR_LANDING: ("LandingAirF",),
+    A.DAIR_LANDING: ("LandingAirLw",),
+    A.LANDING: ("Landing",),  # this one breaks something?
+    A.FALLING: ("Fall",),
 }
+
+
+def best_match_anim(input: A, valid_animations: list[str]):
+    for candidate in LIBMELEE_TO_DEMANGLED[input]:
+        if candidate in valid_animations:
+            return candidate
+    print(f"Debug: couldn't find a matching animation for {input}.")
+    return "OttottoWait"
+
 
 _all = [
     "WallDamage",
