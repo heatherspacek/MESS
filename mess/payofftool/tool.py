@@ -6,7 +6,7 @@ from melee.enums import Stage, Character
 
 from ..messlib.interfaces.host import Host
 from ..messlib.data_structures.situation import Situation
-from ..messlib.data_structures.classes import FacingDirection
+from ..messlib.data_structures.classes import FacingDirection, Drift
 from .solver import PayoffSolver
 
 from mess.animations.vis import lerp_2d
@@ -153,27 +153,56 @@ def ptool_progress_popup():
         dpg.add_progress_bar(tag="progress_bar")
 
 
+def select_action(dispatcher_uid, selection, user_data):
+    # ** `user_data` contains either "p1" or "p2".
+    import inspect
+    from ..messlib.data_structures.move_definitions import Actions
+
+    non_parameterizable = ["character", "direction"]
+    add_to: str = user_data + "act_dynamicgroup"
+
+    selected_function_handle = getattr(Actions, selection)
+    func_sig = inspect.signature(selected_function_handle)
+
+    dpg.delete_item(item=add_to, children_only=True)
+    for param_name, param_info in func_sig.parameters.items():
+        if param_name in non_parameterizable:
+            continue
+        # keep in mind this is (only) the TYPE HINT!
+        if param_info.annotation is float:
+            # dpg.add_input_float(label=param_name, parent=add_to)
+            ...
+        if param_info.annotation is int:
+            with dpg.group(horizontal=True, parent=add_to):
+                dpg.add_text("P?")
+                dpg.add_checkbox()
+                dpg.add_input_int(label=param_name)
+        if param_info.annotation is Drift:
+            with dpg.group(horizontal=True, parent=add_to):
+                dpg.add_text("P?")
+                dpg.add_checkbox()
+                dpg.add_combo([d.value for d in Drift], label=param_name)
+
+
 def ptool_actions_popup():
     """The window for the user to define the actions each player should
     do, and the parameterization for each."""
 
-    with dpg.window(tag="win_actions", show=False):
+    # Get predefined actions list from messlib.
+    from ..messlib.data_structures.move_definitions import Actions
+
+    actions_list = Actions.all_actions()
+
+    with dpg.window(tag="win_actions", show=False, width=550, height=350, pos=(200, 0)):
         dpg.add_combo(
-            ["floop"],
-            label="P1 Base Action",
-            callback=lambda x: dpg.add_checkbox(
-                label="bweh", parent="p1act_dynamicgroup"
-            ),
+            actions_list, label="P1 Base Action", callback=select_action, user_data="p1"
         )
-        dpg.add_group(tag="p1act_dynamicgroup")
+        dpg.add_group(tag="p1act_dynamicgroup", indent=25)
         dpg.add_combo(
-            ["gloop"],
-            label="P2 Base Action",
-            callback=lambda x: dpg.add_checkbox(
-                label="bweh", parent="p2act_dynamicgroup"
-            ),
+            actions_list, label="P2 Base Action", callback=select_action, user_data="p2"
         )
-        dpg.add_group(tag="p2act_dynamicgroup")
+        dpg.add_group(tag="p2act_dynamicgroup", indent=25)
+        dpg.add_button(label="OK", callback=lambda x: dpg.hide_item("win_actions"))
 
 
 def bracket_extract(in_str: str):
