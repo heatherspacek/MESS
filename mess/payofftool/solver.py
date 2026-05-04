@@ -63,6 +63,8 @@ class PayoffSolver:
         return results
 
     def compose_sims(self, dash_timings, aerial_timings):
+        from ..messlib.data_structures.classes import Drift
+
         fox_partial = functools.partial(
             Actions.jump_cancelled_upsmash,
             character=Character.FOX,
@@ -72,8 +74,8 @@ class PayoffSolver:
             Actions.sh_back_air,
             character=Character.FALCO,
             direction=FacingDirection.RIGHT,
-            angle=0.0,
-            drift=0.0,
+            jump_angle=Drift.FULLBACK,
+            drift=Drift.NEUTRAL,
             ff_frame=22,
         )
 
