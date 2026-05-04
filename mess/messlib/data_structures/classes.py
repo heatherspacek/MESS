@@ -5,6 +5,12 @@ from melee.controller import Controller
 from melee.enums import Button, Character
 
 
+class Drift(StrEnum):
+    FULLFWDS = "FULLFWDS"
+    FULLBACK = "FULLBACK"
+    NEUTRAL = "NEUTRAL"
+
+
 class FacingDirection(StrEnum):
     LEFT = "LEFT"
     RIGHT = "RIGHT"
