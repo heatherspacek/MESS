@@ -168,17 +168,16 @@ def select_action(dispatcher_uid, selection, user_data):
     for param_name, param_info in func_sig.parameters.items():
         if param_name in non_parameterizable:
             continue
-        # keep in mind this is (only) the TYPE HINT!
-        if param_info.annotation is float:
-            # dpg.add_input_float(label=param_name, parent=add_to)
-            ...
-        if param_info.annotation is int:
-            with dpg.group(horizontal=True, parent=add_to):
+        with dpg.group(horizontal=True, parent=add_to, tag=f"group_{param_name}"):
+            # keep in mind this is (only) the TYPE HINT!
+            if param_info.annotation is float:
+                # dpg.add_input_float(label=param_name, parent=add_to)
+                ...
+            if param_info.annotation is int:
                 dpg.add_text("vary?")
                 dpg.add_checkbox(tag=f"checkbox_{param_name}", callback=varybox_ticked)
                 dpg.add_input_int(label=param_name, tag=f"value_{param_name}")
-        if param_info.annotation is Drift:
-            with dpg.group(horizontal=True, parent=add_to):
+            if param_info.annotation is Drift:
                 dpg.add_text("vary?")
                 dpg.add_checkbox(tag=f"checkbox_{param_name}", callback=varybox_ticked)
                 dpg.add_combo(
@@ -190,10 +189,30 @@ def select_action(dispatcher_uid, selection, user_data):
 
 
 def varybox_ticked():
-    for ch in dpg.get_item_children("p1act_dynamicgroup")[1]:
-        print(ch)
-    for ch in dpg.get_item_children("p2act_dynamicgroup")[1]:
-        print(ch)
+    def tick_check(item):
+        return dpg.get_item_type(item) == "mvAppItemType::mvCheckbox" and dpg.get_value(
+            item
+        )
+
+    all_child_groups = dpg.get_item_children(
+        "p1act_dynamicgroup", 1
+    ) + dpg.get_item_children("p2act_dynamicgroup", 1)
+    for ch in all_child_groups:
+        subchildren = dpg.get_item_children(ch, 1)
+        if any([tick_check(s) for s in subchildren]):
+            for i in subchildren:
+                if (
+                    dpg.get_item_type(i) != "mvAppItemType::mvCheckbox"
+                    and dpg.get_item_type(i) != "mvAppItemType::mvText"
+                ):
+                    dpg.disable_item(i)
+        else:
+            for i in subchildren:
+                if (
+                    dpg.get_item_type(i) != "mvAppItemType::mvCheckbox"
+                    and dpg.get_item_type(i) != "mvAppItemType::mvText"
+                ):
+                    dpg.enable_item(i)
 
 
 def ptool_actions_popup():
