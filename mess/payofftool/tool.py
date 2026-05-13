@@ -174,14 +174,26 @@ def select_action(dispatcher_uid, selection, user_data):
             ...
         if param_info.annotation is int:
             with dpg.group(horizontal=True, parent=add_to):
-                dpg.add_text("P?")
-                dpg.add_checkbox()
-                dpg.add_input_int(label=param_name)
+                dpg.add_text("vary?")
+                dpg.add_checkbox(tag=f"checkbox_{param_name}", callback=varybox_ticked)
+                dpg.add_input_int(label=param_name, tag=f"value_{param_name}")
         if param_info.annotation is Drift:
             with dpg.group(horizontal=True, parent=add_to):
-                dpg.add_text("P?")
-                dpg.add_checkbox()
-                dpg.add_combo([d.value for d in Drift], label=param_name)
+                dpg.add_text("vary?")
+                dpg.add_checkbox(tag=f"checkbox_{param_name}", callback=varybox_ticked)
+                dpg.add_combo(
+                    [d.value for d in Drift],
+                    label=param_name,
+                    default_value=Drift.NEUTRAL,
+                    tag=f"value_{param_name}",
+                )
+
+
+def varybox_ticked():
+    for ch in dpg.get_item_children("p1act_dynamicgroup")[1]:
+        print(ch)
+    for ch in dpg.get_item_children("p2act_dynamicgroup")[1]:
+        print(ch)
 
 
 def ptool_actions_popup():
