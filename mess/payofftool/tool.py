@@ -168,51 +168,66 @@ def select_action(dispatcher_uid, selection, user_data):
     for param_name, param_info in func_sig.parameters.items():
         if param_name in non_parameterizable:
             continue
-        with dpg.group(horizontal=True, parent=add_to, tag=f"group_{param_name}"):
+        with dpg.group(
+            horizontal=True, parent=add_to, tag=f"{user_data}_group_{param_name}"
+        ):
             # keep in mind this is (only) the TYPE HINT!
             if param_info.annotation is float:
                 # dpg.add_input_float(label=param_name, parent=add_to)
                 ...
             if param_info.annotation is int:
                 dpg.add_text("vary?")
-                dpg.add_checkbox(tag=f"checkbox_{param_name}", callback=varybox_ticked)
-                dpg.add_input_int(label=param_name, tag=f"value_{param_name}")
+                dpg.add_checkbox(
+                    tag=f"{user_data}_checkbox_{param_name}", callback=varybox_ticked
+                )
+                dpg.add_input_int(
+                    label=param_name, tag=f"{user_data}_value_{param_name}"
+                )
             if param_info.annotation is Drift:
                 dpg.add_text("vary?")
-                dpg.add_checkbox(tag=f"checkbox_{param_name}", callback=varybox_ticked)
+                dpg.add_checkbox(
+                    tag=f"{user_data}_checkbox_{param_name}", callback=varybox_ticked
+                )
                 dpg.add_combo(
                     [d.value for d in Drift],
                     label=param_name,
                     default_value=Drift.NEUTRAL,
-                    tag=f"value_{param_name}",
+                    tag=f"{user_data}_value_{param_name}",
                 )
 
 
-def varybox_ticked():
-    def tick_check(item):
-        return dpg.get_item_type(item) == "mvAppItemType::mvCheckbox" and dpg.get_value(
-            item
+def varybox_ticked(checkbox_identifier, unused1, unused2):
+    """
+    if BECAME ticked:
+        replace corresponding row widgets with the VARY one--
+          for an int, two ints.
+          for a Drift, three checkboxes.
+    if became UNticked:
+        replace corresponding row widgets with the normal one
+    """
+    grp = dpg.get_item_parent(checkbox_identifier)
+    if dpg.get_value(checkbox_identifier):
+        # Became checked
+        dpg.delete_item(grp, children_only=True)
+        dpg.add_text("vary?", parent=grp)
+        dpg.add_checkbox(
+            default_value=True,
+            tag=checkbox_identifier,
+            callback=varybox_ticked,
+            parent=grp,
         )
-
-    all_child_groups = dpg.get_item_children(
-        "p1act_dynamicgroup", 1
-    ) + dpg.get_item_children("p2act_dynamicgroup", 1)
-    for ch in all_child_groups:
-        subchildren = dpg.get_item_children(ch, 1)
-        if any([tick_check(s) for s in subchildren]):
-            for i in subchildren:
-                if (
-                    dpg.get_item_type(i) != "mvAppItemType::mvCheckbox"
-                    and dpg.get_item_type(i) != "mvAppItemType::mvText"
-                ):
-                    dpg.disable_item(i)
-        else:
-            for i in subchildren:
-                if (
-                    dpg.get_item_type(i) != "mvAppItemType::mvCheckbox"
-                    and dpg.get_item_type(i) != "mvAppItemType::mvText"
-                ):
-                    dpg.enable_item(i)
+        dpg.add_text("stuff here.", parent=grp)
+    else:
+        # Became UN-checked
+        dpg.delete_item(grp, children_only=True)
+        dpg.add_text("vary?", parent=grp)
+        dpg.add_checkbox(
+            default_value=False,
+            tag=checkbox_identifier,
+            callback=varybox_ticked,
+            parent=grp,
+        )
+        dpg.add_text("stuff here.", parent=grp)
 
 
 def ptool_actions_popup():
