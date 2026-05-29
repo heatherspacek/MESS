@@ -136,13 +136,13 @@ def ptool_setup_window():
                     dpg.add_text("P1: ")
                     dpg.add_text("...", tag="p1_set_action_name")
                     dpg.add_text("(")
-                    dpg.add_text("0", tag="p1_set_action_vary_count")
+                    dpg.add_text("1", tag="p1_set_action_vary_count")
                     dpg.add_text(" variations)")
                 with dpg.group(horizontal=True):
                     dpg.add_text("P2: ")
                     dpg.add_text("...", tag="p2_set_action_name")
                     dpg.add_text("(")
-                    dpg.add_text("0", tag="p2_set_action_vary_count")
+                    dpg.add_text("1", tag="p2_set_action_vary_count")
                     dpg.add_text(" variations)")
 
                 dpg.add_button(
@@ -224,6 +224,7 @@ def select_action(dispatcher_uid, selection, user_data):
 
 
 def range_check(sender, unused1, unused2):
+    ...
     print(f"triggered range correction for {sender}")
 
 
@@ -254,11 +255,19 @@ def ptool_actions_popup():
 
     with dpg.window(tag="win_actions", show=False, width=550, height=350, pos=(200, 0)):
         dpg.add_combo(
-            actions_list, label="P1 Base Action", callback=select_action, user_data="p1"
+            actions_list,
+            label="P1 Base Action",
+            callback=select_action,
+            user_data="p1",
+            tag="p1_base_action_choice",
         )
         dpg.add_group(tag="p1act_dynamicgroup", indent=25)
         dpg.add_combo(
-            actions_list, label="P2 Base Action", callback=select_action, user_data="p2"
+            actions_list,
+            label="P2 Base Action",
+            callback=select_action,
+            user_data="p2",
+            tag="p2_base_action_choice",
         )
         dpg.add_group(tag="p2act_dynamicgroup", indent=25)
         dpg.add_button(
@@ -273,6 +282,29 @@ def hide_actions_and_lock_variations():
     wip here: commit the sets of actions to p1_set_action_name and 
     p2_set_action_vary_count
     """
+    dpg.set_value("p1_set_action_name", dpg.get_value("p1_base_action_choice"))
+    dpg.set_value("p2_set_action_name", dpg.get_value("p2_base_action_choice"))
+    dpg.set_value("p1_set_action_vary_count", 1)
+    dpg.set_value("p2_set_action_vary_count", 1)
+
+    these_vary = {"p1": [], "p2": []}
+
+    for pxx in ["p1", "p2"]:
+        for row in dpg.get_item_children(f"{pxx}act_dynamicgroup", 1):
+            row_widgets = dpg.get_item_children(row, 1)
+            for widget in row_widgets:
+                if "checkbox" in dpg.get_item_alias(widget):
+                    is_varying = dpg.get_value(widget)
+                    break
+            if is_varying:
+                for widget in row_widgets:
+                    if "vary" in dpg.get_item_alias(widget):
+                        varyvals = dpg.get_value(widget)
+                        these_vary[pxx].append(widget)
+                prev_count = int(dpg.get_value(f"{pxx}_set_action_vary_count"))
+                vary_range = varyvals[1] - varyvals[0]
+                dpg.set_value(f"{pxx}_set_action_vary_count", prev_count * vary_range)
+    print(these_vary)
 
 
 def bracket_extract(in_str: str):
@@ -335,6 +367,7 @@ def go_callback():
     # ^ surely this can go in situation_setup someday.
 
     input_sets = slvr.compose_sims(range(1, 8), range(1, 8))
+
     dpg.show_item("win_progress")
     slvr.results = slvr.run_sims(
         input_sets,
