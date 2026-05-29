@@ -132,7 +132,19 @@ def ptool_setup_window():
                 )
                 dpg.add_checkbox(label="p2 plat?")
                 dpg.add_text("Current Actions:")
-                dpg.add_text("P1: bair | P2: dash, usmash")
+                with dpg.group(horizontal=True):
+                    dpg.add_text("P1: ")
+                    dpg.add_text("...", tag="p1_set_action_name")
+                    dpg.add_text("(")
+                    dpg.add_text("0", tag="p1_set_action_vary_count")
+                    dpg.add_text(" variations)")
+                with dpg.group(horizontal=True):
+                    dpg.add_text("P2: ")
+                    dpg.add_text("...", tag="p2_set_action_name")
+                    dpg.add_text("(")
+                    dpg.add_text("0", tag="p2_set_action_vary_count")
+                    dpg.add_text(" variations)")
+
                 dpg.add_button(
                     label="CLICK TO EDIT ACTIONS \n& PARAMETERS",
                     callback=lambda x: dpg.show_item("win_actions"),
@@ -216,17 +228,7 @@ def range_check(sender, unused1, unused2):
 
 
 def varybox_ticked(checkbox_identifier, unused1, unused2):
-    """
-    if BECAME ticked:
-        replace corresponding row widgets with the VARY one--
-          for an int, two ints.
-          for a Drift, three checkboxes.
-    if became UNticked:
-        replace corresponding row widgets with the normal one
-    """
     grp = dpg.get_item_parent(checkbox_identifier)
-    # deduce the original widget type
-    # TODO: unfuck
     ch = [dpg.get_item_alias(i) for i in dpg.get_item_children(grp, 1)]
     vary_item = [i for i in ch if "vary" in i][0]
     set_value_item = [i for i in ch if "value" in i][0]
@@ -259,7 +261,18 @@ def ptool_actions_popup():
             actions_list, label="P2 Base Action", callback=select_action, user_data="p2"
         )
         dpg.add_group(tag="p2act_dynamicgroup", indent=25)
-        dpg.add_button(label="OK", callback=lambda x: dpg.hide_item("win_actions"))
+        dpg.add_button(
+            label="OK", callback=hide_actions_and_lock_variations, height=35, width=-1
+        )
+        dpg.bind_item_font(dpg.last_item(), "header_font")
+
+
+def hide_actions_and_lock_variations():
+    dpg.hide_item("win_actions")
+    """
+    wip here: commit the sets of actions to p1_set_action_name and 
+    p2_set_action_vary_count
+    """
 
 
 def bracket_extract(in_str: str):
