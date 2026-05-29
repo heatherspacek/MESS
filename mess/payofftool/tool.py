@@ -183,6 +183,13 @@ def select_action(dispatcher_uid, selection, user_data):
                 dpg.add_input_int(
                     label=param_name, tag=f"{user_data}_value_{param_name}"
                 )
+                dpg.add_input_intx(
+                    size=2,
+                    label=param_name,
+                    callback=range_check,
+                    tag=f"{user_data}_varyrange_{param_name}",
+                    show=False,
+                )
             if param_info.annotation is Drift:
                 dpg.add_text("vary?")
                 dpg.add_checkbox(
@@ -194,6 +201,18 @@ def select_action(dispatcher_uid, selection, user_data):
                     default_value=Drift.NEUTRAL,
                     tag=f"{user_data}_value_{param_name}",
                 )
+                dpg.add_input_intx(
+                    size=3,
+                    label=param_name,
+                    max_value=1,
+                    min_value=0,
+                    tag=f"{user_data}_varycombo_{param_name}",
+                    show=False,
+                )
+
+
+def range_check(sender, unused1, unused2):
+    print(f"triggered range correction for {sender}")
 
 
 def varybox_ticked(checkbox_identifier, unused1, unused2):
@@ -206,28 +225,20 @@ def varybox_ticked(checkbox_identifier, unused1, unused2):
         replace corresponding row widgets with the normal one
     """
     grp = dpg.get_item_parent(checkbox_identifier)
+    # deduce the original widget type
+    # TODO: unfuck
+    ch = [dpg.get_item_alias(i) for i in dpg.get_item_children(grp, 1)]
+    vary_item = [i for i in ch if "vary" in i][0]
+    set_value_item = [i for i in ch if "value" in i][0]
+
     if dpg.get_value(checkbox_identifier):
         # Became checked
-        dpg.delete_item(grp, children_only=True)
-        dpg.add_text("vary?", parent=grp)
-        dpg.add_checkbox(
-            default_value=True,
-            tag=checkbox_identifier,
-            callback=varybox_ticked,
-            parent=grp,
-        )
-        dpg.add_text("stuff here.", parent=grp)
+        dpg.hide_item(set_value_item)
+        dpg.show_item(vary_item)
     else:
         # Became UN-checked
-        dpg.delete_item(grp, children_only=True)
-        dpg.add_text("vary?", parent=grp)
-        dpg.add_checkbox(
-            default_value=False,
-            tag=checkbox_identifier,
-            callback=varybox_ticked,
-            parent=grp,
-        )
-        dpg.add_text("stuff here.", parent=grp)
+        dpg.hide_item(vary_item)
+        dpg.show_item(set_value_item)
 
 
 def ptool_actions_popup():
