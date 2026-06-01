@@ -62,7 +62,15 @@ class PayoffSolver:
             results[keys] = (res, framelist)
         return results
 
-    def compose_sims(self, dash_timings, aerial_timings):
+    def compose_sims(self, variations_struct):
+        from ..messlib.data_structures.classes import Drift
+
+        p1_variations, p2_variations = variations_struct["p1"], variations_struct["p2"]
+        # ^ each is a list of Variations namedtuples.
+        # TODO: decouple from the app :grimace:
+        ...
+
+    def _debug_compose_sims(self, dash_timings, aerial_timings):
         from ..messlib.data_structures.classes import Drift
 
         fox_partial = functools.partial(
