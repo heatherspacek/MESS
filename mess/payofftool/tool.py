@@ -586,6 +586,14 @@ def draw_replay_frame():
 if __name__ == "__main__":
     dpg.create_context()
 
+    # global theme!
+    with dpg.theme() as global_theme:
+        with dpg.theme_component(dpg.mvAll):
+            dpg.add_theme_style(dpg.mvStyleVar_ItemSpacing, 1, 1)
+            # dpg.add_theme_style(dpg.mvStyleVar_ItemInnerSpacing, 0, 0)
+            dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 2)
+    dpg.bind_theme(global_theme)
+
     # Window layouts, including hidden
     ptool_setup_window()
     ptool_results_window()
