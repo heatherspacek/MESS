@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+from collections import namedtuple
 
 import dearpygui.dearpygui as dpg
 from melee.enums import Stage, Character
@@ -18,6 +19,8 @@ import numpy as np
 from platformdirs import user_cache_path
 
 CACHE_PATH = user_cache_path("mess.payofftool", "Heather Spacek", ensure_exists=True)
+
+Variation = namedtuple("Variation", ["dpg_id", "name", "values"])
 
 
 def tkinter_file_chooser() -> tuple[bool, str]:
@@ -287,7 +290,7 @@ def hide_actions_and_lock_variations():
     dpg.set_value("p1_set_action_vary_count", 1)
     dpg.set_value("p2_set_action_vary_count", 1)
 
-    these_vary = {"p1": [], "p2": []}
+    variations_store = {"p1": [], "p2": []}
 
     for pxx in ["p1", "p2"]:
         for row in dpg.get_item_children(f"{pxx}act_dynamicgroup", 1):
@@ -298,13 +301,20 @@ def hide_actions_and_lock_variations():
                     break
             if is_varying:
                 for widget in row_widgets:
+                    # TODO: ***this only works for the integer flavour rn.
                     if "vary" in dpg.get_item_alias(widget):
                         varyvals = dpg.get_value(widget)
-                        these_vary[pxx].append(widget)
+                        thisvar = Variation(
+                            dpg_id=widget,
+                            name=dpg.get_item_alias(widget),
+                            values=[r for r in range(varyvals[0], varyvals[1] + 1)],
+                        )
+                        variations_store[pxx].append(thisvar)
+
                 prev_count = int(dpg.get_value(f"{pxx}_set_action_vary_count"))
                 vary_range = varyvals[1] - varyvals[0]
                 dpg.set_value(f"{pxx}_set_action_vary_count", prev_count * vary_range)
-    print(these_vary)
+    dpg.set_item_user_data("win_actions", variations_store)
 
 
 def bracket_extract(in_str: str):
@@ -359,6 +369,10 @@ def ptool_results_window():
 
 
 def go_callback():
+    if not dpg.get_item_user_data("win_actions"):
+        print("placeholder error: app steps out of order! Set Variations first!")
+        return
+
     # compose Situation Struct from the window contents:
     slvr: PayoffSolver = dpg.get_item_user_data("solver_dummy")
     sitch = parse_from_window_settings()
@@ -366,7 +380,8 @@ def go_callback():
     slvr.host.save_savestate()
     # ^ surely this can go in situation_setup someday.
 
-    input_sets = slvr.compose_sims(range(1, 8), range(1, 8))
+    # PLACEHOLDER --> input_sets = slvr.compose_sims(range(1, 8), range(1, 8))
+    input_sets = slvr.compose_sims(dpg.get_item_user_data("win_actions"))
 
     dpg.show_item("win_progress")
     slvr.results = slvr.run_sims(
