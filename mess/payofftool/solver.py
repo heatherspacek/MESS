@@ -24,20 +24,8 @@ class PayoffSolver:
         self.situation = situation
         self.results = None
 
-    # def _debug_solve(self):
-    #     self.host.situation_setup(self.situation)
-    #     _ = self.host.save_savestate()
-    #     # ^ what could the value be useful for?
-    #     dash_timings = range(1, 8)
-    #     aerial_timings = range(1, 8)
-    #     # n_sims = len(list(itertools.product(dash_timings, aerial_timings)))
-    #     input_sets = self.compose_sims(dash_timings, aerial_timings)
-    #     self.results = self.run_sims(input_sets)
-    #     self.host.console.stop()
-
     def run_sims(self, input_sets, cbk_text=None, cbk_bar=None):
         results = {}
-        breakpoint()
         for i, sim_data in enumerate(input_sets):
             if cbk_text:
                 cbk_text(f"{i}/{len(input_sets)}")
@@ -95,25 +83,3 @@ class PayoffSolver:
             )
             for variation in ParameterSpace(variations)
         ]
-
-    def _debug_compose_sims(self, dash_timings, aerial_timings):
-        from ..messlib.data_structures.classes import Drift
-
-        fox_partial = functools.partial(
-            Actions.jump_cancelled_upsmash,
-            character=Character.FOX,
-            direction=FacingDirection.RIGHT,
-        )
-        falco_partial = functools.partial(
-            Actions.sh_back_air,
-            character=Character.FALCO,
-            direction=FacingDirection.RIGHT,
-            jump_angle=Drift.FULLBACK,
-            drift=Drift.NEUTRAL,
-            ff_frame=22,
-        )
-
-        return {
-            (t1, t2): (fox_partial(frames_dashing=t1), falco_partial(slack_frames=t2))
-            for t1, t2 in itertools.product(dash_timings, aerial_timings)
-        }
