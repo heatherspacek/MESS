@@ -8,6 +8,7 @@ class Situation:
     Represents a user-specified initial condition: stage, characters,
     and positions.
     In a later revision, more complex parameters may be added.
+    FACING => true for right, false for left.
 
     TODO later: is a typeddict or namedtuple sufficient?
     dataclasses are not overhead per se but I've been bit before by...
@@ -22,11 +23,13 @@ class Situation:
     p1_percent: float
     p1_x_position: float
     p1_platform: bool
+    p1_facing: bool
 
     p2_character: Character
     p2_percent: float
     p2_x_position: float
     p2_platform: bool
+    p2_facing: bool
 
 
 def sample_situation():
@@ -36,8 +39,10 @@ def sample_situation():
         p1_percent=20.0,
         p1_x_position=5.7,
         p1_platform=False,
+        p1_facing=False,
         p2_character=Character.FALCO,
         p2_percent=5.0,
         p2_x_position=-20.6,
         p2_platform=False,
+        p2_facing=True,
     )

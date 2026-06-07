@@ -3,6 +3,26 @@ from enum import Enum, StrEnum
 
 from melee.controller import Controller
 from melee.enums import Button, Character
+from collections import namedtuple
+import itertools
+import math
+
+Variation = namedtuple("Variation", ["dpg_id", "name", "values"])
+
+
+@dataclass
+class ParameterSpace:
+    players: dict[str, list[Variation]]
+
+    def __iter__(self):
+        player_variations = {}
+        for player, variations in self.players.items():
+            keys = [v.name for v in variations]
+            combos = itertools.product(*[v.values for v in variations])
+            player_variations[player] = [dict(zip(keys, c)) for c in combos]
+
+        for combo in itertools.product(*player_variations.values()):
+            yield dict(zip(player_variations.keys(), combo))
 
 
 class Drift(StrEnum):

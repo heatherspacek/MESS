@@ -1,13 +1,17 @@
 import tkinter as tk
 from tkinter import filedialog
-from collections import namedtuple
 
 import dearpygui.dearpygui as dpg
 from melee.enums import Stage, Character
 
 from ..messlib.interfaces.host import Host
 from ..messlib.data_structures.situation import Situation
-from ..messlib.data_structures.classes import FacingDirection, Drift
+from ..messlib.data_structures.classes import (
+    FacingDirection,
+    Drift,
+    Variation,
+    ParameterSpace,
+)
 from .solver import PayoffSolver
 
 from mess.animations.vis import lerp_2d
@@ -19,8 +23,6 @@ import numpy as np
 from platformdirs import user_cache_path
 
 CACHE_PATH = user_cache_path("mess.payofftool", "Heather Spacek", ensure_exists=True)
-
-Variation = namedtuple("Variation", ["dpg_id", "name", "values"])
 
 
 def tkinter_file_chooser() -> tuple[bool, str]:
@@ -125,7 +127,8 @@ def ptool_setup_window():
                     default_value=15,
                     tag="p1x",
                 )
-                dpg.add_checkbox(label="p1 plat?")
+                dpg.add_checkbox(label="p1 plat?", tag="p1plat")
+                dpg.add_checkbox(label="p1 face left?", tag="p1facing")
                 dpg.add_slider_float(
                     label="p2 x pos",
                     min_value=-75,
@@ -133,7 +136,8 @@ def ptool_setup_window():
                     default_value=-15,
                     tag="p2x",
                 )
-                dpg.add_checkbox(label="p2 plat?")
+                dpg.add_checkbox(label="p2 plat?", tag="p2plat")
+                dpg.add_checkbox(label="p2 face left?", tag="p2facing")
                 dpg.add_text("Current Actions:")
                 with dpg.group(horizontal=True):
                     dpg.add_text("P1: ")
@@ -291,6 +295,7 @@ def hide_actions_and_lock_variations():
     dpg.set_value("p2_set_action_vary_count", 1)
 
     variations_store = {"p1": [], "p2": []}
+    constants_store = {"p1": {}, "p2": {}}
 
     for pxx in ["p1", "p2"]:
         for row in dpg.get_item_children(f"{pxx}act_dynamicgroup", 1):
@@ -306,15 +311,21 @@ def hide_actions_and_lock_variations():
                         varyvals = dpg.get_value(widget)
                         thisvar = Variation(
                             dpg_id=widget,
-                            name=dpg.get_item_alias(widget),
+                            name=dpg.get_item_label(widget),
                             values=[r for r in range(varyvals[0], varyvals[1] + 1)],
                         )
                         variations_store[pxx].append(thisvar)
 
                 prev_count = int(dpg.get_value(f"{pxx}_set_action_vary_count"))
-                vary_range = varyvals[1] - varyvals[0]
+                vary_range = (varyvals[1] + 1) - varyvals[0]
                 dpg.set_value(f"{pxx}_set_action_vary_count", prev_count * vary_range)
-    dpg.set_item_user_data("win_actions", variations_store)
+            else:
+                for widget in row_widgets:
+                    if "value" in dpg.get_item_alias(widget):
+                        constants_store[pxx][dpg.get_item_label(widget)] = (
+                            dpg.get_value(widget)
+                        )
+    dpg.set_item_user_data("win_actions", (variations_store, constants_store))
 
 
 def bracket_extract(in_str: str):
@@ -333,11 +344,13 @@ def parse_from_window_settings() -> Situation:
         stage=Stage(stg_idx),
         p1_character=Character(p1c_idx),
         p1_percent=int(dpg.get_value("p1p")),
-        p1_platform=False,
+        p1_platform=dpg.get_value("p1plat"),
+        p1_facing=dpg.get_value("p1facing"),
         p1_x_position=dpg.get_value("p1x"),
         p2_character=Character(p2c_idx),
         p2_percent=int(dpg.get_value("p2p")),
-        p2_platform=False,
+        p2_platform=dpg.get_value("p1plat"),
+        p2_facing=dpg.get_value("p2facing"),
         p2_x_position=dpg.get_value("p2x"),
     )
 
@@ -374,14 +387,19 @@ def go_callback():
         return
 
     # compose Situation Struct from the window contents:
-    slvr: PayoffSolver = dpg.get_item_user_data("solver_dummy")
     sitch = parse_from_window_settings()
+
+    slvr: PayoffSolver = dpg.get_item_user_data("solver_dummy")
+    input_sets = slvr.compose_sims(
+        params_structs=dpg.get_item_user_data("win_actions"),
+        situation=sitch,
+        p1_base_action=dpg.get_value("p1_base_action_choice"),
+        p2_base_action=dpg.get_value("p2_base_action_choice"),
+    )
+
     slvr.host.situation_setup(sitch)
     slvr.host.save_savestate()
     # ^ surely this can go in situation_setup someday.
-
-    # PLACEHOLDER --> input_sets = slvr.compose_sims(range(1, 8), range(1, 8))
-    input_sets = slvr.compose_sims(dpg.get_item_user_data("win_actions"))
 
     dpg.show_item("win_progress")
     slvr.results = slvr.run_sims(

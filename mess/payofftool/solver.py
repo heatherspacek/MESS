@@ -4,7 +4,13 @@ import itertools
 import functools
 
 from melee.enums import Character
-from ..messlib.data_structures.classes import Input, Action, FacingDirection
+from ..messlib.data_structures.classes import (
+    Input,
+    Action,
+    FacingDirection,
+    ParameterSpace,
+    Variation,
+)
 from ..messlib.data_structures.move_definitions import Inputs, Actions
 
 from .structures import PayoffReplayFrame, gs_to_replayframe
@@ -31,7 +37,8 @@ class PayoffSolver:
 
     def run_sims(self, input_sets, cbk_text=None, cbk_bar=None):
         results = {}
-        for i, (keys, sim_data) in enumerate(input_sets.items()):
+        breakpoint()
+        for i, sim_data in enumerate(input_sets):
             if cbk_text:
                 cbk_text(f"{i}/{len(input_sets)}")
             if cbk_bar:
@@ -59,16 +66,35 @@ class PayoffSolver:
                 if "DAMAGE" in str(gs.players[2].action):
                     res = "Fox win"
                     break
-            results[keys] = (res, framelist)
+            results[i] = (res, framelist)
         return results
 
-    def compose_sims(self, variations_struct):
-        from ..messlib.data_structures.classes import Drift
+    def compose_sims(
+        self,
+        params_structs: tuple[dict],
+        situation: Situation,
+        p1_base_action: str,
+        p2_base_action: str,
+    ):
+        variations, constants = params_structs
 
-        p1_variations, p2_variations = variations_struct["p1"], variations_struct["p2"]
-        # ^ each is a list of Variations namedtuples.
-        # TODO: decouple from the app :grimace:
-        ...
+        return [
+            (
+                getattr(Actions, p1_base_action)(
+                    character=situation.p1_character,
+                    direction=situation.p1_facing,
+                    **variation["p1"],
+                    **constants["p1"],
+                ),
+                getattr(Actions, p2_base_action)(
+                    character=situation.p2_character,
+                    direction=situation.p2_facing,
+                    **variation["p2"],
+                    **constants["p2"],
+                ),
+            )
+            for variation in ParameterSpace(variations)
+        ]
 
     def _debug_compose_sims(self, dash_timings, aerial_timings):
         from ..messlib.data_structures.classes import Drift
