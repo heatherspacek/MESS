@@ -264,23 +264,28 @@ def ptool_actions_popup():
         dpg.add_combo(
             actions_list,
             label="P1 Base Action",
+            default_value="sh_back_air",
             callback=select_action,
             user_data="p1",
             tag="p1_base_action_choice",
         )
         dpg.add_group(tag="p1act_dynamicgroup", indent=25)
+        select_action(None, "sh_back_air", "p1")
         dpg.add_combo(
             actions_list,
             label="P2 Base Action",
+            default_value="jump_cancelled_upsmash",
             callback=select_action,
             user_data="p2",
             tag="p2_base_action_choice",
         )
         dpg.add_group(tag="p2act_dynamicgroup", indent=25)
+        select_action(None, "jump_cancelled_upsmash", "p2")
         dpg.add_button(
             label="OK", callback=hide_actions_and_lock_variations, height=35, width=-1
         )
         dpg.bind_item_font(dpg.last_item(), "header_font")
+        hide_actions_and_lock_variations()
 
 
 def hide_actions_and_lock_variations():
@@ -601,6 +606,28 @@ def draw_replay_frame():
         )
 
 
+def draw_setup_frame():
+    from mess.animations.data import retrieve_move_data
+    from ..messlib.data_structures.translations import best_match_anim
+
+    isopath = dpg.get_value("loaded_iso_path")
+    if not isopath:
+        return
+    animations_list_ch2, _, _ = retrieve_character_data(
+        isopath,
+        int(bracket_extract(dpg.get_value("p2c"))),
+    )
+    idle2, _ = retrieve_move_data(
+        isopath,
+        int(bracket_extract(dpg.get_value("p2c"))),
+        animations_list_ch2.index(
+            best_match_anim(repl_frame_to_draw.p2_game_action, animations_list_ch2)
+        ),
+    )
+
+    ...
+
+
 if __name__ == "__main__":
     dpg.create_context()
 
@@ -649,6 +676,7 @@ if __name__ == "__main__":
             if mouse_coords[0] > 0.0:
                 mouseover_plot_react(mouse_coords)
             draw_replay_frame()
-
+        else:
+            draw_setup_frame()
         dpg.render_dearpygui_frame()
     dpg.destroy_context()

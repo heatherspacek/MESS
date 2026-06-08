@@ -65,7 +65,6 @@ class PayoffSolver:
         p2_base_action: str,
     ):
         variations, constants = params_structs
-
         return [
             (
                 getattr(Actions, p1_base_action)(

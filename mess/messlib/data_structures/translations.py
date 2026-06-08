@@ -3,6 +3,7 @@ from melee.enums import Action as A
 LIBMELEE_TO_DEMANGLED = {
     A.DASHING: ("Dash",),
     A.KNEE_BEND: ("Squat",),  # not true but idk where kneebend is!
+    A.CROUCH_START: ("Squat",),
     A.UPSMASH: ("AttackHi4",),
     A.JUMPING_FORWARD: ("JumpF",),
     A.JUMPING_BACKWARD: ("JumpB",),
