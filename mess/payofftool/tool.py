@@ -369,14 +369,14 @@ def ptool_results_window():
             with dpg.plot(no_mouse_pos=True, height=200, width=300, tag="PLT"):
                 dpg.add_plot_axis(
                     dpg.mvXAxis,
-                    label="fox timing",
+                    label="[x axis]",
                     lock_min=True,
                     lock_max=True,
                     tag="plt_xaxis",
                 )
                 with dpg.plot_axis(
                     dpg.mvYAxis,
-                    label="falco timing",
+                    label="[y axis]",
                     lock_min=True,
                     lock_max=True,
                     tag="plt_yaxis",
@@ -387,10 +387,6 @@ def ptool_results_window():
 
 
 def go_callback():
-    if not dpg.get_item_user_data("win_actions"):
-        print("placeholder error: app steps out of order! Set Variations first!")
-        return
-
     # compose Situation Struct from the window contents:
     sitch = parse_from_window_settings()
 
@@ -677,6 +673,8 @@ if __name__ == "__main__":
                 mouseover_plot_react(mouse_coords)
             draw_replay_frame()
         else:
+            # TODO: this `if` is not right, I don't think this ever gets
+            # called.
             draw_setup_frame()
         dpg.render_dearpygui_frame()
     dpg.destroy_context()
