@@ -1,8 +1,7 @@
 from ..messlib.interfaces.host import Host
 from ..messlib.data_structures.situation import Situation
+import math
 import itertools
-import functools
-
 from melee.enums import Character
 from ..messlib.data_structures.classes import (
     Input,
@@ -19,6 +18,8 @@ from .structures import PayoffReplayFrame, gs_to_replayframe
 class PayoffSolver:
     """ """
 
+    SKEWNESS_LIMIT = 5.0
+
     def __init__(self, host: Host, situation: Situation):
         self.host = host
         self.situation = situation
@@ -32,8 +33,9 @@ class PayoffSolver:
             if cbk_bar:
                 cbk_bar(i / len(input_sets))
             gs_loaded = self.host.load_last_savestate()
-            p1_action: Action = sim_data[0]
-            p2_action: Action = sim_data[1]
+            grid_coords: tuple[int] = sim_data[0]
+            p1_action: Action = sim_data[1]
+            p2_action: Action = sim_data[2]
             p1_action.sequence_position = 0
             p2_action.sequence_position = 0
             res = "Whiff"
@@ -54,7 +56,7 @@ class PayoffSolver:
                 if "DAMAGE" in str(gs.players[2].action):
                     res = "Fox win"
                     break
-            results[i] = (res, framelist)
+            results[grid_coords] = (res, framelist)
         return results
 
     def compose_sims(
@@ -65,8 +67,11 @@ class PayoffSolver:
         p2_base_action: str,
     ):
         variations, constants = params_structs
+        ps = ParameterSpace(variations)
+
         return [
             (
+                coords,
                 getattr(Actions, p1_base_action)(
                     character=situation.p1_character,
                     direction=situation.p1_facing,
@@ -80,5 +85,5 @@ class PayoffSolver:
                     **constants["p2"],
                 ),
             )
-            for variation in ParameterSpace(variations)
+            for coords, variation in ps
         ]

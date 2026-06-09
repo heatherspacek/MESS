@@ -397,7 +397,6 @@ def go_callback():
         p1_base_action=dpg.get_value("p1_base_action_choice"),
         p2_base_action=dpg.get_value("p2_base_action_choice"),
     )
-
     slvr.host.situation_setup(sitch)
     slvr.host.save_savestate()
     # ^ surely this can go in situation_setup someday.
@@ -602,6 +601,8 @@ def draw_replay_frame():
         )
 
 
+# TODO: rework this animations code to offload some of the crap to the
+# animations library!
 def draw_setup_frame():
     from mess.animations.data import retrieve_move_data
     from ..messlib.data_structures.translations import best_match_anim

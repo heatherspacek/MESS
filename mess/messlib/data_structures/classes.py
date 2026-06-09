@@ -10,19 +10,46 @@ import math
 Variation = namedtuple("Variation", ["dpg_id", "name", "values"])
 
 
-@dataclass
 class ParameterSpace:
-    players: dict[str, list[Variation]]
+    SKEWNESS_LIMIT = 3.0
+
+    def __init__(self, variations: dict[str, list[Variation]]):
+        self.variations = variations
+
+        dims_p1 = [len(v.values) for v in variations["p1"]] or [1]
+        dims_p2 = [len(v.values) for v in variations["p2"]] or [1]
+        skewness = math.prod(dims_p1) / math.prod(dims_p2)
+        if skewness > self.SKEWNESS_LIMIT or skewness < 1 / self.SKEWNESS_LIMIT:
+            self.skewed = True
+        else:
+            self.skewed = False
 
     def __iter__(self):
-        player_variations = {}
-        for player, variations in self.players.items():
-            keys = [v.name for v in variations]
-            combos = itertools.product(*[v.values for v in variations])
-            player_variations[player] = [dict(zip(keys, c)) for c in combos]
+        if self.skewed:
+            print("WARNING: not fully implemented, 2d graph will be scuffed :0")
 
-        for combo in itertools.product(*player_variations.values()):
-            yield dict(zip(player_variations.keys(), combo))
+        player_variations = {}
+        for pxx in ["p1", "p2"]:
+            vars_this_player = self.variations[pxx]
+            keys = [v.name for v in vars_this_player]
+            combinations = itertools.product(*[v.values for v in vars_this_player])
+            player_variations[pxx] = [dict(zip(keys, c)) for c in combinations]
+
+        x_enum = list(enumerate(player_variations["p1"]))
+        y_enum = list(enumerate(player_variations["p2"]))
+        for gridded_combo in itertools.product(x_enum, y_enum):
+            gc = gridded_combo
+            # sorry
+            yield ((gc[0][0], gc[1][0]), {"p1": gc[0][1], "p2": gc[1][1]})
+
+        # player_variations = {}
+        # for player, variations in self.players.items():
+        #     keys = [v.name for v in variations]
+        #     combos = itertools.product(*[v.values for v in variations])
+        #     player_variations[player] = [dict(zip(keys, c)) for c in combos]
+
+        # for combo in itertools.product(*player_variations.values()):
+        #     yield dict(zip(player_variations.keys(), combo))
 
 
 class Drift(StrEnum):
