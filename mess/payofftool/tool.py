@@ -363,27 +363,30 @@ def parse_from_window_settings() -> Situation:
 def ptool_results_window():
     with dpg.window(tag="win_res", pos=(400, 0), show=False):
         dpg.add_text("(Results go here.)", tag="resultsprint")
-        with dpg.group(horizontal=True):
+        with dpg.group(horizontal=True) as gx:
             with dpg.drawlist(width=300, height=200, tag="canvas"):
                 dpg.draw_rectangle(pmin=[10, 10], pmax=[290, 190])
-            with dpg.plot(no_mouse_pos=True, height=200, width=300, tag="PLT"):
-                dpg.add_plot_axis(
-                    dpg.mvXAxis,
-                    label="[x axis]",
-                    lock_min=True,
-                    lock_max=True,
-                    tag="plt_xaxis",
-                )
-                with dpg.plot_axis(
-                    dpg.mvYAxis,
-                    label="[y axis]",
-                    lock_min=True,
-                    lock_max=True,
-                    tag="plt_yaxis",
-                ):
-                    dpg.add_heat_series([0.0], 1, 1, tag="plt_series", col_major=True)
-                    with dpg.tooltip(dpg.last_item(), tag="ttip"):
-                        dpg.add_text("", tag="tooltext")
+            from .resultsplot import ResultsPlot
+
+            ResultsPlot(init_w=300, init_h=200, parent=gx)
+            # with dpg.plot(no_mouse_pos=True, height=200, width=300, tag="PLT"):
+            #     dpg.add_plot_axis(
+            #         dpg.mvXAxis,
+            #         label="[x axis]",
+            #         lock_min=True,
+            #         lock_max=True,
+            #         tag="plt_xaxis",
+            #     )
+            #     with dpg.plot_axis(
+            #         dpg.mvYAxis,
+            #         label="[y axis]",
+            #         lock_min=True,
+            #         lock_max=True,
+            #         tag="plt_yaxis",
+            #     ):
+            #         dpg.add_heat_series([0.0], 1, 1, tag="plt_series", col_major=True)
+            #         with dpg.tooltip(dpg.last_item(), tag="ttip"):
+            #             dpg.add_text("", tag="tooltext")
 
 
 def go_callback():
@@ -447,8 +450,6 @@ def display_results(solver):
     tickmap_y = tuple((str(k), v) for k, v in zip(sorted(outcomes_y), autoticks_y))
     dpg.set_axis_ticks("plt_yaxis", label_pairs=tickmap_y)
     dpg.set_item_user_data("plt_yaxis", tickmap_y)
-
-    breakpoint()
 
 
 def mouseover_plot_react(mouse_coords):
@@ -680,6 +681,12 @@ if __name__ == "__main__":
     dpg.set_item_user_data("solver_dummy", static_solver)
 
     while dpg.is_dearpygui_running():
+        # update results plot(s)
+        from .resultsplot import ResultsPlotRegistry
+
+        for rxx in ResultsPlotRegistry:
+            rxx.update()
+
         if dpg.is_item_shown("canvas"):
             mouse_coords = dpg.get_plot_mouse_pos()
             if mouse_coords[0] > 0.0:
