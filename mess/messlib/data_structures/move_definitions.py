@@ -1,6 +1,6 @@
 from melee.enums import Button, Character
 
-from .classes import Action, FacingDirection, Input, StochasticInput, Drift
+from .classes import Action, FacingDirection, Input, Drift
 from .helpers import angle_to_meleecircle, drift_to_meleecircle, jumpsquat
 
 
@@ -84,9 +84,7 @@ class Actions:
         # Jump with direction/angle specified:
         sequence = [Inputs.jump(angle=angle)] * (jumpsquat(character) - 1)
         # TODO: how do we fit drift in here????
-        sequence.append(StochasticInput())
         sequence.append(Inputs.down_air())
-        sequence.append(StochasticInput())
         sequence.append(Inputs.fastfall())
         return Action(sequence=sequence)
 
@@ -96,8 +94,6 @@ class Actions:
         # Jump with a direction and angle specified by input arguments...
         sequence = [Inputs.jump()] * (jumpsquat(character) - 1)
         sequence.append(Inputs.nair())
-        # Put a spacer in here-- a StochasticInput
-        sequence.append(StochasticInput())
         sequence.append(Inputs.fastfall())
         return Action(sequence=sequence)
 

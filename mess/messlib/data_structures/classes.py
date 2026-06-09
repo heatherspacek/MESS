@@ -63,14 +63,6 @@ class Input:
             )
 
 
-class StochasticInput(Input):
-    # Idea: normal inputs always return a "go to next input" flag, but
-    # StochasticInputs can "sometimes" set that flag?
-    # Unsure, coming back to it later.
-    def do_input(self, controller: Controller):
-        pass
-
-
 @dataclass
 class Action:
     sequence: list[Input]
