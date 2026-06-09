@@ -24,6 +24,7 @@ class PayoffSolver:
         self.host = host
         self.situation = situation
         self.results = None
+        self.ps = None
 
     def run_sims(self, input_sets, cbk_text=None, cbk_bar=None):
         results = {}
@@ -67,7 +68,7 @@ class PayoffSolver:
         p2_base_action: str,
     ):
         variations, constants = params_structs
-        ps = ParameterSpace(variations)
+        self.ps = ParameterSpace(variations)
 
         return [
             (
@@ -85,5 +86,5 @@ class PayoffSolver:
                     **constants["p2"],
                 ),
             )
-            for coords, variation in ps
+            for coords, variation in self.ps
         ]

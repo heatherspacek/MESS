@@ -411,10 +411,11 @@ def go_callback():
     dpg.hide_item("win_progress")
     dpg.configure_item("win_setup", collapsed=True)
     dpg.show_item("win_res")
-    display_results(slvr.results)
+    display_results(slvr)
 
 
-def display_results(solver_results):
+def display_results(solver):
+    solver_results = solver.results
     """Configure the results window, the plot series, the replay view,
     etc etc. The structure of solver_results is {k: v} where k is the
     tuple of (x,y) to plot, and v is (outcome, [frames_list])"""
@@ -422,6 +423,14 @@ def display_results(solver_results):
     outcomes_numeric = [OUTCOME_MAPPING[v[0]] for v in solver_results.values()]
     outcomes_x = set([k[0] for k in solver_results.keys()])
     outcomes_y = set([k[1] for k in solver_results.keys()])
+    x_strings, y_strings = [], []
+    for xo in outcomes_x:
+        matching = next(x for x in solver.ps if x[0][0] == xo)
+        x_strings.append(str(matching[1]["p1"]))
+    for yo in outcomes_y:
+        matching = next(y for y in solver.ps if y[0][1] == yo)
+        y_strings.append(str(matching[1]["p2"]))
+
     dpg.configure_item(
         "plt_series",
         cols=len(outcomes_x),
@@ -431,12 +440,15 @@ def display_results(solver_results):
     dpg.set_item_user_data("plt_series", outcomes_numeric)
     autoticks_x = np.arange(0, 1, 0.5 / (len(outcomes_x)))[1::2]
     tickmap_x = tuple((str(k), v) for k, v in zip(sorted(outcomes_x), autoticks_x))
+    tickmap_x = tuple((str(k), v) for k, v in zip(x_strings, autoticks_x))
     dpg.set_axis_ticks("plt_xaxis", label_pairs=tickmap_x)
     dpg.set_item_user_data("plt_xaxis", tickmap_x)
     autoticks_y = np.arange(0, 1, 0.5 / (len(outcomes_y)))[1::2]
     tickmap_y = tuple((str(k), v) for k, v in zip(sorted(outcomes_y), autoticks_y))
     dpg.set_axis_ticks("plt_yaxis", label_pairs=tickmap_y)
     dpg.set_item_user_data("plt_yaxis", tickmap_y)
+
+    breakpoint()
 
 
 def mouseover_plot_react(mouse_coords):
