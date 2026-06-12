@@ -124,7 +124,7 @@ def ptool_setup_window():
                     label="p1 x pos",
                     min_value=-75,
                     max_value=75,
-                    default_value=15,
+                    default_value=-15,
                     tag="p1x",
                 )
                 dpg.add_checkbox(label="p1 plat?", tag="p1plat")
@@ -133,7 +133,7 @@ def ptool_setup_window():
                     label="p2 x pos",
                     min_value=-75,
                     max_value=75,
-                    default_value=-15,
+                    default_value=15,
                     tag="p2x",
                 )
                 dpg.add_checkbox(label="p2 plat?", tag="p2plat")
@@ -285,6 +285,17 @@ def ptool_actions_popup():
             label="OK", callback=hide_actions_and_lock_variations, height=35, width=-1
         )
         dpg.bind_item_font(dpg.last_item(), "header_font")
+        # some default parameters for a sweep:
+        for chbox in [
+            "p1_checkbox_slack_frames",
+            "p1_checkbox_ff_frame",
+            "p2_checkbox_frames_dashing",
+        ]:
+            dpg.set_value(chbox, True)
+            varybox_ticked(chbox, None, None)
+        dpg.set_value("p1_varyrange_slack_frames", (1, 5, 0, 0))
+        dpg.set_value("p1_varyrange_ff_frame", (2, 3, 0, 0))
+        dpg.set_value("p2_varyrange_frames_dashing", (2, 6, 0, 0))
         hide_actions_and_lock_variations()
 
 
@@ -363,30 +374,27 @@ def parse_from_window_settings() -> Situation:
 def ptool_results_window():
     with dpg.window(tag="win_res", pos=(400, 0), show=False):
         dpg.add_text("(Results go here.)", tag="resultsprint")
-        with dpg.group(horizontal=True) as gx:
+        with dpg.group(horizontal=True):
             with dpg.drawlist(width=300, height=200, tag="canvas"):
                 dpg.draw_rectangle(pmin=[10, 10], pmax=[290, 190])
-            from .resultsplot import ResultsPlot
-
-            ResultsPlot(init_w=300, init_h=200, parent=gx)
-            # with dpg.plot(no_mouse_pos=True, height=200, width=300, tag="PLT"):
-            #     dpg.add_plot_axis(
-            #         dpg.mvXAxis,
-            #         label="[x axis]",
-            #         lock_min=True,
-            #         lock_max=True,
-            #         tag="plt_xaxis",
-            #     )
-            #     with dpg.plot_axis(
-            #         dpg.mvYAxis,
-            #         label="[y axis]",
-            #         lock_min=True,
-            #         lock_max=True,
-            #         tag="plt_yaxis",
-            #     ):
-            #         dpg.add_heat_series([0.0], 1, 1, tag="plt_series", col_major=True)
-            #         with dpg.tooltip(dpg.last_item(), tag="ttip"):
-            #             dpg.add_text("", tag="tooltext")
+            with dpg.plot(no_mouse_pos=True, height=200, width=300, tag="PLT"):
+                dpg.add_plot_axis(
+                    dpg.mvXAxis,
+                    label="[x axis]",
+                    lock_min=True,
+                    lock_max=True,
+                    tag="plt_xaxis",
+                )
+                with dpg.plot_axis(
+                    dpg.mvYAxis,
+                    label="[y axis]",
+                    lock_min=True,
+                    lock_max=True,
+                    tag="plt_yaxis",
+                ):
+                    dpg.add_heat_series([0.0], 1, 1, tag="plt_series", col_major=True)
+                    with dpg.tooltip(dpg.last_item(), tag="ttip"):
+                        dpg.add_text("", tag="tooltext")
 
 
 def go_callback():
@@ -426,13 +434,13 @@ def display_results(solver):
     outcomes_numeric = [OUTCOME_MAPPING[v[0]] for v in solver_results.values()]
     outcomes_x = set([k[0] for k in solver_results.keys()])
     outcomes_y = set([k[1] for k in solver_results.keys()])
-    x_strings, y_strings = [], []
-    for xo in outcomes_x:
-        matching = next(x for x in solver.ps if x[0][0] == xo)
-        x_strings.append(str(matching[1]["p1"]))
-    for yo in outcomes_y:
-        matching = next(y for y in solver.ps if y[0][1] == yo)
-        y_strings.append(str(matching[1]["p2"]))
+    # x_strings, y_strings = [], []
+    # for xo in outcomes_x:
+    #     matching = next(x for x in solver.ps if x[0][0] == xo)
+    #     x_strings.append(str(matching[1]["p1"]))
+    # for yo in outcomes_y:
+    #     matching = next(y for y in solver.ps if y[0][1] == yo)
+    #     y_strings.append(str(matching[1]["p2"]))
 
     dpg.configure_item(
         "plt_series",
@@ -443,7 +451,6 @@ def display_results(solver):
     dpg.set_item_user_data("plt_series", outcomes_numeric)
     autoticks_x = np.arange(0, 1, 0.5 / (len(outcomes_x)))[1::2]
     tickmap_x = tuple((str(k), v) for k, v in zip(sorted(outcomes_x), autoticks_x))
-    tickmap_x = tuple((str(k), v) for k, v in zip(x_strings, autoticks_x))
     dpg.set_axis_ticks("plt_xaxis", label_pairs=tickmap_x)
     dpg.set_item_user_data("plt_xaxis", tickmap_x)
     autoticks_y = np.arange(0, 1, 0.5 / (len(outcomes_y)))[1::2]
