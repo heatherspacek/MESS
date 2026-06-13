@@ -390,6 +390,7 @@ def ptool_results_window():
                     tag="plt_yaxis",
                 ):
                     dpg.add_heat_series([0.0], 1, 1, tag="plt_series", col_major=True)
+                    dpg.add_spacer(width=0, height=0, tag="plt_xdata_container")
                     with dpg.tooltip(dpg.last_item(), tag="ttip"):
                         dpg.add_text("", tag="tooltext")
 
@@ -422,59 +423,75 @@ def go_callback():
     display_results(slvr)
 
 
-def display_results(solver):
+def display_results(solver: PayoffSolver):
     """Configure the results window, the plot series, the replay view,
     etc etc. The structure of solver_results is {k: v} where k is the
     tuple of (x,y) to plot, and v is (outcome, [frames_list])
 
-    INPUTS: results matrix; axes def'ns; value-coding of results
+    INPUTS: results matrix; [eventually] value-coding of results
     """
-    solver_results = solver.results
-    OUTCOME_MAPPING = {"P1 win": 0.0, "P2 win": 1.0, "Whiff": 0.4, "Trade": 0.6}
-    outcomes_numeric = [OUTCOME_MAPPING[v[0]] for v in solver_results.values()]
-    outcomes_x = set([k[0] for k in solver_results.keys()])
-    outcomes_y = set([k[1] for k in solver_results.keys()])
+    # solver_results = solver.results
+    solver_axes = solver.axes
 
-    # breakpoint()
+    # Pick the first two plot axes...
+    # TODO: account for when there is only ONE axis!!
+    ax0_init: ParamAxis = solver_axes[0]
+    ax1_init: ParamAxis = solver_axes[1]
+    remaining_axes = solver_axes[2:]
+    slice_ = solver.results_slice(
+        ax0_init.param_name,
+        ax1_init.param_name,
+        **{
+            f"{ax_rem.player}_{ax_rem.param_name}": ax_rem.values[0]
+            for ax_rem in remaining_axes
+        },
+    )
+    OUTCOME_MAPPING = {"P1 win": 0.0, "P2 win": 1.0, "Whiff": 0.4, "Trade": 0.6}
+    outcomes_numeric = [OUTCOME_MAPPING[v[0]] for v in slice_]
 
     dpg.configure_item(
         "plt_series",
-        cols=len(outcomes_x),
-        rows=len(outcomes_y),
+        cols=len(ax0_init),
+        rows=len(ax1_init),
         x=outcomes_numeric,
     )
-    dpg.set_item_user_data("plt_series", outcomes_numeric)
-    autoticks_x = np.arange(0, 1, 0.5 / (len(outcomes_x)))[1::2]
-    tickmap_x = tuple((str(k), v) for k, v in zip(sorted(outcomes_x), autoticks_x))
+    dpg.set_item_user_data("plt_series", slice_)
+    dpg.set_item_user_data("plt_xdata_container", outcomes_numeric)
+
+    autoticks_x = np.arange(0, 1, 0.5 / (len(ax0_init)))[1::2]
+    tickmap_x = tuple((str(k), v) for k, v in zip(ax0_init.values, autoticks_x))
     dpg.set_axis_ticks("plt_xaxis", label_pairs=tickmap_x)
-    dpg.configure_item("plt_xaxis", label="new x label")
+    dpg.configure_item("plt_xaxis", label=ax0_init.param_name)
     dpg.set_item_user_data("plt_xaxis", tickmap_x)
-    autoticks_y = np.arange(0, 1, 0.5 / (len(outcomes_y)))[1::2]
-    tickmap_y = tuple((str(k), v) for k, v in zip(sorted(outcomes_y), autoticks_y))
+    autoticks_y = np.arange(0, 1, 0.5 / (len(ax1_init)))[1::2]
+    tickmap_y = tuple((str(k), v) for k, v in zip(ax1_init.values, autoticks_y))
     dpg.set_axis_ticks("plt_yaxis", label_pairs=tickmap_y)
-    dpg.configure_item("plt_yaxis", label="new y label")
+    dpg.configure_item("plt_yaxis", label=ax1_init.param_name)
     dpg.set_item_user_data("plt_yaxis", tickmap_y)
 
 
 def mouseover_plot_react(mouse_coords):
-    plt_val = dpg.get_item_user_data("plt_series")
+    sliced_results = dpg.get_item_user_data("plt_series")
     plt_x = np.array([xi[1] for xi in dpg.get_item_user_data("plt_xaxis")])
     bound_x = plt_x - plt_x[0]
     plt_y = np.array([yi[1] for yi in dpg.get_item_user_data("plt_yaxis")])
     bound_y = plt_y - plt_y[0]
-    shaped = np.reshape(plt_val, (len(plt_x), len(plt_y)))
     sel_x = np.argmax(bound_x > mouse_coords[0]) - 1
     sel_y = np.argmax(bound_y > mouse_coords[1]) - 1
+
+    # unshaped = dpg.get_value("plt_series")[0]
+    unshaped = dpg.get_item_user_data("plt_xdata_container")
+    shaped = np.reshape(unshaped, (len(plt_x), len(plt_y)))
+    # dorky ass sentinel value approach. no judgy
     shaped[sel_x, -sel_y - 1] = 0.27
     dpg.configure_item("plt_series", x=shaped.flatten().tolist())
+    # its getting bad. lol
+    hover_ind = np.argmax(((shaped * 10) - 0.7) % 1 < 1e-8)
 
-    res = dpg.get_item_user_data("solver_dummy").results
-    # Sentinel value... TODO fixup
-    hover_key = list(res.keys())[np.argmax(shaped == 0.27)]
-    dpg.set_value("tooltext", res[hover_key][0])
-    dpg.set_value("resultsprint", hover_key)
-    # just in case its casting to string implicitly:
-    dpg.set_item_user_data("resultsprint", hover_key)
+    dpg.set_value("tooltext", sliced_results[hover_ind][0])
+    dpg.set_value("resultsprint", "this label under construction.")
+    dpg.set_item_user_data("resultsprint", sliced_results[hover_ind])
+    # REMEMBER: this ^ is what is used to decide WHICH REPLAY TO SHOW
 
 
 def dpg_draw_capsule(y1, z1, y2, z2, size, color=(255, 255, 255, 255)):
@@ -484,21 +501,26 @@ def dpg_draw_capsule(y1, z1, y2, z2, size, color=(255, 255, 255, 255)):
 
 
 def draw_replay_frame():
+    PLAYBACK_SPEED = 2
     res = dpg.get_item_user_data("solver_dummy").results
     if res is None:
         return  # no results yet.
 
-    results_index_tuple = dpg.get_item_user_data("resultsprint")
-    if results_index_tuple is None:
-        results_index_tuple = list(res.keys())[0]
+    hovered_data = dpg.get_item_user_data("resultsprint")
+    if hovered_data is None:
+        dummy_index = list(res.keys())[0]
+        frame_seq = res[dummy_index][1]
+    else:
+        outcome_label, frame_seq = hovered_data
 
-    replay = res[results_index_tuple][1]
-    indices_loop = list(range(len(replay)))
+    indices_loop = list(range(len(frame_seq)))
     for _ in range(7):
         indices_loop.append(indices_loop[-1])
 
-    frame_loop_i = indices_loop[(dpg.get_frame_count() // 2) % len(indices_loop)]
-    repl_frame_to_draw: PayoffReplayFrame = replay[frame_loop_i]
+    frame_loop_i = indices_loop[
+        (dpg.get_frame_count() // PLAYBACK_SPEED) % len(indices_loop)
+    ]
+    repl_frame_to_draw: PayoffReplayFrame = frame_seq[frame_loop_i]
 
     p1x = repl_frame_to_draw.p1_pos.x
     p1y = repl_frame_to_draw.p1_pos.y

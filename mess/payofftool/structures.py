@@ -13,6 +13,9 @@ class ParamAxis:
         for v in self.values:
             yield ((self.player, self.param_name, v))
 
+    def __len__(self):
+        return len(self.values)
+
 
 @dataclass
 class PayoffReplayFrame:

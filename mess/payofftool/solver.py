@@ -8,6 +8,7 @@ from ..messlib.data_structures.classes import (
 from ..messlib.data_structures.move_definitions import Inputs, Actions
 
 from .structures import gs_to_replayframe
+import itertools
 
 
 class PayoffSolver:
@@ -19,6 +20,7 @@ class PayoffSolver:
         self.host = host
         self.situation = situation
         self.results = None
+        self.axes = None
 
     def run_sims(self, input_sets, cbk_text=None, cbk_bar=None):
         results = {}
@@ -61,24 +63,13 @@ class PayoffSolver:
         p2_base_action: str,
     ):
         variations, constants = params_structs
-        """
-        todo here:
-        maybe we do away with this PS abstraction.
-        the more useful abstraction here is AXES, right?
-
-        we are collapsing too much and putting in strange
-        places!!
-        app tells us AXES.
-        axes tell us sim constraints.
-        store the results back in terms of the axes.
-        """
-        import itertools
         from .structures import ParamAxis
 
         axes = []
         for pxx, var_list in variations.items():
             for var in var_list:
                 axes.append(ParamAxis(pxx, var[0], var[1]))
+        self.axes = axes
 
         product_iterator = itertools.product(*axes)
 
@@ -103,3 +94,29 @@ class PayoffSolver:
             )
             for point in product_iterator
         ]
+
+    def results_slice(self, ax_x: str, ax_y: str, **kwargs):
+        if not self.results:
+            raise ValueError("No results computed yet.")
+        axis_names = [ax.param_name for ax in self.axes]
+        if ax_x not in axis_names or ax_y not in axis_names:
+            raise ValueError(
+                "specified results-slice names do not match: "
+                f"selecting {ax_x, ax_y} from {axis_names}"
+            )
+        # TODO: even more input validation here (on the kwargs).
+
+        ax_x_full = [a for a in self.axes if a.param_name == ax_x][0]
+        ax_y_full = [a for a in self.axes if a.param_name == ax_y][0]
+
+        constants = []
+        for add_k, add_v in kwargs.items():
+            px, param = add_k.split("_", 1)
+            constants.append((px, param, add_v))
+        if not constants:
+            # TODO: use "defaults" for slices when not enough params given
+            raise NotImplementedError("woof")
+
+        # REMINDER: we overloaded __iter__ for ParamAxis type. :)!!
+        grid_iterator = itertools.product(ax_x_full, ax_y_full, constants)
+        return [self.results[g] for g in grid_iterator]
