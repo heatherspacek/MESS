@@ -9,14 +9,12 @@ from ..messlib.data_structures.situation import Situation
 from ..messlib.data_structures.classes import (
     FacingDirection,
     Drift,
-    Variation,
-    ParameterSpace,
 )
 from .solver import PayoffSolver
 
 from mess.animations.vis import lerp_2d
 from mess.animations.data import retrieve_move_data, HurtBoxProcessed
-from .structures import PayoffReplayFrame
+from .structures import PayoffReplayFrame, ParamAxis
 
 import numpy as np
 
@@ -325,10 +323,9 @@ def hide_actions_and_lock_variations():
                     # TODO: ***this only works for the integer flavour rn.
                     if "vary" in dpg.get_item_alias(widget):
                         varyvals = dpg.get_value(widget)
-                        thisvar = Variation(
-                            dpg_id=widget,
-                            name=dpg.get_item_label(widget),
-                            values=[r for r in range(varyvals[0], varyvals[1] + 1)],
+                        thisvar = (
+                            dpg.get_item_label(widget),
+                            [r for r in range(varyvals[0], varyvals[1] + 1)],
                         )
                         variations_store[pxx].append(thisvar)
 
@@ -426,21 +423,19 @@ def go_callback():
 
 
 def display_results(solver):
-    solver_results = solver.results
     """Configure the results window, the plot series, the replay view,
     etc etc. The structure of solver_results is {k: v} where k is the
-    tuple of (x,y) to plot, and v is (outcome, [frames_list])"""
-    OUTCOME_MAPPING = {"Falco win": 0.0, "Fox win": 1.0, "Whiff": 0.4, "Trade": 0.6}
+    tuple of (x,y) to plot, and v is (outcome, [frames_list])
+
+    INPUTS: results matrix; axes def'ns; value-coding of results
+    """
+    solver_results = solver.results
+    OUTCOME_MAPPING = {"P1 win": 0.0, "P2 win": 1.0, "Whiff": 0.4, "Trade": 0.6}
     outcomes_numeric = [OUTCOME_MAPPING[v[0]] for v in solver_results.values()]
     outcomes_x = set([k[0] for k in solver_results.keys()])
     outcomes_y = set([k[1] for k in solver_results.keys()])
-    # x_strings, y_strings = [], []
-    # for xo in outcomes_x:
-    #     matching = next(x for x in solver.ps if x[0][0] == xo)
-    #     x_strings.append(str(matching[1]["p1"]))
-    # for yo in outcomes_y:
-    #     matching = next(y for y in solver.ps if y[0][1] == yo)
-    #     y_strings.append(str(matching[1]["p2"]))
+
+    # breakpoint()
 
     dpg.configure_item(
         "plt_series",
@@ -452,10 +447,12 @@ def display_results(solver):
     autoticks_x = np.arange(0, 1, 0.5 / (len(outcomes_x)))[1::2]
     tickmap_x = tuple((str(k), v) for k, v in zip(sorted(outcomes_x), autoticks_x))
     dpg.set_axis_ticks("plt_xaxis", label_pairs=tickmap_x)
+    dpg.configure_item("plt_xaxis", label="new x label")
     dpg.set_item_user_data("plt_xaxis", tickmap_x)
     autoticks_y = np.arange(0, 1, 0.5 / (len(outcomes_y)))[1::2]
     tickmap_y = tuple((str(k), v) for k, v in zip(sorted(outcomes_y), autoticks_y))
     dpg.set_axis_ticks("plt_yaxis", label_pairs=tickmap_y)
+    dpg.configure_item("plt_yaxis", label="new y label")
     dpg.set_item_user_data("plt_yaxis", tickmap_y)
 
 

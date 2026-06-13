@@ -4,6 +4,17 @@ import melee
 
 
 @dataclass
+class ParamAxis:
+    player: str
+    param_name: str
+    values: list[int]
+
+    def __iter__(self):
+        for v in self.values:
+            yield ((self.player, self.param_name, v))
+
+
+@dataclass
 class PayoffReplayFrame:
     p1_game_action: melee.enums.Action
     p1_game_action_frame: int

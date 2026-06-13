@@ -1,30 +1,24 @@
 from ..messlib.interfaces.host import Host
 from ..messlib.data_structures.situation import Situation
-import math
-import itertools
 from melee.enums import Character
 from ..messlib.data_structures.classes import (
-    Input,
     Action,
     FacingDirection,
-    ParameterSpace,
-    Variation,
 )
 from ..messlib.data_structures.move_definitions import Inputs, Actions
 
-from .structures import PayoffReplayFrame, gs_to_replayframe
+from .structures import gs_to_replayframe
 
 
 class PayoffSolver:
-    """ """
-
-    SKEWNESS_LIMIT = 5.0
+    """\
+    ...
+    """
 
     def __init__(self, host: Host, situation: Situation):
         self.host = host
         self.situation = situation
         self.results = None
-        self.ps = None
 
     def run_sims(self, input_sets, cbk_text=None, cbk_bar=None):
         results = {}
@@ -45,17 +39,16 @@ class PayoffSolver:
                 p1_action.send_next_input(self.host.p1)
                 p2_action.send_next_input(self.host.p2)
                 gs = self.host.console.step()  # someday, replace with the host-step.
-                # print_gamestate(gs)
                 framelist.append(gs_to_replayframe(gs))
                 if "DAMAGE" in str(gs.players[1].action):
                     if "DAMAGE" in str(gs.players[2].action):
                         res = "Trade"
                         break
                     else:
-                        res = "Falco win"
+                        res = "P2 win"
                         break
                 if "DAMAGE" in str(gs.players[2].action):
-                    res = "Fox win"
+                    res = "P1 win"
                     break
             results[grid_coords] = (res, framelist)
         return results
@@ -68,23 +61,45 @@ class PayoffSolver:
         p2_base_action: str,
     ):
         variations, constants = params_structs
-        self.ps = ParameterSpace(variations)
+        """
+        todo here:
+        maybe we do away with this PS abstraction.
+        the more useful abstraction here is AXES, right?
+
+        we are collapsing too much and putting in strange
+        places!!
+        app tells us AXES.
+        axes tell us sim constraints.
+        store the results back in terms of the axes.
+        """
+        import itertools
+        from .structures import ParamAxis
+
+        axes = []
+        for pxx, var_list in variations.items():
+            for var in var_list:
+                axes.append(ParamAxis(pxx, var[0], var[1]))
+
+        product_iterator = itertools.product(*axes)
+
+        def axestup_to_dict(inp, pxx):
+            return {b: c for a, b, c in inp if a == pxx}
 
         return [
             (
-                coords,
+                point,
                 getattr(Actions, p1_base_action)(
                     character=situation.p1_character,
                     direction=situation.p1_facing,
-                    **variation["p1"],
+                    **axestup_to_dict(point, "p1"),
                     **constants["p1"],
                 ),
                 getattr(Actions, p2_base_action)(
                     character=situation.p2_character,
                     direction=situation.p2_facing,
-                    **variation["p2"],
+                    **axestup_to_dict(point, "p2"),
                     **constants["p2"],
                 ),
             )
-            for coords, variation in self.ps
+            for point in product_iterator
         ]
