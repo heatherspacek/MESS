@@ -391,8 +391,14 @@ def ptool_results_window():
                 ):
                     dpg.add_heat_series([0.0], 1, 1, tag="plt_series", col_major=True)
                     dpg.add_spacer(width=0, height=0, tag="plt_xdata_container")
+                    dpg.add_spacer(width=0, height=0, tag="paramaxis_x")
+                    dpg.add_spacer(width=0, height=0, tag="paramaxis_y")
+                    dpg.add_spacer(width=0, height=0, tag="paramaxis_rem")
                     with dpg.tooltip(dpg.last_item(), tag="ttip"):
                         dpg.add_text("", tag="tooltext")
+        #
+        with dpg.group(tag="sliders_dyngroup"):
+            pass
 
 
 def go_callback():
@@ -420,53 +426,87 @@ def go_callback():
     dpg.hide_item("win_progress")
     dpg.configure_item("win_setup", collapsed=True)
     dpg.show_item("win_res")
-    display_results(slvr)
 
-
-def display_results(solver: PayoffSolver):
-    """Configure the results window, the plot series, the replay view,
-    etc etc. The structure of solver_results is {k: v} where k is the
-    tuple of (x,y) to plot, and v is (outcome, [frames_list])
-
-    INPUTS: results matrix; [eventually] value-coding of results
-    """
-    # solver_results = solver.results
-    solver_axes = solver.axes
-
-    # Pick the first two plot axes...
+    # Configure which axes to show and which to collapse-to-slider.
+    solver_axes = slvr.axes
+    # Just pick the first two plot axes...
     # TODO: account for when there is only ONE axis!!
     ax0_init: ParamAxis = solver_axes[0]
+    dpg.set_item_user_data("paramaxis_x", ax0_init)
     ax1_init: ParamAxis = solver_axes[1]
-    remaining_axes = solver_axes[2:]
+    dpg.set_item_user_data("paramaxis_y", ax1_init)
+    remaining_axes: list[ParamAxis] = solver_axes[2:]
+    dpg.set_item_user_data("paramaxis_rem", remaining_axes)
+    make_axis_sliders()
+    display_results()
+
+
+def swap_x(dispatcher, unused1, unused2):
+    print(dpg.get_item_alias(dispatcher))
+    make_axis_sliders()
+
+
+def swap_y(dispatcher, unused1, unused2):
+    print(dpg.get_item_alias(dispatcher))
+    make_axis_sliders()
+
+
+def make_axis_sliders():
+    dpg.delete_item("sliders_dyngroup", children_only=True)
+    for ax in dpg.get_item_user_data("paramaxis_rem"):
+        with dpg.group(horizontal=True, parent="sliders_dyngroup"):
+            dpg.add_button(label="swap X", width=65, callback=swap_x)
+            dpg.add_button(label="swap Y", width=65, callback=swap_y)
+            dpg.add_slider_int(
+                min_value=min(ax.values),
+                max_value=max(ax.values),
+                default_value=min(ax.values),
+                label=f"{ax.player}_{ax.param_name}",
+                callback=display_results,
+                width=170,
+            )
+
+
+def display_results():
+    """
+    Set the currently-selected results slice onto the axes.
+    """
+    solver: PayoffSolver = dpg.get_item_user_data("solver_dummy")
+    x_par = dpg.get_item_user_data("paramaxis_x")
+    y_par = dpg.get_item_user_data("paramaxis_y")
+    rem_par = dpg.get_item_user_data("paramaxis_rem")
+    axis_values = {}
+    for widg_grp in dpg.get_item_children("sliders_dyngroup", 1):
+        for widg in dpg.get_item_children(widg_grp, 1):
+            if "_" in dpg.get_item_label(widg):
+                axis_values[dpg.get_item_label(widg)] = dpg.get_value(widg)
+
     slice_ = solver.results_slice(
-        ax0_init.param_name,
-        ax1_init.param_name,
-        **{
-            f"{ax_rem.player}_{ax_rem.param_name}": ax_rem.values[0]
-            for ax_rem in remaining_axes
-        },
+        x_par.param_name,
+        y_par.param_name,
+        **axis_values,
     )
     OUTCOME_MAPPING = {"P1 win": 0.0, "P2 win": 1.0, "Whiff": 0.4, "Trade": 0.6}
     outcomes_numeric = [OUTCOME_MAPPING[v[0]] for v in slice_]
 
     dpg.configure_item(
         "plt_series",
-        cols=len(ax0_init),
-        rows=len(ax1_init),
+        cols=len(x_par),
+        rows=len(y_par),
         x=outcomes_numeric,
     )
     dpg.set_item_user_data("plt_series", slice_)
     dpg.set_item_user_data("plt_xdata_container", outcomes_numeric)
 
-    autoticks_x = np.arange(0, 1, 0.5 / (len(ax0_init)))[1::2]
-    tickmap_x = tuple((str(k), v) for k, v in zip(ax0_init.values, autoticks_x))
+    autoticks_x = np.arange(0, 1, 0.5 / (len(x_par)))[1::2]
+    tickmap_x = tuple((str(k), v) for k, v in zip(x_par.values, autoticks_x))
     dpg.set_axis_ticks("plt_xaxis", label_pairs=tickmap_x)
-    dpg.configure_item("plt_xaxis", label=ax0_init.param_name)
+    dpg.configure_item("plt_xaxis", label=x_par.param_name)
     dpg.set_item_user_data("plt_xaxis", tickmap_x)
-    autoticks_y = np.arange(0, 1, 0.5 / (len(ax1_init)))[1::2]
-    tickmap_y = tuple((str(k), v) for k, v in zip(ax1_init.values, autoticks_y))
+    autoticks_y = np.arange(0, 1, 0.5 / (len(y_par)))[1::2]
+    tickmap_y = tuple((str(k), v) for k, v in zip(y_par.values, autoticks_y))
     dpg.set_axis_ticks("plt_yaxis", label_pairs=tickmap_y)
-    dpg.configure_item("plt_yaxis", label=ax1_init.param_name)
+    dpg.configure_item("plt_yaxis", label=y_par.param_name)
     dpg.set_item_user_data("plt_yaxis", tickmap_y)
 
 
@@ -492,6 +532,11 @@ def mouseover_plot_react(mouse_coords):
     dpg.set_value("resultsprint", "this label under construction.")
     dpg.set_item_user_data("resultsprint", sliced_results[hover_ind])
     # REMEMBER: this ^ is what is used to decide WHICH REPLAY TO SHOW
+
+
+...
+"""need to split out the setting of the plot grid, because we do it once
+on display_results and then again every time a slider is changed."""
 
 
 def dpg_draw_capsule(y1, z1, y2, z2, size, color=(255, 255, 255, 255)):
