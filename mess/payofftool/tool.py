@@ -442,13 +442,47 @@ def go_callback():
 
 
 def swap_x(dispatcher, unused1, unused2):
-    print(dpg.get_item_alias(dispatcher))
+    rem_axes_list: list[ParamAxis] = dpg.get_item_user_data("paramaxis_rem")
+    par = dpg.get_item_parent(dispatcher)
+    for ch in dpg.get_item_children(par, 1):
+        if "_" in dpg.get_item_label(ch):  # stupid
+            param_data = [
+                r
+                for r in rem_axes_list
+                if f"{r.player}_{r.param_name}" == dpg.get_item_label(ch)
+            ][0]
+            break
+
+    last_x = dpg.get_item_user_data("paramaxis_x")
+    rem_axes_list.remove(param_data)
+    rem_axes_list.append(last_x)
+    dpg.set_item_user_data("paramaxis_rem", rem_axes_list)
+    dpg.set_item_user_data("paramaxis_x", param_data)
+
     make_axis_sliders()
+    display_results()
 
 
 def swap_y(dispatcher, unused1, unused2):
-    print(dpg.get_item_alias(dispatcher))
+    rem_axes_list: list[ParamAxis] = dpg.get_item_user_data("paramaxis_rem")
+    par = dpg.get_item_parent(dispatcher)
+    for ch in dpg.get_item_children(par, 1):
+        if "_" in dpg.get_item_label(ch):  # stupid
+            param_data = [
+                r
+                for r in rem_axes_list
+                if f"{r.player}_{r.param_name}" == dpg.get_item_label(ch)
+            ][0]
+            break
+
+    last_y = dpg.get_item_user_data("paramaxis_y")
+    rem_axes_list.remove(param_data)
+    rem_axes_list.append(last_y)
+    dpg.set_item_user_data("paramaxis_rem", rem_axes_list)
+    dpg.set_item_user_data("paramaxis_y", param_data)
+
     make_axis_sliders()
+    display_results()
 
 
 def make_axis_sliders():
@@ -474,7 +508,6 @@ def display_results():
     solver: PayoffSolver = dpg.get_item_user_data("solver_dummy")
     x_par = dpg.get_item_user_data("paramaxis_x")
     y_par = dpg.get_item_user_data("paramaxis_y")
-    rem_par = dpg.get_item_user_data("paramaxis_rem")
     axis_values = {}
     for widg_grp in dpg.get_item_children("sliders_dyngroup", 1):
         for widg in dpg.get_item_children(widg_grp, 1):
