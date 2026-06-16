@@ -52,7 +52,7 @@ class PayoffSolver:
                 if "DAMAGE" in str(gs.players[2].action):
                     res = "P1 win"
                     break
-            results[grid_coords] = (res, framelist)
+            results[tuple(sorted(grid_coords))] = (res, framelist)
         return results
 
     def compose_sims(
@@ -119,4 +119,4 @@ class PayoffSolver:
 
         # REMINDER: we overloaded __iter__ for ParamAxis type. :)!!
         grid_iterator = itertools.product(ax_x_full, ax_y_full, constants)
-        return [self.results[g] for g in grid_iterator]
+        return [self.results[tuple(sorted(g))] for g in grid_iterator]
