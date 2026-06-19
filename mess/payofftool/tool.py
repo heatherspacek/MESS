@@ -541,12 +541,12 @@ def display_results():
     autoticks_x = np.arange(0, 1, 0.5 / (len(x_par)))[1::2]
     tickmap_x = tuple((str(k), v) for k, v in zip(x_par.values, autoticks_x))
     dpg.set_axis_ticks("plt_xaxis", label_pairs=tickmap_x)
-    dpg.configure_item("plt_xaxis", label=x_par.param_name)
+    dpg.configure_item("plt_xaxis", label=f"{x_par.player} {x_par.param_name}")
     dpg.set_item_user_data("plt_xaxis", tickmap_x)
     autoticks_y = np.arange(0, 1, 0.5 / (len(y_par)))[1::2]
     tickmap_y = tuple((str(k), v) for k, v in zip(y_par.values, autoticks_y))
     dpg.set_axis_ticks("plt_yaxis", label_pairs=tickmap_y)
-    dpg.configure_item("plt_yaxis", label=y_par.param_name)
+    dpg.configure_item("plt_yaxis", label=f"{y_par.player} {y_par.param_name}")
     dpg.set_item_user_data("plt_yaxis", tickmap_y)
 
 
