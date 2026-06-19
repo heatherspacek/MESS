@@ -113,10 +113,8 @@ class PayoffSolver:
         for add_k, add_v in kwargs.items():
             px, param = add_k.split("_", 1)
             constants.append((px, param, add_v))
-        if not constants:
-            # TODO: use "defaults" for slices when not enough params given
-            raise NotImplementedError("woof")
-
-        # REMINDER: we overloaded __iter__ for ParamAxis type. :)!!
-        grid_iterator = itertools.product(ax_x_full, ax_y_full, constants)
+        if constants:
+            grid_iterator = itertools.product(ax_x_full, ax_y_full, constants)
+        else:
+            grid_iterator = itertools.product(ax_x_full, ax_y_full)
         return [self.results[tuple(sorted(g))] for g in grid_iterator]

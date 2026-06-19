@@ -433,7 +433,10 @@ def go_callback():
     # TODO: account for when there is only ONE axis!!
     ax0_init: ParamAxis = solver_axes[0]
     dpg.set_item_user_data("paramaxis_x", ax0_init)
-    ax1_init: ParamAxis = solver_axes[1]
+    if len(solver_axes) == 1:
+        ax1_init = ParamAxis("", "", [0])
+    else:
+        ax1_init: ParamAxis = solver_axes[1]
     dpg.set_item_user_data("paramaxis_y", ax1_init)
     remaining_axes: list[ParamAxis] = solver_axes[2:]
     dpg.set_item_user_data("paramaxis_rem", remaining_axes)
@@ -506,19 +509,23 @@ def display_results():
     Set the currently-selected results slice onto the axes.
     """
     solver: PayoffSolver = dpg.get_item_user_data("solver_dummy")
-    x_par = dpg.get_item_user_data("paramaxis_x")
-    y_par = dpg.get_item_user_data("paramaxis_y")
+    x_par: ParamAxis = dpg.get_item_user_data("paramaxis_x")
+    y_par: ParamAxis = dpg.get_item_user_data("paramaxis_y")
     axis_values = {}
     for widg_grp in dpg.get_item_children("sliders_dyngroup", 1):
         for widg in dpg.get_item_children(widg_grp, 1):
             if "_" in dpg.get_item_label(widg):
                 axis_values[dpg.get_item_label(widg)] = dpg.get_value(widg)
 
-    slice_ = solver.results_slice(
-        x_par.param_name,
-        y_par.param_name,
-        **axis_values,
-    )
+    if not y_par.param_name:
+        # 1D slice! results_slice cannot elegantly support it...
+        slice_ = [solver.results[(i,)] for i in iter(x_par)]
+    else:
+        slice_ = solver.results_slice(
+            x_par.param_name,
+            y_par.param_name,
+            **axis_values,
+        )
     OUTCOME_MAPPING = {"P1 win": 0.0, "P2 win": 1.0, "Whiff": 0.4, "Trade": 0.6}
     outcomes_numeric = [OUTCOME_MAPPING[v[0]] for v in slice_]
 
@@ -747,10 +754,69 @@ if __name__ == "__main__":
 
     # global theme!
     with dpg.theme() as global_theme:
+        # darks
+        NORD0 = (46, 52, 64)
+        NORD1 = (59, 66, 82)
+        NORD2 = (67, 76, 94)
+        NORD3 = (76, 86, 106)
+        # whites
+        NORD4 = (216, 222, 233)
+        NORD5 = (229, 233, 240)
+        NORD6 = (236, 239, 244)
+        # blues
+        NORD7 = (143, 188, 187)
+        NORD8 = (136, 192, 208)
+        NORD9 = (129, 161, 193)
+        NORD10 = (94, 129, 172)
+        # accents
+        NORD11 = (191, 97, 106)  # red
+        NORD12 = (208, 135, 112)  # orge
+        NORD13 = (235, 203, 139)  # ylw
+        NORD14 = (163, 190, 140)  # green
+        NORD15 = (180, 142, 173)  # purp
+
         with dpg.theme_component(dpg.mvAll):
-            dpg.add_theme_style(dpg.mvStyleVar_ItemSpacing, 1, 1)
+            dpg.add_theme_style(dpg.mvStyleVar_ItemSpacing, 2, 2)
             # dpg.add_theme_style(dpg.mvStyleVar_ItemInnerSpacing, 0, 0)
-            dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 2)
+            dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 3)
+            dpg.add_theme_style(dpg.mvStyleVar_GrabRounding, 3)
+            dpg.add_theme_style(dpg.mvStyleVar_FramePadding, 5, 5)
+            dpg.add_theme_style(dpg.mvStyleVar_FrameBorderSize, 1)
+            dpg.add_theme_style(dpg.mvStyleVar_ScrollbarRounding, 3)
+
+            dpg.add_theme_style(dpg.mvStyleVar_GrabMinSize, 25)
+
+            dpg.add_theme_color(dpg.mvThemeCol_WindowBg, NORD0)
+            dpg.add_theme_color(dpg.mvThemeCol_PopupBg, NORD0)
+
+            dpg.add_theme_color(dpg.mvThemeCol_Button, NORD1)
+            dpg.add_theme_color(dpg.mvThemeCol_FrameBg, NORD1)
+            dpg.add_theme_color(dpg.mvThemeCol_Border, NORD4)
+            dpg.add_theme_color(dpg.mvThemeCol_BorderShadow, (0, 0, 0, 0))
+            dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, NORD2)
+            dpg.add_theme_color(dpg.mvThemeCol_FrameBgHovered, NORD2)
+            dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, NORD3)
+            dpg.add_theme_color(dpg.mvThemeCol_FrameBgActive, NORD3)
+            dpg.add_theme_color(dpg.mvThemeCol_PlotHistogram, NORD10)
+            dpg.add_theme_color(dpg.mvThemeCol_TextSelectedBg, NORD10)
+
+            dpg.add_theme_color(dpg.mvThemeCol_HeaderHovered, NORD9)
+            dpg.add_theme_color(dpg.mvThemeCol_HeaderActive, NORD9)
+            dpg.add_theme_color(dpg.mvThemeCol_Header, NORD10)
+
+            dpg.add_theme_color(dpg.mvThemeCol_Text, NORD6)
+            dpg.add_theme_color(dpg.mvThemeCol_CheckMark, NORD7)
+            dpg.add_theme_color(dpg.mvThemeCol_SliderGrab, NORD8)
+            dpg.add_theme_color(dpg.mvThemeCol_SliderGrabActive, NORD9)
+
+            dpg.add_theme_color(dpg.mvThemeCol_ScrollbarBg, NORD1)
+            dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrab, NORD2)
+            dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrabHovered, NORD3)
+            dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrabActive, NORD8)
+
+            dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, NORD10)
+            dpg.add_theme_color(dpg.mvThemeCol_TitleBg, NORD3)
+            dpg.add_theme_color(dpg.mvThemeCol_TitleBgCollapsed, NORD1)
     dpg.bind_theme(global_theme)
 
     # Window layouts, including hidden
