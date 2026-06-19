@@ -11,10 +11,14 @@ class ParamAxis:
 
     def __iter__(self):
         for v in self.values:
-            yield ((self.player, self.param_name, v))
+            yield (self.player, self.param_name, v)
 
     def __len__(self):
         return len(self.values)
+
+    def __reversed__(self):
+        for v in reversed(self.values):
+            yield (self.player, self.param_name, v)
 
 
 @dataclass
