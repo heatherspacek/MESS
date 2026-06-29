@@ -850,12 +850,6 @@ if __name__ == "__main__":
     dpg.set_item_user_data("solver_dummy", static_solver)
 
     while dpg.is_dearpygui_running():
-        # update results plot(s)
-        from .resultsplot import ResultsPlotRegistry
-
-        for rxx in ResultsPlotRegistry:
-            rxx.update()
-
         if dpg.is_item_shown("canvas"):
             mouse_coords = dpg.get_plot_mouse_pos()
             if mouse_coords[0] > 0.0:
