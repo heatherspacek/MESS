@@ -40,7 +40,6 @@ def tkinter_file_chooser() -> tuple[bool, str]:
             with open(CACHE_PATH / "last_seen_iso_path", "w") as f:
                 f.write(folder_selected)
             return (True, folder_selected)
-    return (False, "No file selected.")
 
 
 def ptool_choose_iso_window():
