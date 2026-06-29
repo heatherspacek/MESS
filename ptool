@@ -1,2 +1,2 @@
-#!/bin/bash
+#!/bin/sh
 uv run python -m mess.payofftool.tool
