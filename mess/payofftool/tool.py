@@ -40,7 +40,6 @@ def tkinter_file_chooser() -> tuple[bool, str]:
             with open(CACHE_PATH / "last_seen_iso_path", "w") as f:
                 f.write(folder_selected)
             return (True, folder_selected)
-    return (False, "No file selected.")
 
 
 def ptool_choose_iso_window():
@@ -50,6 +49,8 @@ def ptool_choose_iso_window():
         if success:
             dpg.set_value("loaded_iso_path", path)
             dpg.hide_item("win_iso_browse")
+            host: Host = dpg.get_item_user_data("host_dummy")
+            host.console_setup()
         else:
             dpg.set_value("iso_browse_result_text", path)
 
@@ -404,7 +405,7 @@ def ptool_results_window():
 def go_callback():
     # compose Situation Struct from the window contents:
     sitch = parse_from_window_settings()
-
+    host: Host = dpg.get_item_user_data("host_dummy")
     slvr: PayoffSolver = dpg.get_item_user_data("solver_dummy")
     input_sets = slvr.compose_sims(
         params_structs=dpg.get_item_user_data("win_actions"),
@@ -844,19 +845,13 @@ if __name__ == "__main__":
     dpg.show_viewport()
 
     # Data objects...
-    host = Host()
+    host = Host(dpg.get_value("loaded_iso_path"))
     static_solver = PayoffSolver(host=host, situation=None)
 
     dpg.set_item_user_data("host_dummy", host)
     dpg.set_item_user_data("solver_dummy", static_solver)
 
     while dpg.is_dearpygui_running():
-        # update results plot(s)
-        from .resultsplot import ResultsPlotRegistry
-
-        for rxx in ResultsPlotRegistry:
-            rxx.update()
-
         if dpg.is_item_shown("canvas"):
             mouse_coords = dpg.get_plot_mouse_pos()
             if mouse_coords[0] > 0.0:
