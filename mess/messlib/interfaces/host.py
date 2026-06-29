@@ -23,14 +23,14 @@ class Host:
         implement it. Returns the GameState
     """
 
-    iso_path = "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso"
-
-    def __init__(self):
+    def __init__(self, iso_path: str):
         self.p1 = None
         self.p2 = None
         self.console = None
-        # Immediately perform setup.
-        _ = self.console_setup()
+        self.iso_path = iso_path
+
+        if self.iso_path:
+            _ = self.console_setup()
 
     def console_setup(self) -> GameState:
         """
