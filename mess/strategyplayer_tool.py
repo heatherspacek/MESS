@@ -4,7 +4,6 @@ import queue
 
 import dearpygui.dearpygui as dpg
 import dearpygui.demo as dpgdemo
-
 import messtool.tool_classes as app_classes
 
 # -

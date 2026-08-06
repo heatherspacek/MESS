@@ -1,8 +1,9 @@
 # based on the gamestate
 
-import melee.gamestate
-import melee.enums
 from pprint import pprint
+
+import melee.enums
+import melee.gamestate
 
 
 def draw_gamestate(gamestate: melee.gamestate.GameState):

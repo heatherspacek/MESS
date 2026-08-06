@@ -1,14 +1,15 @@
-from ..messlib.interfaces.host import Host
-from ..messlib.data_structures.situation import Situation
+import itertools
+
 from melee.enums import Character
+
 from ..messlib.data_structures.classes import (
     Action,
     FacingDirection,
 )
-from ..messlib.data_structures.move_definitions import Inputs, Actions
-
+from ..messlib.data_structures.move_definitions import Actions, Inputs
+from ..messlib.data_structures.situation import Situation
+from ..messlib.interfaces.host import Host
 from .structures import gs_to_replayframe
-import itertools
 
 
 class PayoffSolver:

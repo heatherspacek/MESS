@@ -3,20 +3,22 @@ import numpy as np
 
 from ..resultsplot import ResultsPlot, ResultsPlotRegistry
 
-plot_data_1 = np.array([
+plot_data_1 = np.array(
     [
-        [1, 3, 3, 3],
-        [1, 3, 3, 3],
-    ],
-    [
-        [0, 1, 1, 1],
-        [1, 1, 1, 2],
-    ],
-    [
-        [3, 2, 2, 3],
-        [3, 3, 3, 3],
-    ],
-])
+        [
+            [1, 3, 3, 3],
+            [1, 3, 3, 3],
+        ],
+        [
+            [0, 1, 1, 1],
+            [1, 1, 1, 2],
+        ],
+        [
+            [3, 2, 2, 3],
+            [3, 3, 3, 3],
+        ],
+    ]
+)
 
 # real data doesnt quite assume this form yet, but it's the most
 # condensed form i think we can do?
@@ -33,7 +35,7 @@ if __name__ == "__main__":
     dpg.setup_dearpygui()
     dpg.show_viewport()
 
-    with dpg.window(pos=(0,0)) as win:
+    with dpg.window(pos=(0, 0)) as win:
         RP = ResultsPlot(300, 300, parent=win)
 
     RP.set_data(data_array=plot_data_1, parameters=parameters_data_1)

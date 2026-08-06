@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import dearpygui.dearpygui as dpg
-
 from messlib.data_structures.classes import (
     ActionTrigger,
     DistanceTrigger,

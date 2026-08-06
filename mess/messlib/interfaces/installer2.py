@@ -1,13 +1,13 @@
-import github
 import logging
 import os
-import requests
 import shutil
 import subprocess
+
+import github
+import requests
+import tqdm
 from packaging.version import Version
 from platformdirs import PlatformDirs
-
-import tqdm
 
 
 class Installer2:

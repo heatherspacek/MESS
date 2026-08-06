@@ -1,6 +1,8 @@
 from dataclasses import dataclass
-from ..messlib.data_structures.classes import FacingDirection
+
 import melee
+
+from ..messlib.data_structures.classes import FacingDirection
 
 
 @dataclass

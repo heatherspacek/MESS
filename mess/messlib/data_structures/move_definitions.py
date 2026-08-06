@@ -1,6 +1,6 @@
 from melee.enums import Button, Character
 
-from .classes import Action, FacingDirection, Input, Drift
+from .classes import Action, Drift, FacingDirection, Input
 from .helpers import angle_to_meleecircle, drift_to_meleecircle, jumpsquat
 
 

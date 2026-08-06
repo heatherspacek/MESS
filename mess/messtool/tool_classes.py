@@ -1,8 +1,8 @@
 import dearpygui.dearpygui as dpg
+from messlib.data_structures.classes import Strategy
 
 # -
 import messtool.tool_templates as tp8
-from messlib.data_structures.classes import Strategy
 
 # get_value and set_value work on all dpg ui items, apparently.
 # delete_item() can do runtime deletion. (container AND children!)

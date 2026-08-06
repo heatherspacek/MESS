@@ -1,10 +1,10 @@
 import melee
-from melee.gamestate import GameState
 from melee.enums import Button
-from .patcher import patch_installation
-from ..data_structures.situation import Situation
-from ..data_structures.helpers import angle_to_meleecircle, jumpsquat
+from melee.gamestate import GameState
 
+from ..data_structures.helpers import angle_to_meleecircle, jumpsquat
+from ..data_structures.situation import Situation
+from .patcher import patch_installation
 from .vis import print_gamestate
 
 
