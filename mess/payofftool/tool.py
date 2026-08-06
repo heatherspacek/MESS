@@ -2,23 +2,20 @@ import tkinter as tk
 from tkinter import filedialog
 
 import dearpygui.dearpygui as dpg
-from melee.enums import Stage, Character
-
-from ..messlib.interfaces.host import Host
-from ..messlib.data_structures.situation import Situation
-from ..messlib.data_structures.classes import (
-    FacingDirection,
-    Drift,
-)
-from .solver import PayoffSolver
-
-from mess.animations.vis import lerp_2d
-from mess.animations.data import retrieve_move_data, HurtBoxProcessed
-from .structures import PayoffReplayFrame, ParamAxis
-
 import numpy as np
-
+from melee.enums import Character, Stage
+from mess.animations.data import HurtBoxProcessed, retrieve_move_data
+from mess.animations.vis import lerp_2d
 from platformdirs import user_cache_path
+
+from ..messlib.data_structures.classes import (
+    Drift,
+    FacingDirection,
+)
+from ..messlib.data_structures.situation import Situation
+from ..messlib.interfaces.host import Host
+from .solver import PayoffSolver
+from .structures import ParamAxis, PayoffReplayFrame
 
 CACHE_PATH = user_cache_path("mess.payofftool", "Heather Spacek", ensure_exists=True)
 
@@ -174,6 +171,7 @@ def ptool_progress_popup():
 def select_action(dispatcher_uid, selection, user_data):
     # ** `user_data` contains either "p1" or "p2".
     import inspect
+
     from ..messlib.data_structures.move_definitions import Actions
 
     non_parameterizable = ["character", "direction"]
@@ -730,6 +728,7 @@ def draw_replay_frame():
 # animations library!
 def draw_setup_frame():
     from mess.animations.data import retrieve_move_data
+
     from ..messlib.data_structures.translations import best_match_anim
 
     isopath = dpg.get_value("loaded_iso_path")
@@ -750,7 +749,7 @@ def draw_setup_frame():
     ...
 
 
-if __name__ == "__main__":
+def _entrypoint_payofftool():
     dpg.create_context()
 
     # global theme!
@@ -863,3 +862,8 @@ if __name__ == "__main__":
             draw_setup_frame()
         dpg.render_dearpygui_frame()
     dpg.destroy_context()
+    dpg.stop_dearpygui()
+
+
+if __name__ == "__main__":
+    _entrypoint_payofftool()
