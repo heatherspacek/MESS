@@ -801,31 +801,6 @@ def draw_replay_frame():
         )
 
 
-# TODO: rework this animations code to offload some of the crap to the
-# animations library!
-def draw_setup_frame():
-    from mess.animations.data import retrieve_move_data
-
-    from ..messlib.data_structures.translations import best_match_anim
-
-    isopath = dpg.get_value("loaded_iso_path")
-    if not isopath:
-        return
-    animations_list_ch2, _, _ = retrieve_character_data(
-        isopath,
-        int(bracket_extract(dpg.get_value("p2c"))),
-    )
-    idle2, _ = retrieve_move_data(
-        isopath,
-        int(bracket_extract(dpg.get_value("p2c"))),
-        animations_list_ch2.index(
-            best_match_anim(repl_frame_to_draw.p2_game_action, animations_list_ch2)
-        ),
-    )
-
-    ...
-
-
 def _entrypoint_payofftool():
     dpg.create_context()
 
