@@ -61,6 +61,14 @@ class Inputs:
     def up_smash():
         return Input(c_coordinates=(0.5, 1.0))
 
+    def up_tilt(facing: FacingDirection):
+        x_off = -0.15 if facing == "RIGHT" else +0.15
+        y_off = 0.2
+        return Input(
+            button=Button.BUTTON_A,
+            coordinates=(0.5 + (x_off), 0.5 + (y_off)),
+        )
+
 
 class Actions:
     """organizing class used so elements can be accessed with e.g.
@@ -129,6 +137,11 @@ class Actions:
         # TODO: How long is each character in the air off a SH?
         sequence.extend([Inputs.null()] * 25)
         sequence.insert(ff_frame, Inputs.fastfall())
+        return Action(sequence=sequence)
+
+    def up_tilt(character: Character, direction: FacingDirection, delay_frames: int):
+        sequence: list = [Inputs.null()] * delay_frames
+        sequence.append(Inputs.up_tilt(direction))
         return Action(sequence=sequence)
 
     def wavedash(character: Character, direction: FacingDirection, angle: int | float):

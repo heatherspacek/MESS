@@ -5,6 +5,8 @@ LIBMELEE_TO_DEMANGLED = {
     A.KNEE_BEND: ("Squat",),  # not true but idk where kneebend is!
     A.CROUCH_START: ("Squat",),
     A.UPSMASH: ("AttackHi4",),
+    A.FTILT_HIGH: ("AttackS3Hi",),
+    A.UPTILT: ("AttackHi3",),
     A.JUMPING_FORWARD: ("JumpF",),
     A.JUMPING_BACKWARD: ("JumpB",),
     A.BAIR: ("AttackAirB",),
@@ -29,6 +31,9 @@ LIBMELEE_TO_DEMANGLED = {
     A.DAIR_LANDING: ("LandingAirLw",),
     A.LANDING: ("Landing",),  # this one breaks something?
     A.FALLING: ("Fall",),
+    A.REBOUND: ("Rebound",),
+    A.REBOUND_STOP: ("Rebound",),
+    A.WALK_SLOW: ("WalkSlow",),
 }
 
 
