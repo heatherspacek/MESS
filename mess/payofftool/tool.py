@@ -628,8 +628,8 @@ def draw_preview_frame():
     X_DRAW_OFFSET = 35
     Y_DRAW_OFFSET = 30
 
-    def x_tform(x, world_x, facing: FacingDirection):
-        x_faced = -x if facing == "LEFT" else x
+    def x_tform(x, world_x, facing: bool):
+        x_faced = -x if facing else x
         return DRAW_SCALE * (X_DRAW_OFFSET + world_x + x_faced)
 
     def y_tform(y, world_y):

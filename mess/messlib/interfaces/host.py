@@ -242,7 +242,22 @@ class Host:
                 # Final of init: stand back up, theyre crouching rn
                 self.p1.release_all()
                 self.p2.release_all()
-                for _ in range(15):
+                for _ in range(12):
+                    gs = self.console.step()
+                print("b4 fix", gs.players[1].facing, gs.players[2].facing)
+                # Fix facing.
+                p1_xcoord = 0.3 if sitch.p1_facing else 0.7
+                p2_xcoord = 0.3 if sitch.p2_facing else 0.7
+                self.p1.simple_press(p1_xcoord, 0.5, None)
+                self.p2.simple_press(p2_xcoord, 0.5, None)
+                gs = self.console.step()
+                self.p1.simple_press(p1_xcoord, 0.5, None)
+                self.p2.simple_press(p2_xcoord, 0.5, None)
+                gs = self.console.step()
+                self.p1.release_all()
+                self.p2.release_all()
+                print("after fix", gs.players[1].facing, gs.players[2].facing)
+                for _ in range(20):
                     gs = self.console.step()
                 return gs
         raise RuntimeError(
@@ -289,12 +304,9 @@ class Host:
 
 
 if __name__ == "__main__":
-    MeleeHost = Host()
-    MeleeHost.console_setup()
-
-    for _ in range(500):
-        # Advance time to make sure we're off the respawn plat.
-        MeleeHost.console.step()
+    MeleeHost = Host(
+        "/home/heather/Documents/Disk Images/Super Smash Bros. Melee (v1.02).iso"
+    )
 
     from ..data_structures.situation import sample_situation
 

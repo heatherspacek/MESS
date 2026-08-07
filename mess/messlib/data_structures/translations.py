@@ -34,6 +34,7 @@ LIBMELEE_TO_DEMANGLED = {
     A.REBOUND: ("Rebound",),
     A.REBOUND_STOP: ("Rebound",),
     A.WALK_SLOW: ("WalkSlow",),
+    A.WALK_MIDDLE: ("WalkMiddle",),
 }
 
 
