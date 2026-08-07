@@ -3,7 +3,7 @@ from tkinter import filedialog
 
 import dearpygui.dearpygui as dpg
 import numpy as np
-from melee.enums import Character, Stage
+from melee.enums import Character, Stage, Action
 from mess.animations.data import HurtBoxProcessed, retrieve_move_data
 from mess.animations.vis import lerp_2d
 from platformdirs import user_cache_path
@@ -13,6 +13,7 @@ from ..messlib.data_structures.classes import (
     FacingDirection,
 )
 from ..messlib.data_structures.situation import Situation
+from ..messlib.data_structures.translations import best_match_anim
 from ..messlib.interfaces.host import Host
 from .solver import PayoffSolver
 from .structures import ParamAxis, PayoffReplayFrame
@@ -153,7 +154,7 @@ def ptool_setup_window():
                     callback=lambda x: dpg.show_item("win_actions"),
                 )
             #
-            with dpg.drawlist(tag="setup_dlist", width=370, height=300):
+            with dpg.drawlist(tag="preview_canvas", width=370, height=300):
                 dpg.draw_rectangle(pmin=(5, 5), pmax=(365, 295))
         #
         dpg.add_separator()
@@ -578,10 +579,88 @@ def mouseover_plot_react(mouse_coords):
 on display_results and then again every time a slider is changed."""
 
 
-def dpg_draw_capsule(y1, z1, y2, z2, size, color=(255, 255, 255, 255)):
+def dpg_draw_capsule(y1, z1, y2, z2, size, parent="canvas", color=(255, 255, 255, 255)):
     for t in [a / 9 for a in range(10)]:
         x, y = lerp_2d((y1, z1), (y2, z2), t)
-        dpg.draw_circle([x, y], size, parent="canvas", color=color)
+        dpg.draw_circle([x, y], size, parent=parent, color=color)
+
+
+def draw_preview_frame():
+    p1x = dpg.get_value("p1x")
+    p1f = dpg.get_value("p1facing")
+    p2x = dpg.get_value("p2x")
+    p2f = dpg.get_value("p2facing")
+    p1color = (200, 200, 255, 255)
+    p2color = (200, 255, 200, 255)
+
+    from mess.animations.data import retrieve_character_data
+
+    isopath = dpg.get_value("loaded_iso_path")
+
+    animations_list_ch1, _, _ = retrieve_character_data(
+        isopath,
+        int(bracket_extract(dpg.get_value("p1c"))),
+    )
+    idle1, _ = retrieve_move_data(
+        isopath,
+        int(bracket_extract(dpg.get_value("p1c"))),
+        animations_list_ch1.index(
+            best_match_anim(Action.STANDING, animations_list_ch1)
+        ),
+    )
+    animations_list_ch2, _, _ = retrieve_character_data(
+        isopath,
+        int(bracket_extract(dpg.get_value("p2c"))),
+    )
+    idle2, _ = retrieve_move_data(
+        isopath,
+        int(bracket_extract(dpg.get_value("p2c"))),
+        animations_list_ch2.index(
+            best_match_anim(Action.STANDING, animations_list_ch2)
+        ),
+    )
+    idle1_thisframe: list[HurtBoxProcessed] = idle1[dpg.get_frame_count() % len(idle1)]
+    idle2_thisframe: list[HurtBoxProcessed] = idle2[dpg.get_frame_count() % len(idle2)]
+    dpg.delete_item("preview_canvas", children_only=True)
+    dpg.draw_rectangle(pmin=[10, 10], pmax=[290, 190], parent="preview_canvas")
+
+    DRAW_SCALE = 4
+    X_DRAW_OFFSET = 35
+    Y_DRAW_OFFSET = 30
+
+    def x_tform(x, world_x, facing: FacingDirection):
+        x_faced = -x if facing == "LEFT" else x
+        return DRAW_SCALE * (X_DRAW_OFFSET + world_x + x_faced)
+
+    def y_tform(y, world_y):
+        return DRAW_SCALE * (Y_DRAW_OFFSET - (world_y + y))
+
+    for hx in idle1_thisframe:
+        x1, y1, z1 = hx.pos_a
+        x2, y2, z2 = hx.pos_b
+        scale = hx.size
+        dpg_draw_capsule(
+            x_tform(z1, p1x, p1f),
+            y_tform(y1, 0),
+            x_tform(z2, p1x, p1f),
+            y_tform(y2, 0),
+            scale * DRAW_SCALE,
+            parent="preview_canvas",
+            color=p1color,
+        )
+    for hx in idle2_thisframe:
+        x1, y1, z1 = hx.pos_a
+        x2, y2, z2 = hx.pos_b
+        scale = hx.size
+        dpg_draw_capsule(
+            x_tform(z1, p2x, p2f),
+            y_tform(y1, 0),
+            x_tform(z2, p2x, p2f),
+            y_tform(y2, 0),
+            scale * DRAW_SCALE,
+            parent="preview_canvas",
+            color=p2color,
+        )
 
 
 def draw_replay_frame():
@@ -612,8 +691,6 @@ def draw_replay_frame():
     p2x = repl_frame_to_draw.p2_pos.x
     p2y = repl_frame_to_draw.p2_pos.y
     p2f = repl_frame_to_draw.p2_facing
-
-    from ..messlib.data_structures.translations import best_match_anim
 
     p1color = (200, 200, 255, 255)
     p2color = (200, 255, 200, 255)
@@ -856,10 +933,11 @@ def _entrypoint_payofftool():
             if mouse_coords[0] > 0.0:
                 mouseover_plot_react(mouse_coords)
             draw_replay_frame()
+            draw_preview_frame()
         else:
             # TODO: this `if` is not right, I don't think this ever gets
             # called.
-            draw_setup_frame()
+            draw_preview_frame()
         dpg.render_dearpygui_frame()
     dpg.destroy_context()
     dpg.stop_dearpygui()
