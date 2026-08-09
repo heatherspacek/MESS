@@ -3,7 +3,7 @@ from tkinter import filedialog
 
 import dearpygui.dearpygui as dpg
 import numpy as np
-from melee.enums import Character, Stage, Action
+from melee.enums import Action, Character, Stage
 from mess.animations.data import HurtBoxProcessed, retrieve_move_data
 from mess.animations.vis import lerp_2d
 from platformdirs import user_cache_path
@@ -95,7 +95,7 @@ def ptool_setup_window():
             )
 
         with dpg.group(horizontal=True):
-            with dpg.group(width=200):
+            with dpg.group(width=230):
                 dpg.add_spacer(tag="host_dummy")
                 dpg.add_spacer(tag="solver_dummy")
                 dpg.add_text("Situation setup")
@@ -135,7 +135,12 @@ def ptool_setup_window():
                 )
                 dpg.add_checkbox(label="p2 plat?", tag="p2plat")
                 dpg.add_checkbox(label="p2 face left?", tag="p2facing")
+            # --------------------- horizontal split
+            with dpg.group():
+                with dpg.drawlist(tag="preview_canvas", width=370, height=200):
+                    dpg.draw_rectangle(pmin=(5, 5), pmax=(365, 195))
                 dpg.add_text("Current Actions:")
+                dpg.bind_item_font(dpg.last_item(), "bold_font")
                 with dpg.group(horizontal=True):
                     dpg.add_text("P1: ")
                     dpg.add_text("...", tag="p1_set_action_name")
@@ -148,19 +153,13 @@ def ptool_setup_window():
                     dpg.add_text("(")
                     dpg.add_text("1", tag="p2_set_action_vary_count")
                     dpg.add_text(" variations)")
-
                 dpg.add_button(
-                    label="CLICK TO EDIT ACTIONS \n& PARAMETERS",
+                    label="CLICK TO EDIT ACTIONS\n& PARAMETERS",
                     callback=lambda x: dpg.show_item("win_actions"),
+                    width=-1,
                 )
-            #
-            with dpg.drawlist(tag="preview_canvas", width=370, height=300):
-                dpg.draw_rectangle(pmin=(5, 5), pmax=(365, 295))
-        #
-        dpg.add_separator()
-        with dpg.group(horizontal=True):
-            dpg.add_button(label=" RUN ", callback=go_callback, height=45, width=-1)
-            dpg.bind_item_font(dpg.last_item(), "header_font")
+                dpg.add_button(label=" RUN ", callback=go_callback, height=45, width=-1)
+                dpg.bind_item_font(dpg.last_item(), "header_font")
 
 
 def ptool_progress_popup():
