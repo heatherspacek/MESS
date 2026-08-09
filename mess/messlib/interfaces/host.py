@@ -237,14 +237,14 @@ class Host:
                     p2states.append(gs.players[2].action)
                 gs = self.console.step()
 
-            print([d for d in xdiffs(gs)])
+            # print([d for d in xdiffs(gs)])
             if all(abs(d) < ACCEPTANCE_ABS for d in xdiffs(gs)):
                 # Final of init: stand back up, theyre crouching rn
                 self.p1.release_all()
                 self.p2.release_all()
                 for _ in range(12):
                     gs = self.console.step()
-                print("b4 fix", gs.players[1].facing, gs.players[2].facing)
+                # print("b4 fix", gs.players[1].facing, gs.players[2].facing)
                 # Fix facing.
                 p1_xcoord = 0.3 if sitch.p1_facing else 0.7
                 p2_xcoord = 0.3 if sitch.p2_facing else 0.7
@@ -256,7 +256,7 @@ class Host:
                 gs = self.console.step()
                 self.p1.release_all()
                 self.p2.release_all()
-                print("after fix", gs.players[1].facing, gs.players[2].facing)
+                # print("after fix", gs.players[1].facing, gs.players[2].facing)
                 for _ in range(20):
                     gs = self.console.step()
                 return gs
