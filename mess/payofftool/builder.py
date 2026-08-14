@@ -33,7 +33,12 @@ class Segment:
         self.button_cb = None
 
     def add_to_ui(self, parent=None):
-        ref = dpg.add_button(width=TICK_PIXELS_W*self.n_ticks, height=TICK_PIXELS_H, callback=self.button_cb, parent=parent)
+        ref = dpg.add_button(
+            width=TICK_PIXELS_W*self.n_ticks,
+            height=TICK_PIXELS_H,
+            callback=self.button_cb,
+            parent=parent,
+            user_data=self)
         dpg.bind_item_theme(ref, self.theme)
         self.button_ref = ref
         with dpg.tooltip(parent=ref):
@@ -71,8 +76,8 @@ class SegmentContainer:
             dpg.bind_item_theme(groupref, self.theme)
         self.infobox_ref = infobox
 
-    def parent_cb(self, *args):
-        print([a for a in args])
+    def parent_cb(self, sender, app_data, user_data):
+        # print(sender, app_data, user_data)
         dpg.configure_item(self.infobox_ref, show=True)
 
     def add_segment(self, seg):
