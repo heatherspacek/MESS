@@ -32,8 +32,8 @@ class Segment:
         self.button_ref = None
         self.button_cb = None
 
-    def add_to_ui(self):
-        ref = dpg.add_button(width=TICK_PIXELS_W*self.n_ticks, height=TICK_PIXELS_H, callback=self.button_cb)
+    def add_to_ui(self, parent=None):
+        ref = dpg.add_button(width=TICK_PIXELS_W*self.n_ticks, height=TICK_PIXELS_H, callback=self.button_cb, parent=parent)
         dpg.bind_item_theme(ref, self.theme)
         self.button_ref = ref
         with dpg.tooltip(parent=ref):
@@ -48,20 +48,14 @@ class SegmentContainer:
                 dpg.add_theme_style(dpg.mvStyleVar_ItemSpacing, 0)
                 dpg.add_theme_style(dpg.mvStyleVar_ItemInnerSpacing, 0)
         self.theme = new_theme
+        self._setup_layout()
 
-        self.segments = []
+        self.segment_objects = []
         for seg in args:
-            self.segments.append(seg)
-            seg.button_cb = self.parent_cb
-
-        self.infobox_ref = None
+            self.add_segment(seg)
         self.focused = None
 
-    def parent_cb(self, *args):
-        print(a for a in args)
-        dpg.configure_item(self.infobox_ref, show=True)
-
-    def add_to_ui(self):
+    def _setup_layout(self):
         with dpg.child_window(width=300, height=150, show=False) as infobox:
             with dpg.group(horizontal=True):
                 dpg.add_text("Customizing Action: ")
@@ -72,14 +66,19 @@ class SegmentContainer:
             dpg.add_knob_float(label="Jump Angle")
         with dpg.child_window(width=300, height=55, resizable_x=True, horizontal_scrollbar=True):
             with dpg.group(horizontal=True) as groupref:
-                for seg in self.segments:
-                    seg.add_to_ui()
+                pass
             self.groupref = groupref
             dpg.bind_item_theme(groupref, self.theme)
         self.infobox_ref = infobox
 
-    def add(self):
-        ...
+    def parent_cb(self, *args):
+        print([a for a in args])
+        dpg.configure_item(self.infobox_ref, show=True)
+
+    def add_segment(self, seg):
+        self.segment_objects.append(seg)
+        seg.button_cb = self.parent_cb
+        seg.add_to_ui(parent=self.groupref)
 
     def remove(self):
         ...
@@ -95,10 +94,9 @@ def layout():
     s3 = Segment((100, 225, 44), "action 3", 7)
     scont = SegmentContainer(s1, s2, s3)
 
-    dpg.add_button(label="Add a random action", callback=scont.add)
+    dpg.add_button(label="Add a random action", callback=None)
     dpg.add_button(label="Remove selected action", show=False, callback=scont.remove, tag="btn_remove")
 
-    scont.add_to_ui()
 
 
 if __name__ == "__main__":
