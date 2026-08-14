@@ -20,12 +20,10 @@ class Segment:
                 dpg.add_theme_color(dpg.mvThemeCol_Button, self.color_idle)
                 dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, self.color_hover)
                 dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, self.color_active)
+                dpg.add_theme_color(dpg.mvThemeCol_BorderShadow, (255,255,255))
 
                 dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 5)
                 dpg.add_theme_style(dpg.mvStyleVar_FrameBorderSize, 0)
-                dpg.add_theme_style(dpg.mvStyleVar_FramePadding, 0)
-                dpg.add_theme_style(dpg.mvStyleVar_ItemSpacing, 0)
-                dpg.add_theme_style(dpg.mvStyleVar_ItemInnerSpacing, 0)
         self.theme = new_theme
 
     def add_to_ui(self):
@@ -35,14 +33,38 @@ class Segment:
             dpg.add_text(self.tooltip_contents)
 
 
+class SegmentContainer:
+    frame_pixels = 25
+
+    def __init__(self, *args):
+        with dpg.theme() as new_theme:
+            with dpg.theme_component(dpg.mvAll):
+                dpg.add_theme_style(dpg.mvStyleVar_ItemSpacing, 0)
+                dpg.add_theme_style(dpg.mvStyleVar_ItemInnerSpacing, 0)
+        self.theme = new_theme
+
+        self.segments = []
+        for seg in args:
+            self.segments.append(seg)
+
+    def add_to_ui(self):
+        with dpg.group(horizontal=True) as groupref:
+            for seg in self.segments:
+                seg.add_to_ui()
+        self.groupref = groupref
+        dpg.bind_item_theme(groupref, self.theme)
+
+        # Timeline
+        for n in range(6):
+            dpg.add_text(str(n), pos=(15+(n*25), 50))
+
 def layout():
     s1 = Segment((198, 98, 23), "F1", 75)
     s2 = Segment()
     s3 = Segment()
-    with dpg.group(horizontal=True):
-        s1.add_to_ui()
-        s2.add_to_ui()
-        s3.add_to_ui()
+    scont = SegmentContainer(s1, s2, s3)
+    # this api is ASS will fixup later for easier adding and removing!!!!
+    scont.add_to_ui()
 
 
 if __name__ == "__main__":
